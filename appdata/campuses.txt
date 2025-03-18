@@ -1,0 +1,11 @@
+﻿﻿code,location,pqcode,namesuffix,unit,collection
+UCB,Berkeley,0028,Berkeley,ucb_etd,ucb_lib_etd
+UCD,Davis,0029,Davis,ucd_etd,ucd_lib_etd
+UCI,Irvine,0030,Irvine,uci_etd,uci_lib_etd
+UCM,Merced,1660,Merced,ucm_etd,ucm_lib_etd
+UCR,Riverside,0032,Riverside,ucr_etd,ucr_lib_etd
+UCLA,Los Angeles,0031,Los Angeles,ucla_etd,ucla_lib_etd
+UCSB,Santa Barbara,0035,Santa Barbara,ucsb_etd,ucsb_lib_etd
+UCSC,Santa Cruz,0036,Santa Cruz,ucsc_etd,ucsc_lib_etd
+UCSD,La Jolla,0033,San Diego,ucsd_etd,ucsd_lib_etd
+UCSF,San Francisco,0034,San Francisco,ucsf_etd,ucsf_lib_etd
