@@ -5,3 +5,6 @@
 /.vs/etdproc
 /etdproc.pyproj
 /etdproc.sln
+/creds.py
+/env
+/__pycache__
