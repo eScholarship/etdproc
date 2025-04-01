@@ -141,6 +141,10 @@ class etdParseXml:
         cclic = self._xpatheval("/DISS_submission/DISS_creative_commons_license/DISS_abbreviation")
         if cclic:
             self._data["access_option"] = self.getFirstValue(repo, "DISS_access_option")
+        restriction = self._xpatheval("/DISS_submission/DISS_restriction/DISS_sales_restriction")
+        if restriction:
+            self._data["sales_restriction_code"] = restriction[0].attrib["code"]
+            self._data["sales_restriction_remove"] = restriction[0].attrib["remove"]
         return
 
     def addKeywordsDiscipline(self):

@@ -54,14 +54,14 @@ class etdDb:
     queryPQMap = "select field1,field2,field3,field4 from settings where settingtype='Gateway'"
     querySilsMap = "select field1,field2,field3,field4,field5,info from settings where settingtype='MarcOut'"
     queryPackage = "select id from packages where pubnum='{param}' and isInvalid = '0'"
-    queryGwAttrs = "select id, marcattrs from packages where campusId='{param}' and isInvalid = '0'"
-    queryCompMarcAttrs = "select id, compmarcattrs from packages where campusId='{param}' and isInvalid = '0' and compmarcattrs->>'$.genre' is not null"
+    queryAttrs = "select id, gwattrs, xmlattrs from packages where pubnum='{param}' and isInvalid = '0'"
+    queryComputedAttrs = "select id, computedattrs from packages where pubnum='{param}' and isInvalid = '0'"
     queryCampusInfo = "select pqcode,code,instloc,namesuffix, nameinmarc from campuses"
     queryCampusId = "select id from campuses where code='{param}'"
     insertPackage = "insert into packages (pubnum, campusId) VALUES ('{param1}',{param2}) "
     updateGwMetadata = "update packages set gwattrs = '{param2}' where id = '{param1}'"
     updateXmlMetadata = "update packages set xmlattrs = '{param2}' where id = '{param1}'"
-    updateCompGw = "update packages set compgwattrs = '{param2}' where id = '{param1}'"
+    updateComputed = "update packages set computedattrs = '{param2}' where id = '{param1}'"
     def __init__(self):
         self.cnxn = mysql.connector.connect(user=creds.etdDb.username, 
                         password=creds.etdDb.password,
@@ -87,18 +87,18 @@ class etdDb:
             recordInfo.append(silsmap(row[0],row[1],row[2],row[3],row[4],row[5]))
         return recordInfo
 
-    def getGwAttrs(self, campusId):
+    def getAttrs(self, pubnum):
         print("read marc attrs")
-        query = self.queryGwAttrs.format(param=campusId)
+        query = self.queryAttrs.format(param=pubnum)
         self.cursor.execute(query)
-        attrsInfo = {}
+        #attrsInfo = {}
         for row in self.cursor:
-            attrsInfo[row[0]] = row[1]
-        return attrsInfo
+            return (row[1], row[2])
+        return None
     
-    def getCompAttrs(self, campusId):
+    def getCompAttrs(self, pubnum):
         print("read computed attrs")
-        query = self.queryCompMarcAttrs.format(param=campusId)
+        query = self.queryComputedAttrs.format(param=pubnum)
         self.cursor.execute(query)
         attrsInfo = {}
         for row in self.cursor:
@@ -144,9 +144,9 @@ class etdDb:
         return
 
 
-    def saveCompGwValues(self, packageId, metadata):
+    def saveComputedValues(self, packageId, metadata):
         print("save computed metadata")        
-        query = self.updateCompGw.format(param1=packageId, param2 = metadata.replace("'","''").replace('\\','\\\\'))
+        query = self.updateComputed.format(param1=packageId, param2 = metadata.replace("'","''").replace('\\','\\\\'))
         self.cursor.execute(query)
         self.cnxn.commit()
         return
