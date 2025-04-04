@@ -32,6 +32,7 @@ class etdParseXml:
         self.getpubNumber()
         self.addAuthSet()
         self.addAdvisorSet()
+        self.addMemberSet()
         self.addDescription()
         self.addDegreeInfo()
         self.addAbstract()
@@ -81,6 +82,19 @@ class etdParseXml:
             info["suffix"] = self.getFirstValue(advisor, "DISS_name/DISS_suffix")
 
             self._data["advisors"].append(info)
+        return
+
+    def addMemberSet(self):
+        members = self._xpatheval("/DISS_submission/DISS_description/DISS_cmte_member")
+        self._data["members"] = []
+        for member in members:
+            info = {}
+            info["surname"] = self.getFirstValue(member, "DISS_name/DISS_surname")
+            info["fname"] = self.getFirstValue(member, "DISS_name/DISS_fname")
+            info["middle"] = self.getFirstValue(member, "DISS_name/DISS_middle")
+            info["suffix"] = self.getFirstValue(member, "DISS_name/DISS_suffix")
+
+            self._data["members"].append(info)
         return
 
     def addDescription(self):
@@ -152,9 +166,13 @@ class etdParseXml:
         cat_desc =  self._xpatheval("/DISS_submission/DISS_description/DISS_categorization/DISS_category/DISS_cat_desc")
         if cat_desc:
             self._data["discipline"] = cat_desc[0].text
-        keyword = self._xpatheval("/DISS_submission/DISS_description/DISS_categorization/DISS_keyword")
-        if keyword:
-            self._data["keywords"] = keyword[0].text
+        # there are multiple keywords
+        self._data["keywords"] = []
+        keywords = self._xpatheval("/DISS_submission/DISS_description/DISS_categorization/DISS_keyword")
+        for keyword in keywords:
+            if keyword:
+                self._data["keywords"].append(keyword[0].text)
+
         lang = self._xpatheval("/DISS_submission/DISS_description/DISS_categorization/DISS_language")
         if lang:
             self._data["language"] = lang[0].text

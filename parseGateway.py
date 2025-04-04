@@ -51,7 +51,7 @@ class etdParseGateway:
         #db = etdDb()
         metadata = json.dumps(self._data,ensure_ascii=False)
         # this needs to move elsewhere
-        #db.savePackage(self._pubNumber, 1)
+        db.savePackage(self._pubNumber, 1)
         packageid = db.getPackageId(self._pubNumber)
         db.saveGwMetadata(packageid, metadata)
         return
