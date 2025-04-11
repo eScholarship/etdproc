@@ -54,7 +54,7 @@ class etdDb:
     queryPQMap = "select field1,field2,field3,field4 from settings where settingtype='Gateway'"
     querySilsMap = "select field1,field2,field3,field4,field5,info from settings where settingtype='MarcOut'"
     queryPackage = "select id from packages where pubnum='{param}' and isInvalid = '0'"
-    queryAttrs = "select id, gwattrs, xmlattrs from packages where pubnum='{param}' and isInvalid = '0'"
+    queryAttrs = "select id, gwattrs, xmlattrs, computedattrs from packages where pubnum='{param}' and isInvalid = '0'"
     queryComputedAttrs = "select id, computedattrs from packages where pubnum='{param}' and isInvalid = '0'"
     queryCampusInfo = "select pqcode,code,instloc,namesuffix, nameinmarc from campuses"
     queryCampusId = "select id from campuses where code='{param}'"
@@ -91,9 +91,8 @@ class etdDb:
         print("read marc attrs")
         query = self.queryAttrs.format(param=pubnum)
         self.cursor.execute(query)
-        #attrsInfo = {}
         for row in self.cursor:
-            return (row[1], row[2])
+            return (row[1], row[2], row[3])
         return None
     
     def getCompAttrs(self, pubnum):

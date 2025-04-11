@@ -17,7 +17,7 @@ class etdcomputeValues:
     _compAttrs = {}
     def __init__(self, pubnum):
         self._pubNum = pubnum
-        (gwAttrs, xmlAttrs) = db.getAttrs(pubnum)
+        (gwAttrs, xmlAttrs, compAttrs) = db.getAttrs(pubnum)
         self._gwAttrs = json.loads(gwAttrs)
         self._xmlAttrs = json.loads(xmlAttrs)
 
@@ -86,7 +86,7 @@ class etdcomputeValues:
                 self._compAttrs["isPermEmbargoed"] = True
 
         if end_date:
-            self._compAttrs["embargoEndDate"] = end_date.strftime('%Y-%m-%d')
+            self._compAttrs["embargodate"] = end_date.strftime('%Y-%m-%d')
         return
 
     def getLanguage(self):
@@ -105,6 +105,7 @@ class etdcomputeValues:
 
         # xml language need to convert en to eng
         lang = self.getLanguage()
+        self._compAttrs["lang"] = lang
         self._compAttrs["recinfo"]  = f'{date}s{self._compAttrs["pub_year"]}\\\\cau|||||obm\\||||\||{lang}\d'.replace('\\',' ')
         return
 
@@ -159,6 +160,7 @@ class etdcomputeValues:
         schoolcode = self._xmlAttrs["inst_code"]
 
         self._compAttrs["campuslocation"] = campusinfo[schoolcode].instloc + ", California :"
+        self._compAttrs["campusname"] = "University of California, " + campusinfo[schoolcode].namesuffix
         self._compAttrs["campusfullname"] = "University of California, " + campusinfo[schoolcode].namesuffix + ","
         self._compAttrs["control655"] = campusinfo[schoolcode].nameinmarc
         return
@@ -177,35 +179,42 @@ class etdcomputeValues:
     def computeNotes(self):
         # need to create notes based on xml info about advisors 
         advisors = "Advisors: "
-        members = " Committee members: "
+        members = "Committee members: "
         for advisor in self._xmlAttrs["advisors"]:
-            advisors = advisors + f'{advisor["surname"]},{advisor["fname"]}; '
+            advisors = advisors + f'{advisor["surname"]}, {advisor["fname"]}; '
         for member in self._xmlAttrs["members"]:
-            members = members + f'{member["surname"]},{member["fname"]}; '
+            members = members + f'{member["surname"]}, {member["fname"]}; '
        
         #strip and add full stop if needed
-        notes = advisors.strip('; ').strip() + '.'
-        notes = notes + members.strip('; ').strip() + '.'
+        notes = advisors.strip('; ') + '. '
+        notes = notes + members.strip('; ') + '.'
         self._compAttrs["notes"] = notes
 
     # skip for now and see later how multilanguages are going to be represented in xml
     # May need a mapping for language code to language   
     # # iso639 should works 
     def computeLanguages(self, languages):
+        self._compAttrs["languages"] = None
         # less important - open text list of languages
         if languages and languages != "English":
             return languages
 
         return None
 
-    def computeAdvisor(self):
+    def computeAuthorsAdvisor(self):
         # need to compile the list from xml information - lastname, first middle format
         # need a comma at the end for marc record sake
         self._compAttrs["advisor"] = []
         for advisor in self._xmlAttrs["advisors"]:
-            name = f'{advisor["surname"]},{advisor["fname"]}'
+            name = f'{advisor["surname"]}, {advisor["fname"]}'
             self._compAttrs["advisor"].append(name)
+        names = ""
+        for author in self._xmlAttrs["authset"]:
+            name = f'{author["fname"]} {author["surname"]},' # note sure if it comma separated or not
+            names = names + name
 
+        self._compAttrs["authors"] = names.strip(',') + '.' # end with full stop
+        self._compAttrs["mainauthor"] = self._gwAttrs["mainauthor"] + ","
         return
 
     def computeDept(self):
@@ -223,11 +232,13 @@ class etdcomputeValues:
         self.computeRecInfo()
         self.computeTitleComps()
         self.computeCampusInfo()
-        self.computeEscholMerritt()
-        
+        self.computeEscholMerritt()       
         self.computeNotes()
-        self.computeAdvisor()
+        self.computeAuthorsAdvisor()
         self.computeDept()
+        self.computeLanguages(None) #TBD
+        # does this depend upon the degree?
+        self._compAttrs["genre"] = "Dissertations, Academic"
         packageid = db.getPackageId(self._pubNum)
         db.saveComputedValues(packageid, json.dumps(self._compAttrs,ensure_ascii=False))
         return
