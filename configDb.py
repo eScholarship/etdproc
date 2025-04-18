@@ -5,7 +5,7 @@ import csv
 
 class configDb:
     #allSqlFiles = ["campuses.sql","packages.sql","actionlog.sql","errorlog.sql","settings.sql","identifiers.sql"]
-    allSqlFiles = ["packages.sql","actionlog.sql","errorlog.sql","identifiers.sql"]
+    allSqlFiles = ["merrittcallback.sql"]
     sqlpath = 'sqlscripts/'
     datapath = 'appdata/' #TBD
     InsertCampus = "INSERT INTO Campuses (code,instloc,pqcode,namesuffix,escholunit,merrittcol,nameinmarc) VALUES (%s,%s,%s,%s,%s,%s,%s)"
@@ -105,9 +105,9 @@ class configDb:
 
 print("start")
 x = configDb()
-#x.createDbs()
+x.createDbs()
 #x.populateCampuses()
 #x.populateGatewayConfig()
-x.populateSilsConfig()
+#x.populateSilsConfig()
 #x.populateEscholConfig()
 print("end")
