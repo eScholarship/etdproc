@@ -59,6 +59,7 @@ class etdDb:
     queryCampusInfo = "select pqcode,code,instloc,namesuffix, nameinmarc from campuses"
     queryCampusId = "select id from campuses where code='{param}'"
     insertPackage = "insert into packages (pubnum, campusId) VALUES ('{param1}',{param2}) "
+    insertMerrittRequest = "insert into merrittrequests (packageId, request, response, currentstatus) VALUES ({param1},'{param2}','{param3}','{param4}') "
     updateGwMetadata = "update packages set gwattrs = '{param2}' where id = '{param1}'"
     updateXmlMetadata = "update packages set xmlattrs = '{param2}' where id = '{param1}'"
     updateComputed = "update packages set computedattrs = '{param2}' where id = '{param1}'"
@@ -99,10 +100,9 @@ class etdDb:
         print("read computed attrs")
         query = self.queryComputedAttrs.format(param=pubnum)
         self.cursor.execute(query)
-        attrsInfo = {}
         for row in self.cursor:
-            attrsInfo[row[0]] = row[1]
-        return attrsInfo
+            return (row[0], row[1])
+        return None
 
     def getCampusInfo(self):
         print("read campus info")
@@ -124,6 +124,13 @@ class etdDb:
     def savePackage(self, pubnum, campusId):
         print("create a new package")
         query = self.insertPackage.format(param1=pubnum, param2=campusId)
+        self.cursor.execute(query)
+        self.cnxn.commit()
+        return
+
+    def saveMerrittRequest(self, packageId, requestattrs, responseattrs, status):
+        print("save Merritt request")
+        query = self.insertMerrittRequest.format(param1=packageId, param2=requestattrs, param3= responseattrs, param4 = status)
         self.cursor.execute(query)
         self.cnxn.commit()
         return

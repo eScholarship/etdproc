@@ -17,8 +17,10 @@ class etdcomputeValues:
     _compAttrs = {}
     def __init__(self, pubnum):
         self._pubNum = pubnum
+        self._gwAttrs = None
         (gwAttrs, xmlAttrs, compAttrs) = db.getAttrs(pubnum)
-        self._gwAttrs = json.loads(gwAttrs)
+        if gwAttrs:
+            self._gwAttrs = json.loads(gwAttrs)
         self._xmlAttrs = json.loads(xmlAttrs)
 
     # Update to publication date when xml is populated with that
@@ -209,12 +211,18 @@ class etdcomputeValues:
             name = f'{advisor["surname"]}, {advisor["fname"]}'
             self._compAttrs["advisor"].append(name)
         names = ""
+        creators = []
         for author in self._xmlAttrs["authset"]:
             name = f'{author["fname"]} {author["surname"]},' # note sure if it comma separated or not
+            creators.append(f'{author["surname"]}, {author["fname"][0]}.')
             names = names + name
 
+        self._compAttrs["creators"] = ';'.join(creators)
         self._compAttrs["authors"] = names.strip(',') + '.' # end with full stop
-        self._compAttrs["mainauthor"] = self._gwAttrs["mainauthor"] + ","
+        if self._gwAttrs:
+            self._compAttrs["mainauthor"] = self._gwAttrs["mainauthor"] + ","
+        else:
+            self._compAttrs["mainauthor"] = f'{self._xmlAttrs["authset"][0]["surname"]},{self._xmlAttrs["authset"][0]["fname"]},'
         return
 
     def computeDept(self):

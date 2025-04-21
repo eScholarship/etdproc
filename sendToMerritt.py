@@ -1,19 +1,68 @@
+import creds
+import requests
+import re
+from dbIntf import etdDb
+import json
+import os
 
-# take the zip file from Proquest
-# fill in metadata from extracted info
-# create a lamda function and use that for callback
-# logic for sending
-# https://github.com/eScholarship/janeway_merritt_plugin/blob/main/logic.py#L154
+db = etdDb()
+class EtdToMerritt:
+    _zipfile = None
+    _collection = None
+    _packageId = None
+    _etdattrs = None
+    _requestattrs = None
+    _responseattrs = None
+    def __init__(self, zipfile, pubnum):
+        print(f'EtdToMerritt - working on {pubnum}')
+        self._zipfile = zipfile
+        (self._packageId, etdattrs) = db.getCompAttrs(pubnum)
+        self._etdattrs = json.loads(etdattrs)
+        self._collection = creds.merritt_creds.collection + "_content"# temp for testing
 
 
-# Get job and batch number for one of the 
-#<?xml version="1.0" encoding="UTF-8"?>
-#<bat:batchState xmlns:bat='http://uc3.cdlib.org/ontology/mrt/ingest/batch'>
-#    <bat:submissionDate>2025-03-16T13:01:01-07:00</bat:submissionDate>
-#    <bat:userAgent>eschol_harvester/[]</bat:userAgent>
-#    <bat:batchID>bid-b22bca11-53cf-42c6-93fb-92794a52b1a3</bat:batchID>
-#    <bat:jobStates>
-#    </bat:jobStates>
-#    <bat:batchStatus>QUEUED</bat:batchStatus>
-#    <bat:packageName>8769.zip</bat:packageName>
-#</bat:batchState>
+    def process(self):
+        status = "processing"
+        try:
+            self.sendRequest()
+            status = "sent"
+        except Exception as e:
+            # save error message in db
+            self._responseattrs = str(e)
+            status = "send-error"
+            raise
+        finally:
+            db.saveMerrittRequest(self._packageId, self._requestattrs, self._responseattrs, status)
+
+        print("DONE")
+
+    def sendRequest(self):
+        print("create request and send Merritt update")
+        files = {
+            'file': open(self._zipfile, 'rb'),
+            'type':(None, 'container'),
+            'submitter': (None, creds.merritt_creds.username),
+            'title': (None, re.sub(r'[^a-zA-Z0-9 ]', '', self._etdattrs["maintitle"])), 
+            'date':(None, self._etdattrs["pub_date"]),
+            'creator': (None, self._etdattrs["creators"]),
+            'responseForm': (None, 'json'),
+            'notificationFormat': (None, 'json'),
+            'profile': (None, self._collection),
+            'localIdentifier': (None, self._etdattrs["escholark"]),
+        }
+
+        # send request
+        response = requests.post(creds.merritt_creds.url, files=files, auth=(creds.merritt_creds.username, creds.merritt_creds.password),headers={'Accept': 'application/json'})
+        print(response)
+        
+        # save the request info
+        files['file'] = self._zipfile
+        self._requestattrs = json.dumps(files)
+        # save response
+        self._responseattrs = response.text
+        return
+
+zipfile = 'C:/Temp/test/zip/etdadmin_upload_1032621.zip'
+assert(os.path.exists(zipfile))
+x = EtdToMerritt(zipfile, "30492756")
+x.process()
