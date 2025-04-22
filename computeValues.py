@@ -1,6 +1,5 @@
 import json
-from dbIntf import etdDb, jscholDb, silsmap
-from xml.sax.saxutils import escape
+from dbIntf import etdDb
 from datetime import datetime, date, timedelta
 import dateparser
 from maps import pq_lang_mapping

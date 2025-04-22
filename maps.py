@@ -18,15 +18,17 @@ class silsmap:
     indicator2 = None
     field = None
     sourcefield = None
+    action = None
     info = None
 
-    def __init__(self, p1,p2,p3,p4,p5,p6):
+    def __init__(self, p1,p2,p3,p4,p5,p6,p7):
         self.tag = p1
         self.indicator1 = p2
         self.indicator2 = p3
         self.field = p4
         self.sourcefield = p5
-        self.info = p6
+        self.action = p6
+        self.info = p7
 
 
 class campusmap:

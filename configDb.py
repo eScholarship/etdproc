@@ -4,13 +4,13 @@ import mysql.connector
 import csv
 
 class configDb:
-    #allSqlFiles = ["campuses.sql","packages.sql","actionlog.sql","errorlog.sql","settings.sql","identifiers.sql","merrittcallback.sql"]
-    allSqlFiles = ["merrittrequest.sql"]
+    #allSqlFiles = ["campuses.sql","packages.sql","actionlog.sql","errorlog.sql","settings.sql","identifiers.sql","merrittcallback.sql","merrittrequest.sql"]
+    allSqlFiles = ["escholrequest.sql"]
     sqlpath = 'sqlscripts/'
     datapath = 'appdata/' #TBD
     InsertCampus = "INSERT INTO Campuses (code,instloc,pqcode,namesuffix,escholunit,merrittcol,nameinmarc) VALUES (%s,%s,%s,%s,%s,%s,%s)"
     InsertMarcIn = "INSERT INTO settings (settingtype,field1,field2,field3,field4) VALUES (%s,%s,%s,%s,%s)"
-    InsertSilsMap = "INSERT INTO settings (settingtype,field1,field2,field3,field4,field5,info) VALUES (%s,%s,%s,%s,%s,%s,%s)"
+    InsertSilsMap = "INSERT INTO settings (settingtype,field1,field2,field3,field4,field5,field6,info) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
     InsertEscholMap = "INSERT INTO settings (settingtype,field1,field2,info) VALUES (%s,%s,%s,%s)"
     def __init__(self):
         self.cnxn = mysql.connector.connect(user=creds.etdDb.username, 
@@ -83,8 +83,9 @@ class configDb:
                 field = row[3].strip()
                 sourcefield = row[4].strip()
                 # if the info field contains '#' then replace with space
-                info = row[5].strip().replace('#',' ')               
-                params.append(('MarcOut',tag,ind1,ind2,field,sourcefield,info,))
+                info = row[5].strip().replace('#',' ')
+                actionfield = row[6].strip()
+                params.append(('MarcOut',tag,ind1,ind2,field,sourcefield,actionfield,info,))
         self.cursor.executemany(self.InsertSilsMap, params)
         self.cnxn.commit()
 
@@ -105,9 +106,9 @@ class configDb:
 
 print("start")
 x = configDb()
-x.createDbs()
+#x.createDbs()
 #x.populateCampuses()
 #x.populateGatewayConfig()
-#x.populateSilsConfig()
+x.populateSilsConfig()
 #x.populateEscholConfig()
 print("end")

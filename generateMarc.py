@@ -18,14 +18,23 @@ class createMarc:
         self._xmlattrs = json.loads(xmlAttrs)
         self._compattrs = json.loads(compAttrs)
 
+    def processvalue(self, value, action):
+        if action == "dot":
+            return value + '.'
+        if action == "comma":
+            return value + ','
+        return value
 
     def generateConst(self, setting, fieldtofill):
         print("generate a const field")
 
+        # see if post processing is needed
+        value = self.processvalue(setting.info, setting.action)
+
         # if ind1 and ind2 and field are empty - this is a special case
         if not setting.indicator1 and not setting.indicator2 and not setting.field:
             assert(not fieldtofill)
-            return Field(tag=setting.tag, data=setting.info)
+            return Field(tag=setting.tag, data=value)
 
         # figure out the indicators
         ind1 = " " if setting.indicator1 == "bl" else setting.indicator1
@@ -35,14 +44,14 @@ class createMarc:
         # TBD - I need to work on creating one field with multiple subfields
         if fieldtofill:
             print("filliing")
-            fieldtofill.subfields.append(Subfield(code=setting.field, value=setting.info))
+            fieldtofill.subfields.append(Subfield(code=setting.field, value=value))
             return None
         else:
             return Field(
                     tag = setting.tag,
                     indicators = [ind1,ind2],
                     subfields = [
-                        Subfield(code=setting.field, value=setting.info)
+                        Subfield(code=setting.field, value=value)
                     ])
 
 
@@ -64,11 +73,12 @@ class createMarc:
             fields = []
             assert(not fieldtofill)
             for val in attrs[setting.sourcefield]:
+                value = self.processvalue(val, setting.action)
                 field = Field(
                         tag = setting.tag,
                         indicators = [ind1,ind2],
                         subfields = [
-                            Subfield(code=setting.field, value=val)
+                            Subfield(code=setting.field, value=value)
                         ])
                 fields.append(field)
                 if (field.tag == '700'):
@@ -76,16 +86,17 @@ class createMarc:
                 
             return fields
 
+        value = self.processvalue(attrs[setting.sourcefield], setting.action)
         if fieldtofill:
             print("filliing")
-            fieldtofill.subfields.append(Subfield(code=setting.field, value=attrs[setting.sourcefield]))
+            fieldtofill.subfields.append(Subfield(code=setting.field, value=value))
             return None
         else:
             return Field(
                     tag = setting.tag,
                     indicators = [ind1,ind2],
                     subfields = [
-                        Subfield(code=setting.field, value=attrs[setting.sourcefield])
+                        Subfield(code=setting.field, value=value)
                     ])
 
 

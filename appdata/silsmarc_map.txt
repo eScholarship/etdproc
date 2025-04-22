@@ -1,70 +1,70 @@
-tag, ind1, ind2, field, sourcefield, info 
-006,,,, const, m#####o##d########
-007,,,, const, cr#|n|
-008,,,, recinfo, compute
-020,bl,bl,a,isbn, gw
-024,7,bl,a,merrittark,compute
-024,7,bl,2, const, ark
-024,8,bl,a,escholark,compute
-040,bl,bl,a, const, SCPER
-040,bl,bl,b, lang, compute
-040,bl,bl,e, const, rda
-040,bl,bl,e, const, pn
-040,bl,bl,c, const, SCPER
-100,1,bl,a, mainauthor, compute
-100,1,bl,e, const, author.
-245,1,0,a, maintitle, compute
-245,1,0,b, subtitle, compute
-245,1,0,c, authors, compute
-245,1,2,a, maintitle, compute
-245,1,2,b, subtitle, compute
-245,1,2,c, authors, compute
-245,1,3,a, maintitle, compute
-245,1,3,b, subtitle, compute
-245,1,3,c, authors, compute
-245,1,4,a, maintitle, compute
-245,1,4,b, subtitle, compute
-245,1,4,c, authors, compute
-264,bl,1,a, campuslocation, compute
-264,bl,1,b, campusfullname, compute
-264,bl,1,c, pubyear, compute
-300,bl,bl,a, const, 1 online resource
-336,bl,bl,a, const, text
-336,bl,bl,b, const, txt
-336,bl,bl,2, const, rdacontent
-337,bl,bl,a, const, computer
-337,bl,bl,b, const, c
-337,bl,bl,2, const, rdamedia
-338,bl,bl,a, const, online resource
-338,bl,bl,b, const, cr
-338,bl,bl,2, const, rdacarrier
-500,bl,bl,a, notes, compute
-502,bl,bl,b, degree, xml
-502,bl,bl,c, campusname, compute
-502,bl,bl,d, pub_year, compute
-504,bl,bl,a, const, Includes bibliographical references.
-506,0,bl,3, const, Some versions: 
-506,0,bl,a, const, Open access versions available from some providers.
-506,0,bl,f, const, Unrestricted online access
-506,0,bl,2, const, star
-506,1,bl,a, const, Embargoed until
-506,1,bl,f, const, embargoed access
-506,1,bl,g, embargodate, compute
-506,1,bl,2, const, coarar
-520,3,bl,a, abstract, gw
-546,bl,bl,a, languages, compute
-588,0,bl,a, const, Metadata from ProQuest and information submitted by author.
-650,bl,4,a, subjects, gw
-653,bl,bl,a, keywords, xml 
-655,bl,4, a, genre, compute
-655,bl,4, z, control655, compute
-655,bl,4, x, dept, compute
-655,bl,7, a, const, Academic theses.
-655,bl,7, 2, const, lcgft
-700,1,bl, a, advisor, compute
-710,2,bl, a, campusfullname, compute
-710,2,bl, e, const, degree granting institution.
-856,4,0, z, const, Open Access via eScholarship
-856,4,0, u, escholurl, compute
-856,4,0, 7, const, 0
-856,4,0, I, const, (star)Unrestricted online access
+tag, ind1, ind2, field, sourcefield, info, proc 
+006,,,, const, m#####o##d########, none
+007,,,, const, cr#|n|, none
+008,,,, recinfo, compute, none
+020,bl,bl,a,isbn, gw, none
+024,7,bl,a,merrittark,compute, none
+024,7,bl,2, const, ark, none
+024,8,bl,a,escholark,compute, none
+040,bl,bl,a, const, SCPER, none
+040,bl,bl,b, lang, compute, none
+040,bl,bl,e, const, rda, none
+040,bl,bl,e, const, pn, none
+040,bl,bl,c, const, SCPER, none
+100,1,bl,a, mainauthor, compute, none
+100,1,bl,e, const, author, dot
+245,1,0,a, maintitle, compute, none
+245,1,0,b, subtitle, compute, none
+245,1,0,c, authors, compute, none
+245,1,2,a, maintitle, compute, none
+245,1,2,b, subtitle, compute, none
+245,1,2,c, authors, compute, none
+245,1,3,a, maintitle, compute, none
+245,1,3,b, subtitle, compute, none
+245,1,3,c, authors, compute, none
+245,1,4,a, maintitle, compute, none
+245,1,4,b, subtitle, compute, none
+245,1,4,c, authors, compute, none
+264,bl,1,a, campuslocation, compute, none
+264,bl,1,b, campusfullname, compute, none
+264,bl,1,c, pubyear, compute, none
+300,bl,bl,a, const, 1 online resource, none
+336,bl,bl,a, const, text, none
+336,bl,bl,b, const, txt, none
+336,bl,bl,2, const, rdacontent, none
+337,bl,bl,a, const, computer, none
+337,bl,bl,b, const, c, none
+337,bl,bl,2, const, rdamedia, none
+338,bl,bl,a, const, online resource, none
+338,bl,bl,b, const, cr, none
+338,bl,bl,2, const, rdacarrier, none
+500,bl,bl,a, notes, compute, none
+502,bl,bl,b, degree, xml, none
+502,bl,bl,c, campusname, compute, none
+502,bl,bl,d, pub_year, compute, none
+504,bl,bl,a, const, Includes bibliographical references, dot
+506,0,bl,3, const, Some versions:, none 
+506,0,bl,a, const, Open access versions available from some providers, dot
+506,0,bl,f, const, Unrestricted online access, none
+506,0,bl,2, const, star, none
+506,1,bl,a, const, Embargoed until, none
+506,1,bl,f, const, embargoed access, none
+506,1,bl,g, embargodate, compute, none
+506,1,bl,2, const, coarar, none
+520,3,bl,a, abstract, gw, none
+546,bl,bl,a, languages, compute, none
+588,0,bl,a, const, Metadata from ProQuest and information submitted by author, dot
+650,bl,4,a, subjects, gw, none
+653,bl,bl,a, keywords, xml, none 
+655,bl,4, a, genre, compute, none
+655,bl,4, z, control655, compute, none
+655,bl,4, x, dept, compute, none
+655,bl,7, a, const, Academic theses, dot
+655,bl,7, 2, const, lcgft, none
+700,1,bl, a, advisor, compute, none
+710,2,bl, a, campusfullname, compute, none
+710,2,bl, e, const, degree granting institution, dot
+856,4,0, z, const, Open Access via eScholarship, none
+856,4,0, u, escholurl, compute, none
+856,4,0, 7, const, 0, none
+856,4,0, I, const, (star)Unrestricted online access, none
