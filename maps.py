@@ -12,6 +12,16 @@ class pqmap:
         self.attr = p3
         self.isMulti = True if p4 == "True" else False
 
+class escholmap:
+    field = None
+    typedata = None
+    info = None
+    def __init__(self, p1,p2,p3):
+        self.field = p1
+        self.typedata = p2
+        self.info = p3
+
+
 class silsmap:
     tag = None
     indicator1 = None

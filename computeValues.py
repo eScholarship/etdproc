@@ -49,7 +49,7 @@ class etdcomputeValues:
         decision = self.computeDecisionDate()
         self._compAttrs["pub_date"] = decision.strftime('%Y-%m-%d')
         self._compAttrs["pub_year"] = decision.strftime('%Y')
-        self._compAttrs["pubyear"] = self._compAttrs["pub_year"] + "."
+        #self._compAttrs["pubyear"] = self._compAttrs["pub_year"] + "."
         return decision
 
     def computeIfEmbargoed(self):
@@ -162,7 +162,7 @@ class etdcomputeValues:
 
         self._compAttrs["campuslocation"] = campusinfo[schoolcode].instloc + ", California :"
         self._compAttrs["campusname"] = "University of California, " + campusinfo[schoolcode].namesuffix
-        self._compAttrs["campusfullname"] = "University of California, " + campusinfo[schoolcode].namesuffix + ","
+        self._compAttrs["campusshort"] = campusinfo[schoolcode].code.lower()
         self._compAttrs["control655"] = campusinfo[schoolcode].nameinmarc
         return
 
@@ -170,7 +170,7 @@ class etdcomputeValues:
     def computeEscholMerritt(self):
         print("get the eschol url")
         self._compAttrs["escholark"] = "qt5cq8c801"
-        self._compAttrs["escholurl"] = "uhttps://escholarship.org/uc/item/qt5cq8c801"
+        self._compAttrs["escholurl"] = "https://escholarship.org/uc/item/5cq8c801"
         self._compAttrs["merrittark"] = "ark:/13030/m51086wv"
         escholid = None
         #escholurl = "https://escholarship.org/uc/item/"
@@ -217,18 +217,60 @@ class etdcomputeValues:
             names = names + name
 
         self._compAttrs["creators"] = ';'.join(creators)
-        self._compAttrs["authors"] = names.strip(',') + '.' # end with full stop
+        self._compAttrs["authors"] = names.strip(',')
         if self._gwAttrs:
-            self._compAttrs["mainauthor"] = self._gwAttrs["mainauthor"] + ","
+            self._compAttrs["mainauthor"] = self._gwAttrs["mainauthor"]
         else:
-            self._compAttrs["mainauthor"] = f'{self._xmlAttrs["authset"][0]["surname"]},{self._xmlAttrs["authset"][0]["fname"]},'
+            self._compAttrs["mainauthor"] = f'{self._xmlAttrs["authset"][0]["surname"]},{self._xmlAttrs["authset"][0]["fname"]}'
         return
 
     def computeDept(self):
         # Start with this and see if something needs to change
         self._compAttrs["dept"] = self._xmlAttrs["discipline"]
-
         return
+
+    def getescholAuthors(self):
+        authors = []
+        for author in self._xmlAttrs["authset"]:
+            values = {}
+            values["nameParts"] = {"fname":author["fname"],"lname":author["surname"]}
+            values["email"] = author["email"]
+            values["orcid"] = author["orcid"]
+            authors.append(values)
+        return authors
+
+    def getescholIds(self):
+        localIds = []
+        localIds.append({"ItemIDScheme":"ARK", "id":self._compAttrs["merrittark"]})
+        localIds.append({"ItemIDScheme":"OTHER_ID", "id":self._gwAttrs["isbn"], "subSchema": "ISBN"})
+        return localIds
+
+    def getescholunits(self):
+        units = []
+        # get unit from campus settings
+        units.append("etd_" + self._compAttrs["campusshort"])
+        # inst_contact in xml can be used to determine other units the article should go to
+        return units
+
+    def getcontributors(self):
+        contribs = []
+        for advisor in self._xmlAttrs["advisors"]:
+            nameparts = {"fname": advisor["fname"],
+                         "lname": advisor["surname"]}
+            contribs.append({"role":"ADVISOR", "nameParts": nameparts})
+
+        return contribs
+
+    def computeEscholValues(self):
+        print("compute for eschol deposit json")
+        self._compAttrs["contentLink"] = "https://pub-submit-stg.escholarship.org/etdprocTmp/test.pdf"
+        self._compAttrs["escholauthors"] = self.getescholAuthors()
+        self._compAttrs["escholIds"] = self.getescholIds()
+        self._compAttrs["escholunits"] = self.getescholunits()
+        self._compAttrs["escholadvisors"] = self.getcontributors()
+        #self._compAttrs["escholsupp"] = [] 
+        #self._compAttrs["cclicence"] = []
+        
 
     # read a marc attr set along with the package id it is associated with
     # start a json and add the following vales
@@ -244,6 +286,7 @@ class etdcomputeValues:
         self.computeAuthorsAdvisor()
         self.computeDept()
         self.computeLanguages(None) #TBD
+        self.computeEscholValues()
         # does this depend upon the degree?
         self._compAttrs["genre"] = "Dissertations, Academic"
         packageid = db.getPackageId(self._pubNum)
@@ -258,3 +301,27 @@ x.saveComputedValues()
 #for code in campuses:
 #    x.generateComputedValules(code)
 print("end")
+
+#filedname, type, value
+#sourceName, const, proQuest
+#sourceID, xml, pubNumber
+#submitterEmail, const, etd@ProQuest.uc
+#type, const, ARTICLE,
+#isPeerReviewed, const, true
+#contentLink, xml, binary-name # tbd
+#id, compute, escholark
+#contentFileName, xml, binary-name
+#abstract, gw, abstract  
+#title, xml, title
+#published, compute, pub_date
+#keywords, xml, keywords
+#localIDs, compute, escholIds   # tbd
+#authors, compute, escholauthors   # tbd {nameParts:{fname, lname,mname,suffix}, email, orcid}
+#units, compute, escholunits
+#contributors, compute, escholadvisors
+#isbn, gw, isbn
+#subjects, gw, subjects
+#language, xml, language
+#embargoExpires, compute, embargoEndDate
+#rights, compute, cclicence # tbd
+#suppFiles, compute, escholsupp # tbd

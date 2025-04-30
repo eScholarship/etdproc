@@ -11,23 +11,23 @@ tag, ind1, ind2, field, sourcefield, info, proc
 040,bl,bl,e, const, rda, none
 040,bl,bl,e, const, pn, none
 040,bl,bl,c, const, SCPER, none
-100,1,bl,a, mainauthor, compute, none
+100,1,bl,a, mainauthor, gw, comma
 100,1,bl,e, const, author, dot
 245,1,0,a, maintitle, compute, none
 245,1,0,b, subtitle, compute, none
-245,1,0,c, authors, compute, none
+245,1,0,c, authors, compute, dot
 245,1,2,a, maintitle, compute, none
 245,1,2,b, subtitle, compute, none
-245,1,2,c, authors, compute, none
+245,1,2,c, authors, compute, dot
 245,1,3,a, maintitle, compute, none
 245,1,3,b, subtitle, compute, none
-245,1,3,c, authors, compute, none
+245,1,3,c, authors, compute, dot
 245,1,4,a, maintitle, compute, none
 245,1,4,b, subtitle, compute, none
-245,1,4,c, authors, compute, none
+245,1,4,c, authors, compute, dot
 264,bl,1,a, campuslocation, compute, none
-264,bl,1,b, campusfullname, compute, none
-264,bl,1,c, pubyear, compute, none
+264,bl,1,b, campusname, compute, comma
+264,bl,1,c, pub_year, compute, dot
 300,bl,bl,a, const, 1 online resource, none
 336,bl,bl,a, const, text, none
 336,bl,bl,b, const, txt, none
@@ -62,7 +62,7 @@ tag, ind1, ind2, field, sourcefield, info, proc
 655,bl,7, a, const, Academic theses, dot
 655,bl,7, 2, const, lcgft, none
 700,1,bl, a, advisor, compute, none
-710,2,bl, a, campusfullname, compute, none
+710,2,bl, a, campusname, compute, comma
 710,2,bl, e, const, degree granting institution, dot
 856,4,0, z, const, Open Access via eScholarship, none
 856,4,0, u, escholurl, compute, none

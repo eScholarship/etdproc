@@ -1,11 +1,12 @@
 import creds
 import mysql.connector
-from maps import pqmap, silsmap, campusmap
+from maps import pqmap, silsmap, campusmap, escholmap
 
 
 class etdDb:
     queryPQMap = "select field1,field2,field3,field4 from settings where settingtype='Gateway'"
     querySilsMap = "select field1,field2,field3,field4,field5,field6,info from settings where settingtype='MarcOut'"
+    queryEscholMap = "select field1,field2,info from settings where settingtype='EscholOut'"
     queryPackage = "select id from packages where pubnum='{param}' and isInvalid = '0'"
     queryAttrs = "select id, gwattrs, xmlattrs, computedattrs from packages where pubnum='{param}' and isInvalid = '0'"
     queryComputedAttrs = "select id, computedattrs from packages where pubnum='{param}' and isInvalid = '0'"
@@ -15,6 +16,7 @@ class etdDb:
     insertPackage = "insert into packages (pubnum, campusId) VALUES ('{param1}',{param2}) "
     insertMerrittRequest = "insert into merrittrequests (packageId, request, response, currentstatus) VALUES ({param1},'{param2}','{param3}','{param4}') "
     insertEscholRequest = "insert into escholrequests (packageId, pubnum, escholId) VALUES ({param1},'{param2}','{param3}') "
+    updateEscholDeposit = "update escholrequests set depositrequest = '{param2}',depositresponse = '{param3}' where packageId = '{param1}'"
     updateGwMetadata = "update packages set gwattrs = '{param2}' where id = '{param1}'"
     updateXmlMetadata = "update packages set xmlattrs = '{param2}' where id = '{param1}'"
     updateComputed = "update packages set computedattrs = '{param2}' where id = '{param1}'"
@@ -44,6 +46,14 @@ class etdDb:
         for row in self.cursor:
             recordInfo.append(silsmap(row[0],row[1],row[2],row[3],row[4],row[5],row[6]))
         return recordInfo
+
+    def getescholSetting(self):
+        print("read eschol settings")
+        self.cursor.execute(self.queryEscholMap)
+        tagInfo = []
+        for row in self.cursor:
+            tagInfo.append(escholmap(row[0],row[1],row[2]))
+        return tagInfo
 
     def getAttrs(self, pubnum):
         print("read marc attrs")
@@ -130,9 +140,15 @@ class etdDb:
         return None
 
     def saveEscholId(self, packageId, pubnum, escholId):
-        print("get eschol id if present")
+        print("save eschol id if present")
         query = self.insertEscholRequest.format(param1=packageId, param2 = pubnum, param3 = escholId)
         self.cursor.execute(query)
         self.cnxn.commit()
         return
 
+    def saveEscholDeposit(self, packageId, request, response):
+        print("save eschol deposit request and response")
+        query = self.updateEscholDeposit.format(param1=packageId, param2 = request, param3 = response)
+        self.cursor.execute(query)
+        self.cnxn.commit()
+        return

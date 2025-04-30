@@ -22,7 +22,7 @@ class graphClient:
         
         try:
             response = requests.post(self.endpoint, json.dumps(data).encode('utf-8'), self.headers)
-            return response.read().decode('utf-8')
+            return response.text
         except Exception as e:
             print(e)
             raise e
@@ -61,7 +61,7 @@ class eschol:
 
     def createItem(self, pubId):
         mintquery = self.mintMutation.replace("PUB_ID",str(pubId))
-        result = self.client.execute(mintquery)
+        result = self.client.send(mintquery)
         print(result)
         res = json.loads(result)
         return res['data']['mintProvisionalID']['id']
@@ -69,5 +69,5 @@ class eschol:
 
     def depositItem(self, depositInput):
         depositquery = self.depositMutation.replace("DEP_INPUT",depositInput)
-        result = self.client.execute(depositquery)
+        result = self.client.send(depositquery)
         return result
