@@ -241,14 +241,14 @@ class etdcomputeValues:
 
     def getescholIds(self):
         localIds = []
-        localIds.append({"ItemIDScheme":"ARK", "id":self._compAttrs["merrittark"]})
-        localIds.append({"ItemIDScheme":"OTHER_ID", "id":self._gwAttrs["isbn"], "subSchema": "ISBN"})
+        #localIds.append({"id":self._compAttrs["merrittark"], "scheme":"ARK"})
+        localIds.append({"id":self._gwAttrs["isbn"], "scheme":"OTHER_ID", "subScheme":"ISBN"})
         return localIds
 
     def getescholunits(self):
         units = []
         # get unit from campus settings
-        units.append("etd_" + self._compAttrs["campusshort"])
+        units.append(self._compAttrs["campusshort"] + "_etd")
         # inst_contact in xml can be used to determine other units the article should go to
         return units
 
@@ -262,10 +262,11 @@ class etdcomputeValues:
         return contribs
 
     def computeEscholValues(self):
-        print("compute for eschol deposit json")
+        print("compute for eschol deposit json")       
+        self._compAttrs["isPeerReviewed"] = True
         self._compAttrs["contentLink"] = "https://pub-submit-stg.escholarship.org/etdprocTmp/test.pdf"
         self._compAttrs["escholauthors"] = self.getescholAuthors()
-        self._compAttrs["escholIds"] = self.getescholIds()
+        #self._compAttrs["escholIds"] = self.getescholIds()
         self._compAttrs["escholunits"] = self.getescholunits()
         self._compAttrs["escholadvisors"] = self.getcontributors()
         #self._compAttrs["escholsupp"] = [] 

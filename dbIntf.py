@@ -12,11 +12,12 @@ class etdDb:
     queryComputedAttrs = "select id, computedattrs from packages where pubnum='{param}' and isInvalid = '0'"
     queryCampusInfo = "select pqcode,code,instloc,namesuffix, nameinmarc from campuses"
     queryCampusId = "select id from campuses where code='{param}'"
-    queryEscholId = "select id from escholrequests where pubnum='{param}'"
+    queryEscholId = "select escholId from escholrequests where pubnum='{param}'"
     insertPackage = "insert into packages (pubnum, campusId) VALUES ('{param1}',{param2}) "
     insertMerrittRequest = "insert into merrittrequests (packageId, request, response, currentstatus) VALUES ({param1},'{param2}','{param3}','{param4}') "
-    insertEscholRequest = "insert into escholrequests (packageId, pubnum, escholId) VALUES ({param1},'{param2}','{param3}') "
-    updateEscholDeposit = "update escholrequests set depositrequest = '{param2}',depositresponse = '{param3}' where packageId = '{param1}'"
+    insertEscholId = "insert into escholrequests (packageId, pubnum, escholId) VALUES ({param1},'{param2}','{param3}') "
+    updateEscholRequest = "update escholrequests set depositrequest = '{param2}' where packageId = '{param1}'"
+    updateEscholResponse = "update escholrequests set depositresponse = '{param2}' where packageId = '{param1}'"
     updateGwMetadata = "update packages set gwattrs = '{param2}' where id = '{param1}'"
     updateXmlMetadata = "update packages set xmlattrs = '{param2}' where id = '{param1}'"
     updateComputed = "update packages set computedattrs = '{param2}' where id = '{param1}'"
@@ -141,14 +142,21 @@ class etdDb:
 
     def saveEscholId(self, packageId, pubnum, escholId):
         print("save eschol id if present")
-        query = self.insertEscholRequest.format(param1=packageId, param2 = pubnum, param3 = escholId)
+        query = self.insertEscholId.format(param1=packageId, param2 = pubnum, param3 = escholId)
         self.cursor.execute(query)
         self.cnxn.commit()
         return
 
-    def saveEscholDeposit(self, packageId, request, response):
+    def saveEscholRequest(self, packageId, request):
         print("save eschol deposit request and response")
-        query = self.updateEscholDeposit.format(param1=packageId, param2 = request, param3 = response)
+        query = self.updateEscholRequest.format(param1=packageId, param2 = request)
+        self.cursor.execute(query)
+        self.cnxn.commit()
+        return
+
+    def saveEscholResponse(self, packageId, response):
+        print("save eschol deposit request and response")
+        query = self.updateEscholResponse.format(param1=packageId, param2 = response)
         self.cursor.execute(query)
         self.cnxn.commit()
         return

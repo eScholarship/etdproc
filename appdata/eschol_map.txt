@@ -1,9 +1,10 @@
 filedname, type, value
-sourceName, const, proQuest
+sourceName, const, etd_proc
 sourceID, xml, pubNumber
+sourceURL, const, dissertations.umi.com
 submitterEmail, const, etd@ProQuest.uc
 type, const, ARTICLE,
-isPeerReviewed, const, true
+isPeerReviewed, compute, isPeerReviewed
 contentLink, compute, contentLink
 id, compute, escholark
 contentFileName, xml, binary-name
@@ -21,3 +22,4 @@ language, xml, language
 embargoExpires, compute, embargoEndDate
 rights, compute, cclicence
 suppFiles, compute, escholsupp
+isbn, gw, isbn

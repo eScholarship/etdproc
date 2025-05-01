@@ -36,7 +36,7 @@ class depositToEschol:
     def deposit(self, escholId):
         print("deposit")
         # create the deposit package
-        depositpackage = {"id":escholId}
+        depositpackage = {}
         for setting in escholSetting:
             print(setting)
             if setting.typedata == "const":
@@ -48,18 +48,20 @@ class depositToEschol:
             elif setting.typedata == "compute" and setting.info in self._compattrs and self._compattrs[setting.info]:
                 depositpackage[setting.field] = self._compattrs[setting.info]
 
+        depositpackage["id"] = escholId
         # save the package in DB
-        request = json.dumps(depositpackage,ensure_ascii=False)
+        db.saveEscholRequest(self._packageId, json.dumps(depositpackage,ensure_ascii=False))
         # call API with deposit package
-        response = api.depositItem(request)
+        response = api.depositItem(depositpackage)
         # save result and response in DB
-        db.saveEscholDeposit(self._packageId, request, json.dumps(response,ensure_ascii=False))
+        db.saveEscholResponse(self._packageId, response)
         # update escholid and url in 
         return depositpackage
 
 
 x = depositToEschol("30492756")
 escholid = x.mint()
+#escholid = "ark:/13030/qttt03knt6"
 y = x.deposit(escholid)
 print(y)
 print("done")
