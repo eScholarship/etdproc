@@ -1,34 +1,37 @@
-from ftplib import FTP_TLS
+import paramiko
 import zipfile
+from creds import sftp
 from datetime import datetime
 import os
 
 class pqSfptIntf:
-    remote = 'sftp-stg.cdlib.org'
-    section = 'proquest'
-    workingDir = '/apps/eschol/etdproc/zip/working'
+    downloadDir = '/apps/eschol/etdproc/zip/download'
+    extractDir = '/apps/eschol/etdproc/zip/extract'
     doneDir = '/apps/eschol/etdproc/zip/done'
     errorDir = '/apps/eschol/etdproc/zip/error'
     def __init__(self):
         print("created intf")
+        print("connecting")
+        self.transport = paramiko.Transport((sftp.host,sftp.port))
         # get staged files
         #self.getStagedFiles()
-        # look over the files and process
+        # look over the files and process those
 
     def getStagedFiles(self):
         self.filesFound = []
-        with FTP_TLS(self.remote, self.section ) as ftps:
-            ftps.prot_p()
-            print(ftps.nlst())
-            # use ftplib to get the files on the server
-            self.filesFound = ftps.nlst()
-            for filename in self.filesFound:
-                print(filename)
-                local_filename = os.path.join(self.workingDir, filename)
-                file = open(local_filename, 'wb')
-                ftps.retrbinary('RETR '+ filename, file.write)
-                # tbd - remove the file from FTP site
-                #ftps.delete(filename)
+        pkey = paramiko.RSAKey.from_private_key_file("/apps/eschol/.ssh/id_rsa")
+        self.transport.connect(None,sftp.username, pkey=pkey)
+        print("got sftp connection")
+        with paramiko.SFTPClient.from_transport(self.transport) as sftp:
+            filesFound = sftp.listdir(sftp.username)
+            print(filesFound)
+            for filename in filesFound:
+                local_path = os.path.join(self.downloadDir, filename)
+                remote_path = os.path.join(sftp.username, filename)
+                sftp.get(remote_path, local_path)
+                # tbd - remove the file from sftp site
+                #sftp.remove(remote_file_path)
+                self.unzipFile(local_path)
 
     def isValidZip(self, zfiles):
         count_proquest = 0
@@ -45,7 +48,7 @@ class pqSfptIntf:
         # make sure there is a pdf
         return (count_proquest == 1) and (count_pdf > 0)
 
-    def unzipFile(self, filepath, extractpath):
+    def unzipFile(self, filepath):
         print("unzip the file and save the files in a new folder")
 
         assert(zipfile.is_zipfile(filepath))
@@ -54,8 +57,8 @@ class pqSfptIntf:
         # inspect the zip file
         # make sure it has _DATA file
         assert(self.isValidZip(zfiles))
-
-        zfiles.extractall(extractpath)
+        zfiles.extractall(self.extractDir)
 
 a = pqSfptIntf()
-a.unzipFile("C:/Temp/test/ark+=13030=m5ch0sz1.zip", "C:/Temp/test")
+a.getStagedFiles()
+
