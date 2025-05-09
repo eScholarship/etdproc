@@ -4,8 +4,8 @@ import mysql.connector
 import csv
 
 class configDb:
-    #allSqlFiles = ["campuses.sql","packages.sql","actionlog.sql","errorlog.sql","settings.sql","identifiers.sql","merrittcallback.sql","merrittrequest.sql"]
-    allSqlFiles = ["escholrequest.sql"]
+    #allSqlFiles = ["campuses.sql","packages.sql","actionlog.sql","errorlog.sql","settings.sql","identifiers.sql","merrittcallback.sql","merrittrequest.sql","escholrequest.sql"]
+    allSqlFiles = ["queues.sql"]
     sqlpath = 'sqlscripts/'
     datapath = 'appdata/' #TBD
     InsertCampus = "INSERT INTO Campuses (code,instloc,pqcode,namesuffix,escholunit,merrittcol,nameinmarc) VALUES (%s,%s,%s,%s,%s,%s,%s)"
