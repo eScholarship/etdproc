@@ -13,7 +13,8 @@
 
 import lxml.etree as ET
 import json
-from dbIntf import etdDb
+import consts
+
 
 class etdParseXml:
     _data = {}
@@ -154,7 +155,7 @@ class etdParseXml:
         self._data["access_option"] = self.getFirstValue(repo, "DISS_access_option")
         cclic = self._xpatheval("/DISS_submission/DISS_creative_commons_license/DISS_abbreviation")
         if cclic:
-            self._data["access_option"] = self.getFirstValue(repo, "DISS_access_option")
+            self._data["cclicense"] = cclic[0].text
         restriction = self._xpatheval("/DISS_submission/DISS_restriction/DISS_sales_restriction")
         if restriction:
             self._data["sales_restriction_code"] = restriction[0].attrib["code"]
@@ -182,16 +183,19 @@ class etdParseXml:
     def saveToDb(self):
         print("save the xml extracted data in ")
         # save - xmlmetadata table
-        db = etdDb()
+        
         metadata = json.dumps(self._data,ensure_ascii=False)
-        packageid = db.getPackageId(self._data["pubNumber"])
-        db.savexmlMetadata(packageid, metadata)
-        return
+        campusId = consts.campusinfo[self._data["inst_code"]].localid
+        # need to insert
+        consts.db.savePackage(self._data["pubNumber"], campusId)
+        packageid = consts.db.getPackageId(self._data["pubNumber"])
+        consts.db.savexmlMetadata(packageid, metadata)
+        return packageid
 
 
-print("Start")
-a = etdParseXml()
-a.convertToJson("C:/Temp/Bartke_berkeley_0028E_22277_DATA.xml")
-a.saveToDb() 
-print("End")
+#print("Start")
+#a = etdParseXml()
+#a.convertToJson("C:/Temp/Bartke_berkeley_0028E_22277_DATA.xml")
+#a.saveToDb() 
+#print("End")
 

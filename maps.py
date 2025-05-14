@@ -46,11 +46,24 @@ class campusmap:
     instloc = None 
     namesuffix = None
     nameinmarc = None
-    def __init__(self, p1,p2,p3,p4):
+    localid = None
+    def __init__(self, p1,p2,p3,p4, p5):
         self.code = p1 
         self.instloc = p2 
         self.namesuffix = p3
         self.nameinmarc = p4
+        self.localid = p5
+
+
+cc_url_mapping = {
+        'cc by':'https://creativecommons.org/licenses/by/4.0/',
+        'cc by-nc':'https://creativecommons.org/licenses/by-nc/4.0/',
+        'cc by-nc-nd':'https://creativecommons.org/licenses/by-nc-nd/4.0/',
+        'cc by-nc-sa':'https://creativecommons.org/licenses/by-nc-sa/4.0/',
+        'cc by-nd':' https://creativecommons.org/licenses/by-nd/4.0/',
+        'cc by-sa':'https://creativecommons.org/licenses/by-sa/4.0/'
+		}
+
 
 pq_lang_mapping = {
      'en': 'eng',

@@ -2,7 +2,7 @@ import json
 from dbIntf import etdDb
 from datetime import datetime, date, timedelta
 import dateparser
-from maps import pq_lang_mapping
+from maps import pq_lang_mapping, cc_url_mapping
 
 # need to move these to const
 db = etdDb()
@@ -242,7 +242,9 @@ class etdcomputeValues:
     def getescholIds(self):
         localIds = []
         #localIds.append({"id":self._compAttrs["merrittark"], "scheme":"ARK"})
-        localIds.append({"id":self._gwAttrs["isbn"], "scheme":"OTHER_ID", "subScheme":"ISBN"})
+        #localIds.append({"id":self._gwAttrs["isbn"], "scheme":"OTHER_ID", "subScheme":"ISBN"})
+        # what other ids can I provide
+        localIds = {"id": self._xmlAttrs["external_id"], "scheme":"OTHER_ID", "subScheme":"proquest"}
         return localIds
 
     def getescholunits(self):
@@ -261,16 +263,43 @@ class etdcomputeValues:
 
         return contribs
 
+    def getsupplementaryFiiles(self):
+        if not self._xmlAttrs["attachset"]:
+            return None
+        suppFiles = []
+
+        for attachment in self._xmlAttrs["attachset"]:
+            entry = { "file": attachment['name'], 
+                     "fetchLink": "https://pub-submit-stg.escholarship.org/etdprocTmp/test.pdf", 
+                     "title": attachment["descr"],
+                     "size": 694447
+                     }
+            # os.path.getsize(file_path)
+            suppFiles.append(entry)
+        return suppFiles
+
+    def getcclicense(self):
+        # get the actual license if present
+        if "cclicense" in self._xmlAttrs:
+            abbr = self._xmlAttrs["cclicense"].lower()
+            if abbr in cc_url_mapping:
+                return cc_url_mapping[abbr]
+            else:
+                print("CC lincese not found in mapping " + abbr )
+
+        return None
+
     def computeEscholValues(self):
-        print("compute for eschol deposit json")       
+        print("compute for eschol deposit json")   
+        # TBD - find a link to the file
         self._compAttrs["isPeerReviewed"] = True
         self._compAttrs["contentLink"] = "https://pub-submit-stg.escholarship.org/etdprocTmp/test.pdf"
         self._compAttrs["escholauthors"] = self.getescholAuthors()
-        #self._compAttrs["escholIds"] = self.getescholIds()
+        self._compAttrs["escholIds"] = self.getescholIds()
         self._compAttrs["escholunits"] = self.getescholunits()
         self._compAttrs["escholadvisors"] = self.getcontributors()
-        #self._compAttrs["escholsupp"] = [] 
-        #self._compAttrs["cclicence"] = []
+        self._compAttrs["escholsupp"] = self.getsupplementaryFiiles() 
+        self._compAttrs["cclicence"] = self.getcclicense()
         
 
     # read a marc attr set along with the package id it is associated with

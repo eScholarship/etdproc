@@ -26,7 +26,7 @@ class graphClient:
             # Print response
             print(f"Response: {response.status_code} -- {response.reason}")
             print(response)
-            return response.text
+            return response.status_code, response.text
         except Exception as e:
             print(e)
             raise e
@@ -49,14 +49,16 @@ class eschol:
         # to do create etd_proc
         mintparam = {"input": {'sourceName': "etd_proc", 'sourceID': pubId }}
         #mintquery = self.mintMutation.replace("PUB_ID",str(pubId))
-        result = self.client.send(self.mint, mintparam)
+        code, result = self.client.send(self.mint, mintparam)
         print(result)
-        res = json.loads(result)
-        return res['data']['mintProvisionalID']['id']
+        if code == 200:
+            res = json.loads(result)
+            return code, res['data']['mintProvisionalID']['id']
+        return code, result
 
 
     def depositItem(self, depositInput):
         #depositquery = self.depositMutation.replace("DEP_INPUT",depositInput)
         depositparam = {"input": depositInput}
-        result = self.client.send(self.deposit, depositparam)
-        return result
+        code, result = self.client.send(self.deposit, depositparam)
+        return code, result

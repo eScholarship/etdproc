@@ -1,6 +1,7 @@
 
 from escholClient import eschol
 from dbIntf import etdDb
+from errorLog import CustomError
 import json
 # work with one package
 # call eschol to mint with pubnumber from ProQuest
@@ -28,10 +29,19 @@ class depositToEschol:
         print("mint if needed")
         escholId = db.getEscholId(self._pubnum)
         if not escholId:
-            escholId = api.createItem(self._pubnum)
-            db.saveEscholId(self._packageId, self._pubnum, escholId)
+            code, escholId = api.createItem(self._pubnum)
+            if code == 200:
+                db.saveEscholRequest(self._packageId, self._pubnum, escholId)
+            else:
+                raise CustomError("Mint operation failed", self.cleanResponse(escholId)) 
 
         return escholId
+
+    def cleanResponse(self, text):
+        # Remove single and double quotes
+        text = text.replace("'", "").replace('"', "")
+        # Limit string length to 900 characters
+        return text[:900]
 
     def deposit(self, escholId):
         print("deposit")
@@ -52,16 +62,19 @@ class depositToEschol:
         # save the package in DB
         db.saveEscholRequest(self._packageId, json.dumps(depositpackage,ensure_ascii=False))
         # call API with deposit package
-        response = api.depositItem(depositpackage)
+        code, response = api.depositItem(depositpackage)
         # save result and response in DB
-        db.saveEscholResponse(self._packageId, response)
+        db.saveEscholResponse(self._packageId, self.cleanResponse(response))
+        # was this successfull or not - check the response
         # update escholid and url in 
+        if code != 200:
+            raise CustomError(f'deposit failed for {escholId}', "details in escholrequests table")
         return depositpackage
 
 
 x = depositToEschol("30492756")
-escholid = x.mint()
-#escholid = "ark:/13030/qttt03knt6"
+#escholid = x.mint()
+escholid = "ark:/13030/qtttddfsch"
 y = x.deposit(escholid)
 print(y)
 print("done")

@@ -10,17 +10,20 @@ class etdDb:
     queryPackage = "select id from packages where pubnum='{param}' and isInvalid = '0'"
     queryAttrs = "select id, gwattrs, xmlattrs, computedattrs from packages where pubnum='{param}' and isInvalid = '0'"
     queryComputedAttrs = "select id, computedattrs from packages where pubnum='{param}' and isInvalid = '0'"
-    queryCampusInfo = "select pqcode,code,instloc,namesuffix, nameinmarc from campuses"
+    queryCampusInfo = "select pqcode,code,instloc,namesuffix, nameinmarc, id from campuses"
     queryCampusId = "select id from campuses where code='{param}'"
     queryEscholId = "select escholId from escholrequests where pubnum='{param}'"
+    queryQueuedTasks = "select queuename, packageId from queues where queuename != 'done'"
     insertPackage = "insert into packages (pubnum, campusId) VALUES ('{param1}',{param2}) "
     insertMerrittRequest = "insert into merrittrequests (packageId, request, response, currentstatus) VALUES ({param1},'{param2}','{param3}','{param4}') "
-    insertEscholId = "insert into escholrequests (packageId, pubnum, escholId) VALUES ({param1},'{param2}','{param3}') "
+    insertEscholRequest = "insert into escholrequests (packageId, pubnum, escholId) VALUES ({param1},'{param2}','{param3}') "
+    insertQueue = "insert into queues (packageId) VALUES ('{param1}') "
     updateEscholRequest = "update escholrequests set depositrequest = '{param2}' where packageId = '{param1}'"
     updateEscholResponse = "update escholrequests set depositresponse = '{param2}' where packageId = '{param1}'"
     updateGwMetadata = "update packages set gwattrs = '{param2}' where id = '{param1}'"
     updateXmlMetadata = "update packages set xmlattrs = '{param2}' where id = '{param1}'"
     updateComputed = "update packages set computedattrs = '{param2}' where id = '{param1}'"
+    updateFileAttrs = "update packages set fileattrs = '{param2}' where id = '{param1}'"
         
     
     def __init__(self):
@@ -77,7 +80,7 @@ class etdDb:
         self.cursor.execute(self.queryCampusInfo)
         attrsInfo = {}
         for row in self.cursor:
-            attrsInfo[row[0]] = campusmap(row[1],row[2], row[3], row[4])
+            attrsInfo[row[0]] = campusmap(row[1],row[2], row[3], row[4], row[5])
         return attrsInfo
 
     def getCampusId(self, code):
@@ -132,6 +135,13 @@ class etdDb:
         self.cnxn.commit()
         return
 
+    def savefileattrs(self, packageId, fileatts):
+        print("save file attrs")
+        query = self.updateFileAttrs.format(param1=packageId, param2 = fileatts)
+        self.cursor.execute(query)
+        self.cnxn.commit()
+        return
+
     def getEscholId(self, pubnum):
         print("get eschol id if present")
         query = self.queryEscholId.format(param=pubnum)
@@ -140,9 +150,16 @@ class etdDb:
             return row[0]
         return None
 
-    def saveEscholId(self, packageId, pubnum, escholId):
+    def saveEscholRequest(self, packageId, pubnum, escholId):
         print("save eschol id if present")
-        query = self.insertEscholId.format(param1=packageId, param2 = pubnum, param3 = escholId)
+        query = self.insertEscholRequest.format(param1=packageId, param2 = pubnum, param3 = escholId)
+        self.cursor.execute(query)
+        self.cnxn.commit()
+        return
+
+    def saveQueue(self, packageId):
+        print("insert queue")
+        query = self.insertQueue.format(param1=packageId)
         self.cursor.execute(query)
         self.cnxn.commit()
         return
@@ -160,3 +177,14 @@ class etdDb:
         self.cursor.execute(query)
         self.cnxn.commit()
         return
+
+    def getAllQueuedTasks(self):
+        print("get any item not yet done")
+        self.cursor.execute(self.queryQueuedTasks)
+        alltasks = {}
+        for row in self.cursor:
+            if row[0] not in alltasks:
+                alltasks[row[0]] = []
+            alltasks[row[0]].append(row[1])
+
+        return alltasks

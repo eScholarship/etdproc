@@ -3,10 +3,14 @@ import zipfile
 from creds import sftp_creds
 from datetime import datetime
 import os
+from pathlib import Path
+import json
+import consts
 
 class pqSfptIntf:
     downloadDir = '/apps/eschol/etdproc/zip/download'
-    extractDir = '/apps/eschol/etdproc/zip/extract'
+    extractDir = 'c:/Temp'
+    #extractDir = '/apps/eschol/etdproc/zip/extract'
     doneDir = '/apps/eschol/etdproc/zip/done'
     errorDir = '/apps/eschol/etdproc/zip/error'
     filesFound = []
@@ -15,7 +19,7 @@ class pqSfptIntf:
         print("created intf")
         print("connecting")
         self.filesFound = []
-        self.filesUnziped = []
+        self.filesUnziped = {}
         #self.transport = paramiko.Transport((sftp_creds.host,sftp_creds.port))
         # get staged files
         #self.getStagedFiles()
@@ -57,6 +61,28 @@ class pqSfptIntf:
         # make sure there is a pdf
         return (count_proquest == 1) and (count_pdf > 0)
 
+    def getfileAttrs(self, zfiles, extractfolder):
+        xmlname = None
+        pdfname = None
+        otherfiles = []
+        for name in zfiles.namelist():
+            if name[-9:] == "_DATA.xml":
+                # name is proQuest xml
+                xmlname = name
+            else:
+                otherfiles.append(name)
+
+        pdfname = xmlname[:-9] + ".pdf"
+        if pdfname not in otherfiles:
+            # throw
+            print("main file not as expected")
+        otherfiles.remove(pdfname)
+
+        fileattrs = {"xmlfile": xmlname, "pdffile": pdfname, "supp": otherfiles, "folder": extractfolder}
+        return fileattrs
+
+        
+
     def unzipFile(self, filepath):
         print("unzip the file and save the files in a new folder")
         if(zipfile.is_zipfile(filepath) == False):
@@ -66,12 +92,38 @@ class pqSfptIntf:
         # inspect the zip file
         # make sure it has _DATA file
         if(self.isValidZip(zfiles)):
-            zfiles.extractall(self.extractDir)
-            self.filesUnziped.append(filepath)
+            zipname = os.path.splitext(os.path.basename(filepath))[0]
+            extractfolder = os.path.join(self.extractDir, zipname)
+            zfiles.extractall(extractfolder)
+            self.filesUnziped[zipname] = self.getfileAttrs(zfiles, zipname)
         else:
             print(f'{filepath} is not a valid ProQuest package')
         return
 
-a = pqSfptIntf()
-a.getStagedFiles()
+    def getFullPathForProQuestXml(self, zipname):
+        fileatts = self.filesUnziped[zipname]
+
+        # get the xml name
+        return os.path.join(self.extractDir, zipname, fileatts["xmlfile"])
+        #for name in names:
+        #    if name[-9:] == "_DATA.xml":
+        #        # keep this file in extract folder
+        #        print(name)
+        #    else:
+        #        # move rest to deposit folder
+        #directory = os.path.join(self.extractDir, zipname) 
+        #for root, _, files in os.walk(directory):
+        #    for file in files:
+        #        relative_path = os.path.relpath(os.path.join(root, file), directory)
+        #        #files_list.append(relative_path)
+
+    def saveToDb(self, zipname, packageId):
+        print("save fileattrs and create queue item for this")
+        fileatts = self.filesUnziped[zipname]
+        # update fileattr 
+        consts.db.savefileattrs(packageId, json.dumps(fileatts,ensure_ascii=False))
+        consts.db.saveQueue(packageId)
+
+#a = pqSfptIntf()
+#a.getStagedFiles()
 
