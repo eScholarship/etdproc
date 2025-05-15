@@ -4,20 +4,23 @@ import re
 from dbIntf import etdDb
 import json
 import os
-
+import consts
 db = etdDb()
-class EtdToMerritt:
+
+class etdToMerritt:
     _zipfile = None
+    _pubnum = None
     _collection = None
     _packageId = None
     _etdattrs = None
     _requestattrs = None
     _responseattrs = None
-    def __init__(self, zipfile, pubnum):
-        print(f'EtdToMerritt - working on {pubnum}')
-        self._zipfile = zipfile
-        (self._packageId, etdattrs) = db.getCompAttrs(pubnum)
+    def __init__(self, packageId):
+        print(f'EtdToMerritt start')
+        self._packageId = packageId        
+        (zipfile, self._pubnum, etdattrs) = db.getCompAttrs(packageId)
         self._etdattrs = json.loads(etdattrs)
+        self._zipfile = os.path.join( consts.downloadDir, zipfile+".zip")
         self._collection = creds.merritt_creds.collection + "_content"# temp for testing
 
 
@@ -48,7 +51,7 @@ class EtdToMerritt:
             'responseForm': (None, 'json'),
             'notificationFormat': (None, 'json'),
             'profile': (None, self._collection),
-            'localIdentifier': (None, self._etdattrs["escholark"]),
+            'localIdentifier': (None, self._pubnum),
         }
 
         # send request
@@ -56,13 +59,13 @@ class EtdToMerritt:
         print(response)
         
         # save the request info
-        files['file'] = self._zipfile
+        files['file'] = None
         self._requestattrs = json.dumps(files)
         # save response
         self._responseattrs = response.text
         return
 
-zipfile = 'C:/Temp/test/zip/etdadmin_upload_1032621.zip'
-assert(os.path.exists(zipfile))
-x = EtdToMerritt(zipfile, "30492756")
-x.process()
+#zipfile = 'C:/Temp/test/zip/etdadmin_upload_1032621.zip'
+#assert(os.path.exists(zipfile))
+#x = EtdToMerritt(zipfile, "30492756")
+#x.process()

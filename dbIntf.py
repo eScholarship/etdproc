@@ -9,12 +9,13 @@ class etdDb:
     queryEscholMap = "select field1,field2,info from settings where settingtype='EscholOut'"
     queryPackage = "select id from packages where pubnum='{param}' and isInvalid = '0'"
     queryAttrs = "select id, gwattrs, xmlattrs, computedattrs from packages where pubnum='{param}' and isInvalid = '0'"
-    queryComputedAttrs = "select id, computedattrs from packages where pubnum='{param}' and isInvalid = '0'"
+    queryXmlAttrs = "select xmlattrs from packages where id='{param}'"
+    queryComputedAttrs = "select zipname, pubnum, computedattrs from packages where id ='{param}'"
     queryCampusInfo = "select pqcode,code,instloc,namesuffix, nameinmarc, id from campuses"
     queryCampusId = "select id from campuses where code='{param}'"
     queryEscholId = "select escholId from escholrequests where pubnum='{param}'"
     queryQueuedTasks = "select queuename, packageId from queues where queuename != 'done'"
-    insertPackage = "insert into packages (pubnum, campusId) VALUES ('{param1}',{param2}) "
+    insertPackage = "insert into packages (pubnum, zipname, campusId) VALUES ('{param1}','{param2}', {param3}) "
     insertMerrittRequest = "insert into merrittrequests (packageId, request, response, currentstatus) VALUES ({param1},'{param2}','{param3}','{param4}') "
     insertEscholRequest = "insert into escholrequests (packageId, pubnum, escholId) VALUES ({param1},'{param2}','{param3}') "
     insertQueue = "insert into queues (packageId) VALUES ('{param1}') "
@@ -24,7 +25,7 @@ class etdDb:
     updateXmlMetadata = "update packages set xmlattrs = '{param2}' where id = '{param1}'"
     updateComputed = "update packages set computedattrs = '{param2}' where id = '{param1}'"
     updateFileAttrs = "update packages set fileattrs = '{param2}' where id = '{param1}'"
-        
+    updateQueueStatus = "update queues set queuename = '{param2}' where packageId = {param1}"    
     
     def __init__(self):
         self.cnxn = mysql.connector.connect(user=creds.etdDb.username, 
@@ -67,12 +68,12 @@ class etdDb:
             return (row[1], row[2], row[3])
         return None
     
-    def getCompAttrs(self, pubnum):
+    def getCompAttrs(self, packageId):
         print("read computed attrs")
-        query = self.queryComputedAttrs.format(param=pubnum)
+        query = self.queryComputedAttrs.format(param=packageId)
         self.cursor.execute(query)
         for row in self.cursor:
-            return (row[0], row[1])
+            return (row[0], row[1], row[2])
         return None
 
     def getCampusInfo(self):
@@ -92,9 +93,9 @@ class etdDb:
             campusid = row[0]
         return campusid
 
-    def savePackage(self, pubnum, campusId):
+    def savePackage(self, pubnum, zipname, campusId):
         print("create a new package")
-        query = self.insertPackage.format(param1=pubnum, param2=campusId)
+        query = self.insertPackage.format(param1=pubnum, param2= zipname, param3=campusId)
         self.cursor.execute(query)
         self.cnxn.commit()
         return
@@ -188,3 +189,19 @@ class etdDb:
             alltasks[row[0]].append(row[1])
 
         return alltasks
+
+    def getxmlAttrs(self, id):
+        print("read xml attrs")
+        query = self.queryXmlAttrs.format(param=id)
+        self.cursor.execute(query)
+        for row in self.cursor:
+            return row[0]
+        return None
+
+    def saveQueueStatus(self, packageId, newstatus):
+        print("save the new status")
+        query = self.updateQueueStatus.format(param1=packageId, param2 = newstatus)
+        self.cursor.execute(query)
+        self.cnxn.commit()
+        return
+    

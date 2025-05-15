@@ -1,7 +1,7 @@
 fetch, fetch-error
 extract, extract-error
-mint, mint-error
 merritt, merritt-error
+mint, mint-error
 gw, gw-error
 eschol, eschol-error
 sils, sils-error

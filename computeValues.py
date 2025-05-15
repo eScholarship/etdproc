@@ -3,23 +3,16 @@ from dbIntf import etdDb
 from datetime import datetime, date, timedelta
 import dateparser
 from maps import pq_lang_mapping, cc_url_mapping
-
-# need to move these to const
-db = etdDb()
-campusinfo = db.getCampusInfo()
+import consts
 
 class etdcomputeValues:
-    campusinfo = None
-    _pubNum = None
-    _gwAttrs = None
     _xmlAttrs = None
+    _packageId = None
     _compAttrs = {}
-    def __init__(self, pubnum):
-        self._pubNum = pubnum
-        self._gwAttrs = None
-        (gwAttrs, xmlAttrs, compAttrs) = db.getAttrs(pubnum)
-        if gwAttrs:
-            self._gwAttrs = json.loads(gwAttrs)
+    def __init__(self, packageId):
+        self._packageId = packageId
+        self._compAttrs = {}
+        xmlAttrs = consts.db.getxmlAttrs(packageId)
         self._xmlAttrs = json.loads(xmlAttrs)
 
     # Update to publication date when xml is populated with that
@@ -160,10 +153,10 @@ class etdcomputeValues:
         print("get campus location and name from db")
         schoolcode = self._xmlAttrs["inst_code"]
 
-        self._compAttrs["campuslocation"] = campusinfo[schoolcode].instloc + ", California :"
-        self._compAttrs["campusname"] = "University of California, " + campusinfo[schoolcode].namesuffix
-        self._compAttrs["campusshort"] = campusinfo[schoolcode].code.lower()
-        self._compAttrs["control655"] = campusinfo[schoolcode].nameinmarc
+        self._compAttrs["campuslocation"] = consts.campusinfo[schoolcode].instloc + ", California :"
+        self._compAttrs["campusname"] = "University of California, " + consts.campusinfo[schoolcode].namesuffix
+        self._compAttrs["campusshort"] = consts.campusinfo[schoolcode].code.lower()
+        self._compAttrs["control655"] = consts.campusinfo[schoolcode].nameinmarc
         return
 
     # this needs to go away from here and moved to when we do eschol and merritt interaction
@@ -218,10 +211,7 @@ class etdcomputeValues:
 
         self._compAttrs["creators"] = ';'.join(creators)
         self._compAttrs["authors"] = names.strip(',')
-        if self._gwAttrs:
-            self._compAttrs["mainauthor"] = self._gwAttrs["mainauthor"]
-        else:
-            self._compAttrs["mainauthor"] = f'{self._xmlAttrs["authset"][0]["surname"]},{self._xmlAttrs["authset"][0]["fname"]}'
+        self._compAttrs["mainauthor"] = f'{self._xmlAttrs["authset"][0]["surname"]},{self._xmlAttrs["authset"][0]["fname"]}'
         return
 
     def computeDept(self):
@@ -242,7 +232,6 @@ class etdcomputeValues:
     def getescholIds(self):
         localIds = []
         #localIds.append({"id":self._compAttrs["merrittark"], "scheme":"ARK"})
-        #localIds.append({"id":self._gwAttrs["isbn"], "scheme":"OTHER_ID", "subScheme":"ISBN"})
         # what other ids can I provide
         localIds = {"id": self._xmlAttrs["external_id"], "scheme":"OTHER_ID", "subScheme":"proquest"}
         return localIds
@@ -319,18 +308,17 @@ class etdcomputeValues:
         self.computeEscholValues()
         # does this depend upon the degree?
         self._compAttrs["genre"] = "Dissertations, Academic"
-        packageid = db.getPackageId(self._pubNum)
-        db.saveComputedValues(packageid, json.dumps(self._compAttrs,ensure_ascii=False))
+        consts.db.saveComputedValues(self._packageId, json.dumps(self._compAttrs,ensure_ascii=False))
         return
 
-print("start")
-x = etdcomputeValues("30492756")
-x.saveComputedValues()
-#campuses = ["UCD","UCI","UCM","UCR","UCSC","UCSB","UCSD","UCLA","UCB","UCSF"]
-##campuses = ["UCSF"]
-#for code in campuses:
-#    x.generateComputedValules(code)
-print("end")
+#print("start")
+#x = etdcomputeValues("30492756")
+#x.saveComputedValues()
+##campuses = ["UCD","UCI","UCM","UCR","UCSC","UCSB","UCSD","UCLA","UCB","UCSF"]
+###campuses = ["UCSF"]
+##for code in campuses:
+##    x.generateComputedValules(code)
+#print("end")
 
 #filedname, type, value
 #sourceName, const, proQuest

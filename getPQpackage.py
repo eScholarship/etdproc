@@ -8,11 +8,6 @@ import json
 import consts
 
 class pqSfptIntf:
-    downloadDir = '/apps/eschol/etdproc/zip/download'
-    extractDir = 'c:/Temp'
-    #extractDir = '/apps/eschol/etdproc/zip/extract'
-    doneDir = '/apps/eschol/etdproc/zip/done'
-    errorDir = '/apps/eschol/etdproc/zip/error'
     filesFound = []
     filesUnziped = []
     def __init__(self):
@@ -38,7 +33,7 @@ class pqSfptIntf:
             self.filesFound = sftp.listdir(sftp_creds.username)
             print(self.filesFound)
             for filename in self.filesFound:
-                local_path = os.path.join(self.downloadDir, filename)
+                local_path = os.path.join(consts.downloadDir, filename)
                 remote_path = os.path.join(sftp_creds.username, filename)
                 sftp.get(remote_path, local_path)
                 # tbd - remove the file from sftp site
@@ -93,7 +88,7 @@ class pqSfptIntf:
         # make sure it has _DATA file
         if(self.isValidZip(zfiles)):
             zipname = os.path.splitext(os.path.basename(filepath))[0]
-            extractfolder = os.path.join(self.extractDir, zipname)
+            extractfolder = os.path.join(consts.extractDir, zipname)
             zfiles.extractall(extractfolder)
             self.filesUnziped[zipname] = self.getfileAttrs(zfiles, zipname)
         else:
@@ -104,7 +99,7 @@ class pqSfptIntf:
         fileatts = self.filesUnziped[zipname]
 
         # get the xml name
-        return os.path.join(self.extractDir, zipname, fileatts["xmlfile"])
+        return os.path.join(consts.extractDir, zipname, fileatts["xmlfile"])
         #for name in names:
         #    if name[-9:] == "_DATA.xml":
         #        # keep this file in extract folder

@@ -11,6 +11,7 @@
 # use the information to create json for eschol deposit
 
 
+from lib2to3.pytree import convert
 import lxml.etree as ET
 import json
 import consts
@@ -20,15 +21,20 @@ class etdParseXml:
     _data = {}
     _dbparams = []
     _xpatheval = None
-    def __init__(self):
+    _pqfile = None
+    _zipname = None
+    def __init__(self, zipname, pqfile):
         print("get the path to the folder where content lives")
         self._data = {}
         self._xpatheval = None
+        self._pqfile = pqfile
+        self._zipname = zipname
+        self.convertToJson()
 
-    def convertToJson(self, pqfile):
+    def convertToJson(self):
         print("convert from proquest to marc")
         # run xslt on the given file
-        dom = ET.parse(pqfile)
+        dom = ET.parse(self._pqfile)
         self._xpatheval = ET.XPathEvaluator(dom)
         self.getpubNumber()
         self.addAuthSet()
@@ -187,7 +193,7 @@ class etdParseXml:
         metadata = json.dumps(self._data,ensure_ascii=False)
         campusId = consts.campusinfo[self._data["inst_code"]].localid
         # need to insert
-        consts.db.savePackage(self._data["pubNumber"], campusId)
+        consts.db.savePackage(self._data["pubNumber"], self._zipname, campusId)
         packageid = consts.db.getPackageId(self._data["pubNumber"])
         consts.db.savexmlMetadata(packageid, metadata)
         return packageid
