@@ -11,7 +11,6 @@
 # use the information to create json for eschol deposit
 
 
-from lib2to3.pytree import convert
 import lxml.etree as ET
 import json
 import consts

@@ -13,6 +13,7 @@ class etdParseGateway:
     _record = None
     _pubNumber = None
     allsettings = None
+    # this needs to take packageId instead and obtain corresponding pubnum
     def __init__(self, pubnum):
         print("get the path to the folder where content lives")
         self._data = {}
@@ -35,6 +36,7 @@ class etdParseGateway:
             'x-password':pg_creds.password
         }
         response = requests.get(pg_creds.host, params=params)
+        # no need to save
         with open('pq.dat', 'w') as out:
             out.write(response.text)
 

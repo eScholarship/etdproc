@@ -8,7 +8,7 @@ class etdDb:
     querySilsMap = "select field1,field2,field3,field4,field5,field6,info from settings where settingtype='MarcOut'"
     queryEscholMap = "select field1,field2,info from settings where settingtype='EscholOut'"
     queryPackage = "select id from packages where pubnum='{param}' and isInvalid = '0'"
-    queryAttrs = "select id, gwattrs, xmlattrs, computedattrs from packages where pubnum='{param}' and isInvalid = '0'"
+    queryAttrs = "select id, gwattrs, xmlattrs, computedattrs from packages where id= {param}"
     queryXmlAttrs = "select xmlattrs from packages where id='{param}'"
     queryComputedAttrs = "select zipname, pubnum, computedattrs from packages where id ='{param}'"
     queryCampusInfo = "select pqcode,code,instloc,namesuffix, nameinmarc, id from campuses"
@@ -25,7 +25,9 @@ class etdDb:
     updateXmlMetadata = "update packages set xmlattrs = '{param2}' where id = '{param1}'"
     updateComputed = "update packages set computedattrs = '{param2}' where id = '{param1}'"
     updateFileAttrs = "update packages set fileattrs = '{param2}' where id = '{param1}'"
-    updateQueueStatus = "update queues set queuename = '{param2}' where packageId = {param1}"    
+    updateQueueStatus = "update queues set queuename = '{param2}' where packageId = {param1}"  
+    updateMerrittArk = "update packages set computedattrs = JSON_SET(computedattrs, '$.merrittark', '{param2}') where id = {param1}"
+    updateEscholArk = "update packages set computedattrs = JSON_SET(computedattrs, '$.escholark', '{param2}') where id = {param1}"
     
     def __init__(self):
         self.cnxn = mysql.connector.connect(user=creds.etdDb.username, 
@@ -60,12 +62,12 @@ class etdDb:
             tagInfo.append(escholmap(row[0],row[1],row[2]))
         return tagInfo
 
-    def getAttrs(self, pubnum):
-        print("read marc attrs")
-        query = self.queryAttrs.format(param=pubnum)
+    def getAttrs(self, packageId):
+        print("read all attrs")
+        query = self.queryAttrs.format(param=packageId)
         self.cursor.execute(query)
         for row in self.cursor:
-            return (row[1], row[2], row[3])
+            return (row[0], row[1], row[2])
         return None
     
     def getCompAttrs(self, packageId):
@@ -204,4 +206,17 @@ class etdDb:
         self.cursor.execute(query)
         self.cnxn.commit()
         return
-    
+
+    def saveEscholArk(self, packageId, ark):
+        print("save eschol ark")
+        query = self.updateEscholArk.format(param1=packageId, param2 = ark)
+        self.cursor.execute(query)
+        self.cnxn.commit()
+        return    
+
+    def saveMerrittArk(self, packageId, ark):
+        print("save merritt ark")
+        query = self.updateMerrittArk.format(param1=packageId, param2 = ark)
+        self.cursor.execute(query)
+        self.cnxn.commit()
+        return    

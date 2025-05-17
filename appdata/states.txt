@@ -1,8 +1,8 @@
 fetch, fetch-error
 extract, extract-error
 merritt, merritt-error
-mint, mint-error
 gw, gw-error
+mint, mint-error
 eschol, eschol-error
 sils, sils-error
 done

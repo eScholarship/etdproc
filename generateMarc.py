@@ -1,19 +1,17 @@
 import json
 from pymarc import Record, Field, Subfield
 from dbIntf import etdDb
+import consts
 
 
-# should be moved to const
-db = etdDb()
-silsSettings = db.getgenerateSetting()
 class createMarc:
-    _pubNumber = None
+    _packageId = None
     _gwattrs = None
     _xmlattrs = None
     _compattrs = None
-    def __init__(self, pubnum):
-        self._pubNumber = pubnum
-        (gwAttrs, xmlAttrs, compAttrs) = db.getAttrs(pubnum)
+    def __init__(self, packageId):
+        self._packageId = packageId
+        (gwAttrs, xmlAttrs, compAttrs) = consts.db.getAttrs(packageId)
         self._gwattrs = json.loads(gwAttrs)
         self._xmlattrs = json.loads(xmlAttrs)
         self._compattrs = json.loads(compAttrs)
@@ -23,6 +21,8 @@ class createMarc:
             return value + '.'
         if action == "comma":
             return value + ','
+        if action == "eschourl":
+            return consts.escholurl + value[-8:]
         return value
 
     def generateConst(self, setting, fieldtofill):
@@ -150,7 +150,7 @@ class createMarc:
         lastSetting = None
         lastField = None
 
-        for setting in silsSettings:
+        for setting in consts.silsSettings:
             # need to bring the indicator back to '0' after
             fields = self.generateFields(setting, lastSetting, lastField)
             if fields and isinstance(fields, list):
@@ -167,12 +167,12 @@ class createMarc:
 
     def writeMarcFile(self):
         record = self.generateRecord()
-        with open(f'out/ETDS-{self._pubNumber}.mrc', 'wb') as data:
+        with open(f'out/ETDS-{self._xmlattrs["pubNumber"]}.mrc', 'wb') as data:
             data.write(record.as_marc21())
 
-print("start - create")
+#print("start - create")
 
-x = createMarc("30492756")
-x.writeMarcFile()
+#x = createMarc("30492756")
+#x.writeMarcFile()
 
-print("end -- crate")
+#print("end -- crate")

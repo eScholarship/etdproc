@@ -65,6 +65,6 @@ tag, ind1, ind2, field, sourcefield, info, proc
 710,2,bl, a, campusname, compute, comma
 710,2,bl, e, const, degree granting institution, dot
 856,4,0, z, const, Open Access via eScholarship, none
-856,4,0, u, escholurl, compute, none
+856,4,0, u, escholark, compute, escholurl
 856,4,0, 7, const, 0, none
 856,4,0, I, const, (star)Unrestricted online access, none
