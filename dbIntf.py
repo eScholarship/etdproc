@@ -4,7 +4,7 @@ from maps import pqmap, silsmap, campusmap, escholmap
 
 
 class etdDb:
-    queryPQMap = "select field1,field2,field3,field4 from settings where settingtype='Gateway'"
+    queryGatewayMap = "select field1,field2,field3,field4 from settings where settingtype='Gateway'"
     querySilsMap = "select field1,field2,field3,field4,field5,field6,info from settings where settingtype='MarcOut'"
     queryEscholMap = "select field1,field2,info from settings where settingtype='EscholOut'"
     queryPackage = "select id from packages where pubnum='{param}' and isInvalid = '0'"
@@ -15,6 +15,8 @@ class etdDb:
     queryCampusId = "select id from campuses where code='{param}'"
     queryEscholId = "select escholId from escholrequests where pubnum='{param}'"
     queryQueuedTasks = "select queuename, packageId from queues where queuename != 'done'"
+    queryUnprocessedMCs = "select id, callbackdata from merrittcallbacks where isProcessed = False"
+    queryPubNumber = "SELECT pubnum FROM packages where id = {param}"
     insertPackage = "insert into packages (pubnum, zipname, campusId) VALUES ('{param1}','{param2}', {param3}) "
     insertMerrittRequest = "insert into merrittrequests (packageId, request, response, currentstatus) VALUES ({param1},'{param2}','{param3}','{param4}') "
     insertEscholRequest = "insert into escholrequests (packageId, pubnum, escholId) VALUES ({param1},'{param2}','{param3}') "
@@ -28,7 +30,8 @@ class etdDb:
     updateQueueStatus = "update queues set queuename = '{param2}' where packageId = {param1}"  
     updateMerrittArk = "update packages set computedattrs = JSON_SET(computedattrs, '$.merrittark', '{param2}') where id = {param1}"
     updateEscholArk = "update packages set computedattrs = JSON_SET(computedattrs, '$.escholark', '{param2}') where id = {param1}"
-    
+    updateMcProcessed = "update merrittcallbacks set isProcessed = True where id = {param}" 
+
     def __init__(self):
         self.cnxn = mysql.connector.connect(user=creds.etdDb.username, 
                         password=creds.etdDb.password,
@@ -38,9 +41,9 @@ class etdDb:
                         port=creds.etdDb.port)
         self.cursor = self.cnxn.cursor()
 
-    def getparseSetting(self):
+    def getGwSetting(self):
         print("read parse settings")
-        self.cursor.execute(self.queryPQMap)
+        self.cursor.execute(self.queryGatewayMap)
         tagInfo = []
         for row in self.cursor:
             tagInfo.append(pqmap(row[0],row[1],row[2],row[3]))
@@ -94,6 +97,22 @@ class etdDb:
         for row in self.cursor:
             campusid = row[0]
         return campusid
+
+    def getUnprocessedMCs(self):
+        print("read unprocessed Merritt Callback")
+        self.cursor.execute(self.queryUnprocessedMCs)
+        data = {}
+        for row in self.cursor:
+            data[row[0]] = row[1]
+        return data
+
+    def getPubNumber(self, packageId):
+        print("read pub number")
+        query = self.queryPubNumber.format(param=packageId)
+        self.cursor.execute(query)
+        for row in self.cursor:
+            return row[0]
+        return None
 
     def savePackage(self, pubnum, zipname, campusId):
         print("create a new package")
@@ -220,3 +239,10 @@ class etdDb:
         self.cursor.execute(query)
         self.cnxn.commit()
         return    
+
+    def markMCprocessed(self, mcid):
+        print("save merritt ark")
+        query = self.updateMcProcessed.format(param=mcid)
+        self.cursor.execute(query)
+        self.cnxn.commit()
+        return   

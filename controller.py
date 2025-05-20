@@ -3,6 +3,7 @@ from getPQpackage import pqSfptIntf
 from parseXml import etdParseXml
 from computeValues import etdcomputeValues
 from sendToMerritt import etdToMerritt
+from parseGateway import etdParseGateway
 import consts
 import os
 import json
@@ -43,6 +44,9 @@ class Controller:
         if "extract" in queuedtasks:
             self.processExtracted(queuedtasks["extract"])
 
+        if "gw" in queuedtasks:
+            self.processGatewayPending(queuedtasks["gw"])
+
         return
 
     def processFetched(self, packageIds):
@@ -67,23 +71,34 @@ class Controller:
 
     def processMerrittCallbacks(self):
         # find out unprocess entries from callback table
-        queuedMC = consts.db.getMerrittCallbacks()
-        for mc in queuedMC:
-        # extract pub number from json and if the stutus is COMPLETED then move the queue status to gw
-            data = json.load(mc)
+        queuedMC = consts.db.getUnprocessedMCs()
+        for mcid in queuedMC:
+            # extract pub number from json and if the stutus is COMPLETED then move the queue status to gw
+            data = json.loads(queuedMC[mcid])
             jobstatus = data["job:jobState"]["job:jobStatus"].lower()
             pubnum = data["job:jobState"]["job:localID"]
-            packageId = consts.db.getPackageId(pubnum)
+            packageid = consts.db.getPackageId(pubnum)
             if jobstatus == "completed":
                 merrittark = data["job:jobState"]["job:primaryID"]
-                consts.db.saveMerrittArk(packageId, merrittark)
+                consts.db.saveMerrittArk(packageid, merrittark)
                 # advance queue status
-                consts.db.saveQueueStatus(packageId, "gw")
-                
+                consts.db.saveQueueStatus(packageid, "gw")
+            else:
+                consts.db.saveQueueStatus(packageid, "merritt-error")
+            consts.db.markMCprocessed(mcid)
 
         # also get merrittark and update that entry
         # if status is QUEUED - leave status as it is
-        # if  
+        
+    def processGatewayPending(self, packageIds):
+        print("find all package pending information from gw")
+        print(packageIds)
+        # extract these
+        for packageid in packageIds:
+            print("package waiting for data from Gateway")
+            x = etdParseGateway(packageid)
+            if x.process():
+                consts.db.saveQueueStatus(packageid, "mint")
 
 # add to DB and create a queue entry
 
@@ -99,3 +114,4 @@ class Controller:
 c = Controller()
 #c.buildQueue()
 c.processQueue()
+#c.processMerrittCallbacks()

@@ -5,6 +5,7 @@ from dbIntf import etdDb
 db = etdDb()
 campusinfo = db.getCampusInfo()
 silsSettings = db.getgenerateSetting()
+gwSettings = db.getGwSetting()
 
 #downloadDir = '/apps/eschol/etdproc/zip/download'
 downloadDir = 'C:/Users/myucekul/Downloads'
