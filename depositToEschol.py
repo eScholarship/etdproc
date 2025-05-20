@@ -3,51 +3,50 @@ from escholClient import eschol
 from dbIntf import etdDb
 from errorLog import CustomError
 import json
+import consts
 # work with one package
 # call eschol to mint with pubnumber from ProQuest
 
-# this should move to consts
-api = eschol()
-db = etdDb()
-#escholId = api.createItem("xyz")
-escholSetting = db.getescholSetting()
+def cleanResponse(text):
+    # Remove single and double quotes
+    text = text.replace("'", "").replace('"', "")
+    # Limit string length to 900 characters
+    return text[:900]
+
+class mintEscholId:
+    _packageId = None
+    def __init__(self, packageId):
+        self._packageId = packageId
+
+    def mint(self):
+        print("mint if needed")
+        code, escholId = consts.api.createItem(f'etdproc id {self._packageId}')
+        if code == 200:
+            consts.db.addEscholRequest(self._packageId, "TBD", escholId)
+            consts.db.saveEscholArk(self._packageId, escholId[-10:])
+        else:
+            raise CustomError("Mint operation failed", cleanResponse(escholId)) 
+
+        return escholId
+
 class depositToEschol:
-    _pubnum = None
     _packageId = None
     _gwattrs = None
     _xmlattrs = None
     _compattrs = None
-    def __init__(self, pubnum):
-        self._pubnum = pubnum
-        (self._packageId, etdattrs) = db.getCompAttrs(pubnum)
-        (gwAttrs, xmlAttrs, compAttrs) = db.getAttrs(pubnum)
+    def __init__(self, packageId):
+        self._packageId = packageId
+        (gwAttrs, xmlAttrs, compAttrs) = consts.db.getAttrs(packageId)
         self._gwattrs = json.loads(gwAttrs)
         self._xmlattrs = json.loads(xmlAttrs)
         self._compattrs = json.loads(compAttrs)
 
-    def mint(self):
-        print("mint if needed")
-        escholId = db.getEscholId(self._pubnum)
-        if not escholId:
-            code, escholId = api.createItem(self._pubnum)
-            if code == 200:
-                db.saveEscholRequest(self._packageId, self._pubnum, escholId)
-            else:
-                raise CustomError("Mint operation failed", self.cleanResponse(escholId)) 
 
-        return escholId
-
-    def cleanResponse(self, text):
-        # Remove single and double quotes
-        text = text.replace("'", "").replace('"', "")
-        # Limit string length to 900 characters
-        return text[:900]
-
-    def deposit(self, escholId):
+    def deposit(self):
         print("deposit")
         # create the deposit package
         depositpackage = {}
-        for setting in escholSetting:
+        for setting in consts.escholSetting:
             print(setting)
             if setting.typedata == "const":
                 depositpackage[setting.field] = setting.info
@@ -58,24 +57,23 @@ class depositToEschol:
             elif setting.typedata == "compute" and setting.info in self._compattrs and self._compattrs[setting.info]:
                 depositpackage[setting.field] = self._compattrs[setting.info]
 
-        depositpackage["id"] = escholId
         # save the package in DB
-        db.saveEscholRequest(self._packageId, json.dumps(depositpackage,ensure_ascii=False))
+        consts.db.saveEscholRequest(self._packageId, json.dumps(depositpackage,ensure_ascii=False))
         # call API with deposit package
-        code, response = api.depositItem(depositpackage)
+        code, response = consts.api.depositItem(depositpackage)
         # save result and response in DB
-        db.saveEscholResponse(self._packageId, self.cleanResponse(response))
+        consts.db.saveEscholResponse(self._packageId, cleanResponse(response))
         # was this successfull or not - check the response
         # update escholid and url in 
         if code != 200:
-            raise CustomError(f'deposit failed for {escholId}', "details in escholrequests table")
-        return depositpackage
+            raise CustomError(f'deposit failed for {self._packageId}', "details in escholrequests table")
+        return
 
 
-x = depositToEschol("30492756")
-#escholid = x.mint()
-escholid = "ark:/13030/qtttddfsch"
-y = x.deposit(escholid)
-print(y)
-print("done")
+#x = depositToEschol("30492756")
+##escholid = x.mint()
+#escholid = "ark:/13030/qtttddfsch"
+#y = x.deposit(escholid)
+#print(y)
+#print("done")
 

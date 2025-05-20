@@ -167,8 +167,10 @@ class createMarc:
 
     def writeMarcFile(self):
         record = self.generateRecord()
-        with open(f'out/ETDS-{self._xmlattrs["pubNumber"]}.mrc', 'wb') as data:
+        filepath = f'{consts.marcDir}/ETDS-{self._xmlattrs["pubNumber"]}.mrc'
+        with open(filepath, 'wb') as data:
             data.write(record.as_marc21())
+        return filepath
 
 #print("start - create")
 

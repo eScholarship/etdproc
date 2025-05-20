@@ -4,6 +4,8 @@ from parseXml import etdParseXml
 from computeValues import etdcomputeValues
 from sendToMerritt import etdToMerritt
 from parseGateway import etdParseGateway
+from depositToEschol import mintEscholId, depositToEschol
+from generateMarc import createMarc
 import consts
 import os
 import json
@@ -47,7 +49,41 @@ class Controller:
         if "gw" in queuedtasks:
             self.processGatewayPending(queuedtasks["gw"])
 
+        if "mint" in queuedtasks:
+            self.processMintPending(queuedtasks["mint"])
+
+        if "eschol" in queuedtasks:
+            self.processEscholDeposit(queuedtasks["eschol"])
+
+        if "sils" in queuedtasks:
+            self.processSilsDesposit(queuedtasks["sils"])
         return
+
+    def processSilsDesposit(self, packageIds):
+        print("process sils submission")
+        for packageid in packageIds:
+            x = createMarc(packageid)
+            # drop and create DBs and add seed data
+            marcfile = x.writeMarcFile()
+            # need to send the generated marc file to Merritt
+            # find out information about FTP for SILS
+            consts.db.saveQueueStatus(packageid, "done")
+
+    def processMintPending(self, packageIds):
+        print("process mint requests")
+        for packageid in packageIds:
+            x = mintEscholId(packageid)
+            x.mint()
+            consts.db.saveQueueStatus(packageid, "eschol")
+
+
+    def processEscholDeposit(self, packageIds):
+        print("process eschol deposits")
+        for packageid in packageIds:
+            x = depositToEschol(packageid)
+            x.deposit()
+            consts.db.saveQueueStatus(packageid, "sils")
+
 
     def processFetched(self, packageIds):
         print(packageIds)

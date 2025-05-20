@@ -8,12 +8,12 @@ class etdDb:
     querySilsMap = "select field1,field2,field3,field4,field5,field6,info from settings where settingtype='MarcOut'"
     queryEscholMap = "select field1,field2,info from settings where settingtype='EscholOut'"
     queryPackage = "select id from packages where pubnum='{param}' and isInvalid = '0'"
-    queryAttrs = "select id, gwattrs, xmlattrs, computedattrs from packages where id= {param}"
+    queryAttrs = "select gwattrs, xmlattrs, computedattrs from packages where id= {param}"
     queryXmlAttrs = "select xmlattrs from packages where id='{param}'"
     queryComputedAttrs = "select zipname, pubnum, computedattrs from packages where id ='{param}'"
     queryCampusInfo = "select pqcode,code,instloc,namesuffix, nameinmarc, id from campuses"
     queryCampusId = "select id from campuses where code='{param}'"
-    queryEscholId = "select escholId from escholrequests where pubnum='{param}'"
+    queryEscholId = "select escholId from escholrequests where packageId={param}"
     queryQueuedTasks = "select queuename, packageId from queues where queuename != 'done'"
     queryUnprocessedMCs = "select id, callbackdata from merrittcallbacks where isProcessed = False"
     queryPubNumber = "SELECT pubnum FROM packages where id = {param}"
@@ -164,16 +164,16 @@ class etdDb:
         self.cnxn.commit()
         return
 
-    def getEscholId(self, pubnum):
+    def getEscholId(self, packageId):
         print("get eschol id if present")
-        query = self.queryEscholId.format(param=pubnum)
+        query = self.queryEscholId.format(param=packageId)
         self.cursor.execute(query)
         for row in self.cursor:
             return row[0]
         return None
 
-    def saveEscholRequest(self, packageId, pubnum, escholId):
-        print("save eschol id if present")
+    def addEscholRequest(self, packageId, pubnum, escholId):
+        print("insert a new request")
         query = self.insertEscholRequest.format(param1=packageId, param2 = pubnum, param3 = escholId)
         self.cursor.execute(query)
         self.cnxn.commit()
@@ -188,7 +188,7 @@ class etdDb:
 
     def saveEscholRequest(self, packageId, request):
         print("save eschol deposit request and response")
-        query = self.updateEscholRequest.format(param1=packageId, param2 = request)
+        query = self.updateEscholRequest.format(param1=packageId, param2 = request.replace("'","''").replace('\\','\\\\'))
         self.cursor.execute(query)
         self.cnxn.commit()
         return
@@ -238,7 +238,7 @@ class etdDb:
         query = self.updateMerrittArk.format(param1=packageId, param2 = ark)
         self.cursor.execute(query)
         self.cnxn.commit()
-        return    
+        return   
 
     def markMCprocessed(self, mcid):
         print("save merritt ark")
