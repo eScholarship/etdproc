@@ -5,7 +5,30 @@ from dbIntf import etdDb
 import json
 import os
 import consts
-db = etdDb()
+
+class marcToMerritt:
+    _collection = None
+    _marcpath = None
+    _merrittark = None
+    def __init__(self, marcpath, merrittark):
+        print(f'EtdToMerritt start')
+        self._marcpath = marcpath   
+        self._merrittark = merrittark
+        self._collection = creds.merritt_creds.collection + "_content"# temp for testing
+
+    def sendToMerritt(self):
+        files = {
+            'file': open(self._marcpath, 'rb'),
+            'submitter': (None, creds.merritt_creds.username),
+            'responseForm': (None, 'json'),
+            'notificationFormat': (None, 'json'),
+            'profile': (None, self._collection),
+            'primaryIdentifier':(None, self._merrittark),
+        }
+
+        # send request
+        response = requests.post(creds.merritt_creds.url, files=files, auth=(creds.merritt_creds.username, creds.merritt_creds.password),headers={'Accept': 'application/json'})
+        print(response)
 
 class etdToMerritt:
     _zipfile = None
@@ -18,7 +41,7 @@ class etdToMerritt:
     def __init__(self, packageId):
         print(f'EtdToMerritt start')
         self._packageId = packageId        
-        (zipfile, self._pubnum, etdattrs) = db.getCompAttrs(packageId)
+        (zipfile, self._pubnum, etdattrs) = consts.db.getCompAttrs(packageId)
         self._etdattrs = json.loads(etdattrs)
         self._zipfile = os.path.join( consts.downloadDir, zipfile+".zip")
         self._collection = creds.merritt_creds.collection + "_content"# temp for testing
@@ -35,7 +58,7 @@ class etdToMerritt:
             status = "send-error"
             raise
         finally:
-            db.saveMerrittRequest(self._packageId, self._requestattrs, self._responseattrs, status)
+            consts.db.saveMerrittRequest(self._packageId, self._requestattrs, self._responseattrs, status)
 
         print("DONE")
 

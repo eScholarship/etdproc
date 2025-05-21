@@ -21,8 +21,8 @@ class createMarc:
             return value + '.'
         if action == "comma":
             return value + ','
-        if action == "eschourl":
-            return consts.escholurl + value[-8:]
+        if action == "escholurl":
+            return consts.escholUrlBase + value[-8:]
         return value
 
     def generateConst(self, setting, fieldtofill):

@@ -2,7 +2,7 @@
 from getPQpackage import pqSfptIntf
 from parseXml import etdParseXml
 from computeValues import etdcomputeValues
-from sendToMerritt import etdToMerritt
+from sendToMerritt import etdToMerritt, marcToMerritt
 from parseGateway import etdParseGateway
 from depositToEschol import mintEscholId, depositToEschol
 from generateMarc import createMarc
@@ -65,6 +65,9 @@ class Controller:
             x = createMarc(packageid)
             # drop and create DBs and add seed data
             marcfile = x.writeMarcFile()
+            # x._compAttrs["merrittark"]
+            y = marcToMerritt(marcfile, x._compAttrs["merrittark"])
+            y.sendToMerritt()
             # need to send the generated marc file to Merritt
             # find out information about FTP for SILS
             consts.db.saveQueueStatus(packageid, "done")

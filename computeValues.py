@@ -162,9 +162,8 @@ class etdcomputeValues:
     # this needs to go away from here and moved to when we do eschol and merritt interaction
     def computeEscholMerritt(self):
         print("get the eschol url")
-        self._compAttrs["escholark"] = "qt5cq8c801"
-        self._compAttrs["escholurl"] = "https://escholarship.org/uc/item/5cq8c801"
-        self._compAttrs["merrittark"] = "ark:/13030/m51086wv"
+        self._compAttrs["escholark"] = "TBD"
+        self._compAttrs["merrittark"] = "TBD"
         escholid = None
         #escholurl = "https://escholarship.org/uc/item/"
 
