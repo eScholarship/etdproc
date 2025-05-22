@@ -164,6 +164,7 @@ class etdcomputeValues:
         print("get the eschol url")
         self._compAttrs["escholark"] = "TBD"
         self._compAttrs["merrittark"] = "TBD"
+        self._compAttrs["merrittbucket"] = self._compAttrs["campusshort"] + "_lib_etd"
         escholid = None
         #escholurl = "https://escholarship.org/uc/item/"
 

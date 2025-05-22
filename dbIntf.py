@@ -19,8 +19,9 @@ class etdDb:
     queryPubNumber = "SELECT pubnum FROM packages where id = {param}"
     insertPackage = "insert into packages (pubnum, zipname, campusId) VALUES ('{param1}','{param2}', {param3}) "
     insertMerrittRequest = "insert into merrittrequests (packageId, request, response, currentstatus) VALUES ({param1},'{param2}','{param3}','{param4}') "
-    insertEscholRequest = "insert into escholrequests (packageId, pubnum, escholId) VALUES ({param1},'{param2}','{param3}') "
+    insertEscholRequest = "insert into escholrequests (packageId, escholId) VALUES ({param1},'{param2}')"
     insertQueue = "insert into queues (packageId) VALUES ('{param1}') "
+    insertErrorLog = "insert into errorlog (packageId, message, details) VALUES ({param1},'{param2}','{param3}') "
     updateEscholRequest = "update escholrequests set depositrequest = '{param2}' where packageId = '{param1}'"
     updateEscholResponse = "update escholrequests set depositresponse = '{param2}' where packageId = '{param1}'"
     updateGwMetadata = "update packages set gwattrs = '{param2}' where id = '{param1}'"
@@ -172,9 +173,9 @@ class etdDb:
             return row[0]
         return None
 
-    def addEscholRequest(self, packageId, pubnum, escholId):
+    def addEscholRequest(self, packageId, escholId):
         print("insert a new request")
-        query = self.insertEscholRequest.format(param1=packageId, param2 = pubnum, param3 = escholId)
+        query = self.insertEscholRequest.format(param1=packageId, param2 = escholId)
         self.cursor.execute(query)
         self.cnxn.commit()
         return
@@ -236,6 +237,13 @@ class etdDb:
     def saveMerrittArk(self, packageId, ark):
         print("save merritt ark")
         query = self.updateMerrittArk.format(param1=packageId, param2 = ark)
+        self.cursor.execute(query)
+        self.cnxn.commit()
+        return   
+
+    def saveErrorLog(self, packageId, error, details):
+        print("save error info")
+        query = self.insertErrorLog.format(param1=packageId, param2 = error, param3=details)
         self.cursor.execute(query)
         self.cnxn.commit()
         return   

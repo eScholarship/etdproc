@@ -14,6 +14,7 @@ class marcToMerritt:
         print(f'EtdToMerritt start')
         self._marcpath = marcpath   
         self._merrittark = merrittark
+        # Merritt collection should come from self._compAttrs["merrittbucket"]
         self._collection = creds.merritt_creds.collection + "_content"# temp for testing
 
     def sendToMerritt(self):
@@ -44,6 +45,7 @@ class etdToMerritt:
         (zipfile, self._pubnum, etdattrs) = consts.db.getCompAttrs(packageId)
         self._etdattrs = json.loads(etdattrs)
         self._zipfile = os.path.join( consts.downloadDir, zipfile+".zip")
+        # Merritt collection should come from self._compAttrs["merrittbucket"]
         self._collection = creds.merritt_creds.collection + "_content"# temp for testing
 
 

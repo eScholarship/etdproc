@@ -22,10 +22,11 @@ class mintEscholId:
         print("mint if needed")
         code, escholId = consts.api.createItem(f'etdproc id {self._packageId}')
         if code == 200:
-            consts.db.addEscholRequest(self._packageId, "TBD", escholId)
+            consts.db.addEscholRequest(self._packageId, escholId)
             consts.db.saveEscholArk(self._packageId, escholId[-10:])
         else:
-            raise CustomError("Mint operation failed", cleanResponse(escholId)) 
+            consts.db.saveErrorLog(self._packageId,"Mint operation failed", cleanResponse(escholId))
+            raise Exception("Mint operation failed") 
 
         return escholId
 
@@ -66,7 +67,8 @@ class depositToEschol:
         # was this successfull or not - check the response
         # update escholid and url in 
         if code != 200:
-            raise CustomError(f'deposit failed for {self._packageId}', "details in escholrequests table")
+            consts.db.saveErrorLog(self._packageId,"deposit failed", "details in escholrequests table")
+            raise Exception("desposit failed") 
         return
 
 
