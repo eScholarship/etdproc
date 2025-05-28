@@ -1,7 +1,7 @@
 import json
-from pymarc import Record, Field, Subfield
-from dbIntf import etdDb
 import consts
+from pymarc import Record, Field, Subfield
+
 
 
 class createMarc:

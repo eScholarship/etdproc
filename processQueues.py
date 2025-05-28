@@ -1,10 +1,9 @@
-
+import consts
+from generateMarc import createMarc
+from parseGateway import etdParseGateway
 from computeValues import etdcomputeValues
 from sendToMerritt import etdToMerritt, marcToMerritt
-from parseGateway import etdParseGateway
 from depositToEschol import mintEscholId, depositToEschol
-from generateMarc import createMarc
-import consts
 
 
 class processQueueImpl:
@@ -22,6 +21,7 @@ class processQueueImpl:
         self._mintTasks = []
         self._escholTasks = []
         self._silsTasks = []
+        self.fillTasks()
 
     def fillTasks(self):
         print("prepare the queues")
@@ -56,8 +56,7 @@ class processQueueImpl:
 
         return
 
-    def processFetched(self, packageIds):
-        print(packageIds)
+    def processFetched(self):
         # extract these
         for packageid in self._fetchedTasks:
             try:
@@ -71,8 +70,7 @@ class processQueueImpl:
                 consts.db.saveQueueStatus(packageid, "fetch-error")
             # TBD - error case
 
-    def processExtracted(self, packageIds):
-        print(packageIds)
+    def processExtracted(self):
         # extract these
         for packageid in self._extractedTasks:
             try:
@@ -83,9 +81,8 @@ class processQueueImpl:
                 print(e)
                 consts.db.saveQueueStatus(packageid, "extract-error") 
 
-    def processGatewayPending(self, packageIds):
+    def processGatewayPending(self):
         print("find all package pending information from gw")
-        print(packageIds)
         # extract these
         for packageid in self._gatewayTasks:
             try:
@@ -97,7 +94,7 @@ class processQueueImpl:
                 print(e)
                 consts.db.saveQueueStatus(packageid, "gw-error") 
 
-    def processMintPending(self, packageIds):
+    def processMintPending(self):
         print("process mint requests")
         for packageid in self._mintTasks:
             try:
@@ -109,7 +106,7 @@ class processQueueImpl:
                 print(e)
                 consts.db.saveQueueStatus(packageid, "mint-error") 
 
-    def processEscholDeposit(self, packageIds):
+    def processEscholDeposit(self):
         print("process eschol deposits")
         for packageid in self._escholTasks:
             try:
@@ -121,7 +118,7 @@ class processQueueImpl:
                 print(e)
                 consts.db.saveQueueStatus(packageid, "eschol-error") 
 
-    def processSilsDesposit(self, packageIds):
+    def processSilsDesposit(self):
         print("process sils submission")
         for packageid in self._silsTasks:
             try:
@@ -129,7 +126,7 @@ class processQueueImpl:
                 # drop and create DBs and add seed data
                 marcfile = x.writeMarcFile()
                 # x._compAttrs["merrittark"]
-                y = marcToMerritt(marcfile, x._compAttrs["merrittark"])
+                y = marcToMerritt(marcfile, x._compattrs["merrittark"])
                 y.sendToMerritt()
                 # need to send the generated marc file to Merritt
                 # find out information about FTP for SILS

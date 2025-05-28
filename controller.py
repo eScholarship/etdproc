@@ -1,10 +1,11 @@
 
+import os
+import json
+import consts
 from getPQpackage import pqSfptIntf
 from parseXml import etdParseXml
 from processQueues import processQueueImpl
-import consts
-import os
-import json
+
 
 class Controller:
     def __init__(self):
@@ -73,5 +74,5 @@ class Controller:
 # parsexml, fetcherror
 c = Controller()
 #c.buildQueue()
-c.processQueue()
+#c.processQueue()
 #c.processMerrittCallbacks()

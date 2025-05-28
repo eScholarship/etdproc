@@ -10,10 +10,9 @@
 # use the information in the attrs to create marc records
 # use the information to create json for eschol deposit
 
-
-import lxml.etree as ET
 import json
 import consts
+import lxml.etree as ET
 
 
 class etdParseXml:

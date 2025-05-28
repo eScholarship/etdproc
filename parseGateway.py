@@ -1,11 +1,10 @@
+
+import io
+import json
+import consts
 import requests
 from creds import pg_creds
-import json
-from dbIntf import etdDb
 from pymarc.marcxml import record_to_xml, parse_xml_to_array
-from maps import pqmap
-import consts
-import io
 
 
 class etdParseGateway:

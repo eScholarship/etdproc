@@ -33,6 +33,7 @@ class pqSfptIntf:
             self.filesFound = sftp.listdir(sftp_creds.username)
             print(self.filesFound)
             for filename in self.filesFound:
+                # if the zipname is present in DB, skip for now
                 local_path = os.path.join(consts.downloadDir, filename)
                 remote_path = os.path.join(sftp_creds.username, filename)
                 sftp.get(remote_path, local_path)
@@ -79,6 +80,10 @@ class pqSfptIntf:
         
 
     def unzipFile(self, filepath):
+        zipname = os.path.splitext(os.path.basename(filepath))[0]
+        if consts.db.IsZipFilePresent(zipname):
+            print(f'Skipping {zipname}')
+            return
         print("unzip the file and save the files in a new folder")
         if(zipfile.is_zipfile(filepath) == False):
             print(f'{filepath} is not a zip file')

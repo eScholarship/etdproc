@@ -1,10 +1,10 @@
-import creds
-import requests
+
 import re
-from dbIntf import etdDb
-import json
 import os
+import json
+import creds
 import consts
+import requests
 
 class marcToMerritt:
     _collection = None

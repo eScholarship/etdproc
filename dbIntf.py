@@ -8,20 +8,21 @@ class etdDb:
     querySilsMap = "select field1,field2,field3,field4,field5,field6,info from settings where settingtype='MarcOut'"
     queryEscholMap = "select field1,field2,info from settings where settingtype='EscholOut'"
     queryPackage = "select id from packages where pubnum='{param}' and isInvalid = '0'"
-    queryAttrs = "select gwattrs, xmlattrs, computedattrs from packages where id= {param}"
+    queryAttrs = "select fileattrs, gwattrs, xmlattrs, computedattrs from packages where id= {param}"
     queryXmlAttrs = "select xmlattrs from packages where id='{param}'"
     queryComputedAttrs = "select zipname, pubnum, computedattrs from packages where id ='{param}'"
     queryCampusInfo = "select pqcode,code,instloc,namesuffix, nameinmarc, id from campuses"
     queryCampusId = "select id from campuses where code='{param}'"
     queryEscholId = "select escholId from escholrequests where packageId={param}"
-    queryQueuedTasks = "select queuename, packageId from queues where queuename != 'done'"
+    queryQueuedTasks = "select queuename, packageId from queues where queuename != 'done' and RIGHT(queuename, 6) != '-error'"
     queryUnprocessedMCs = "select id, callbackdata from merrittcallbacks where isProcessed = False"
     queryPubNumber = "SELECT pubnum FROM packages where id = {param}"
+    queryPackageZip = "SELECT id FROM packages where zipname = '{param}'"
     insertPackage = "insert into packages (pubnum, zipname, campusId) VALUES ('{param1}','{param2}', {param3}) "
     insertMerrittRequest = "insert into merrittrequests (packageId, request, response, currentstatus) VALUES ({param1},'{param2}','{param3}','{param4}') "
     insertEscholRequest = "insert into escholrequests (packageId, escholId) VALUES ({param1},'{param2}')"
     insertQueue = "insert into queues (packageId) VALUES ('{param1}') "
-    insertErrorLog = "insert into errorlog (packageId, message, details) VALUES ({param1},'{param2}','{param3}') "
+    insertErrorLog = "insert into errorlog (packageId, message, detail) VALUES ({param1},'{param2}','{param3}') "
     updateEscholRequest = "update escholrequests set depositrequest = '{param2}' where packageId = '{param1}'"
     updateEscholResponse = "update escholrequests set depositresponse = '{param2}' where packageId = '{param1}'"
     updateGwMetadata = "update packages set gwattrs = '{param2}' where id = '{param1}'"
@@ -71,7 +72,7 @@ class etdDb:
         query = self.queryAttrs.format(param=packageId)
         self.cursor.execute(query)
         for row in self.cursor:
-            return (row[0], row[1], row[2])
+            return (row[0], row[1], row[2], row[3])
         return None
     
     def getCompAttrs(self, packageId):
@@ -254,3 +255,12 @@ class etdDb:
         self.cursor.execute(query)
         self.cnxn.commit()
         return   
+
+    def IsZipFilePresent(self, zipname):        
+        query = self.queryPackageZip.format(param=zipname)
+        self.cursor.execute(query)
+        for row in self.cursor:
+            return row[0]
+        return None
+
+   

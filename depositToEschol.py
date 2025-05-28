@@ -1,8 +1,6 @@
-
-from escholClient import eschol
-from dbIntf import etdDb
-from errorLog import CustomError
+import os
 import json
+import shutil
 import consts
 # work with one package
 # call eschol to mint with pubnumber from ProQuest
@@ -32,16 +30,27 @@ class mintEscholId:
 
 class depositToEschol:
     _packageId = None
+    _fileattrs = None
     _gwattrs = None
     _xmlattrs = None
     _compattrs = None
     def __init__(self, packageId):
         self._packageId = packageId
-        (gwAttrs, xmlAttrs, compAttrs) = consts.db.getAttrs(packageId)
+        (fileattrs, gwAttrs, xmlAttrs, compAttrs) = consts.db.getAttrs(packageId)
+        self._fileattrs = json.loads(fileattrs)
         self._gwattrs = json.loads(gwAttrs)
         self._xmlattrs = json.loads(xmlAttrs)
         self._compattrs = json.loads(compAttrs)
 
+    def copyFilesToDepositDir(self):
+        # copy pdf from extract folder to deposit one
+        source_path = consts.extractDir + self._fileattrs["extractFolder"] 
+        dest_path = consts.depositDir + self._fileattrs["extractFolder"] 
+        os.makedirs(dest_path)
+        shutil.copy(os.path.join(source_path, self._fileattrs["pdffile"]), os.path.join(dest_path, self._fileattrs["pdffile"]))
+        shutil.copy(os.path.join(source_path, self._fileattrs["xmlfile"]), os.path.join(dest_path, self._fileattrs["xmlfile"]))
+
+        # TBD - For other files find location in the director tree and also update the byte size in 
 
     def deposit(self):
         print("deposit")
@@ -58,6 +67,7 @@ class depositToEschol:
             elif setting.typedata == "compute" and setting.info in self._compattrs and self._compattrs[setting.info]:
                 depositpackage[setting.field] = self._compattrs[setting.info]
 
+        self.copyFilesToDepositDir()
         # save the package in DB
         consts.db.saveEscholRequest(self._packageId, json.dumps(depositpackage,ensure_ascii=False))
         # call API with deposit package

@@ -1,9 +1,10 @@
+import os
 import json
-from dbIntf import etdDb
-from datetime import datetime, date, timedelta
 import dateparser
-from maps import pq_lang_mapping, cc_url_mapping
 import consts
+from datetime import datetime, date, timedelta
+from maps import pq_lang_mapping, cc_url_mapping
+
 
 class etdcomputeValues:
     _xmlAttrs = None
@@ -258,10 +259,11 @@ class etdcomputeValues:
         suppFiles = []
 
         for attachment in self._xmlAttrs["attachset"]:
+            link = os.path.join(consts.depositUrlBase, attachment['name'])
             entry = { "file": attachment['name'], 
-                     "fetchLink": "https://pub-submit-stg.escholarship.org/etdprocTmp/test.pdf", 
+                     "fetchLink": link, 
                      "title": attachment["descr"],
-                     "size": 694447
+                     "size": 694447 # TBD: need to get this from fileattrs
                      }
             # os.path.getsize(file_path)
             suppFiles.append(entry)
