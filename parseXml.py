@@ -187,7 +187,7 @@ class etdParseXml:
     def saveToDb(self):
         print("save the xml extracted data in ")
         # save - xmlmetadata table
-        
+        self._data["depositfolder"] = self._zipname
         metadata = json.dumps(self._data,ensure_ascii=False)
         campusId = consts.campusinfo[self._data["inst_code"]].localid
         # need to insert

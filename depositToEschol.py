@@ -2,6 +2,7 @@ import os
 import json
 import shutil
 import consts
+import pathlib
 # work with one package
 # call eschol to mint with pubnumber from ProQuest
 
@@ -50,7 +51,29 @@ class depositToEschol:
         shutil.copy(os.path.join(source_path, self._fileattrs["pdffile"]), os.path.join(dest_path, self._fileattrs["pdffile"]))
         shutil.copy(os.path.join(source_path, self._fileattrs["xmlfile"]), os.path.join(dest_path, self._fileattrs["xmlfile"]))
 
+        traversepath = pathlib.Path(source_path)
         # TBD - For other files find location in the director tree and also update the byte size in 
+        # os.path.getsize(file_path)
+        supp_info = {}
+        for item in traversepath.rglob("*"):
+            if item.is_file():
+                if item.name in self._fileattrs["supp"]:
+                    print(item.name)
+                    print(os.path.getsize(item))
+                    # copy the files
+                    item_dest = os.path.join(dest_path, item.name)
+                    item_size = os.path.getsize(item)
+                    shutil.copy(item, item_dest)
+                    supp_info[item.name] = item_size
+        return supp_info
+
+    def updateSupp(self, depositpackage, supp_info):
+        print("update supp")
+        if "suppFiles" in depositpackage:
+            for item in depositpackage["suppFiles"]:
+                item["size"] = supp_info["file"]
+        return depositpackage
+
 
     def deposit(self):
         print("deposit")
@@ -67,7 +90,8 @@ class depositToEschol:
             elif setting.typedata == "compute" and setting.info in self._compattrs and self._compattrs[setting.info]:
                 depositpackage[setting.field] = self._compattrs[setting.info]
 
-        self.copyFilesToDepositDir()
+        supp_info = self.copyFilesToDepositDir()
+        depositpackage = self.updateSupp(depositpackage, supp_info)
         # save the package in DB
         consts.db.saveEscholRequest(self._packageId, json.dumps(depositpackage,ensure_ascii=False))
         # call API with deposit package

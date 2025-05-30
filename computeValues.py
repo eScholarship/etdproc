@@ -257,13 +257,14 @@ class etdcomputeValues:
         if not self._xmlAttrs["attachset"]:
             return None
         suppFiles = []
-
+        linkbase = f'{consts.depositUrlBase}/{self._xmlAttrs["depositfolder"]}'
         for attachment in self._xmlAttrs["attachset"]:
-            link = os.path.join(consts.depositUrlBase, attachment['name'])
-            entry = { "file": attachment['name'], 
+            filename = attachment['name']
+            link = f'{linkbase}/{filename}'
+            entry = { "file": filename, 
                      "fetchLink": link, 
                      "title": attachment["descr"],
-                     "size": 694447 # TBD: need to get this from fileattrs
+                     "size": "TBD" # TBD: need to get this from fileattrs
                      }
             # os.path.getsize(file_path)
             suppFiles.append(entry)
@@ -284,7 +285,8 @@ class etdcomputeValues:
         print("compute for eschol deposit json")   
         # TBD - find a link to the file
         self._compAttrs["isPeerReviewed"] = True
-        self._compAttrs["contentLink"] = "https://pub-submit-stg.escholarship.org/etdprocTmp/test.pdf"
+        #self._compAttrs["contentLink"] = "https://pub-submit-stg.escholarship.org/etdprocTmp/test.pdf"
+        self._compAttrs["contentLink"] = f'{consts.depositUrlBase}/{self._xmlAttrs["depositfolder"]}/{self._xmlAttrs["binary-name"]}'
         self._compAttrs["escholauthors"] = self.getescholAuthors()
         self._compAttrs["escholIds"] = self.getescholIds()
         self._compAttrs["escholunits"] = self.getescholunits()
