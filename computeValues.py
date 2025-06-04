@@ -272,7 +272,7 @@ class etdcomputeValues:
 
     def getcclicense(self):
         # get the actual license if present
-        if "cclicense" in self._xmlAttrs:
+        if "cclicense" in self._xmlAttrs and self._xmlAttrs["cclicense"]:
             abbr = self._xmlAttrs["cclicense"].lower()
             if abbr in cc_url_mapping:
                 return cc_url_mapping[abbr]

@@ -1,4 +1,5 @@
 import consts
+import traceback
 from generateMarc import createMarc
 from parseGateway import etdParseGateway
 from computeValues import etdcomputeValues
@@ -66,6 +67,8 @@ class processQueueImpl:
                 consts.db.saveQueueStatus(packageid, "extract")
                 self._extractedTasks.append(packageid)
             except Exception as e:
+                callstack = traceback.format_exc()
+                print(callstack)
                 print(e)
                 consts.db.saveQueueStatus(packageid, "fetch-error")
             # TBD - error case
@@ -78,6 +81,8 @@ class processQueueImpl:
                 x.process()
                 consts.db.saveQueueStatus(packageid, "merritt")
             except Exception as e:
+                callstack = traceback.format_exc()
+                print(callstack)
                 print(e)
                 consts.db.saveQueueStatus(packageid, "extract-error") 
 
@@ -91,6 +96,8 @@ class processQueueImpl:
                     consts.db.saveQueueStatus(packageid, "mint")
                     self._mintTasks.append(packageid)
             except Exception as e:
+                callstack = traceback.format_exc()
+                print(callstack)
                 print(e)
                 consts.db.saveQueueStatus(packageid, "gw-error") 
 
@@ -103,6 +110,8 @@ class processQueueImpl:
                 consts.db.saveQueueStatus(packageid, "eschol")
                 self._escholTasks.append(packageid)
             except Exception as e:
+                callstack = traceback.format_exc()
+                print(callstack)
                 print(e)
                 consts.db.saveQueueStatus(packageid, "mint-error") 
 
@@ -115,6 +124,8 @@ class processQueueImpl:
                 consts.db.saveQueueStatus(packageid, "sils")
                 self._silsTasks.append(packageid)
             except Exception as e:
+                callstack = traceback.format_exc()
+                print(callstack)
                 print(e)
                 consts.db.saveQueueStatus(packageid, "eschol-error") 
 
@@ -132,6 +143,8 @@ class processQueueImpl:
                 # find out information about FTP for SILS
                 consts.db.saveQueueStatus(packageid, "done")
             except Exception as e:
+                callstack = traceback.format_exc()
+                print(callstack)
                 print(e)
                 consts.db.saveQueueStatus(packageid, "sils-error") 
 

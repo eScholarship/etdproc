@@ -1,6 +1,7 @@
 import creds
 import requests
 import json
+import traceback
 
 ########################################
 #
@@ -28,6 +29,8 @@ class graphClient:
             print(response)
             return response.status_code, response.text
         except Exception as e:
+            callstack = traceback.format_exc()
+            print(callstack)
             print(e)
             raise e
 

@@ -45,9 +45,9 @@ class depositToEschol:
 
     def copyFilesToDepositDir(self):
         # copy pdf from extract folder to deposit one
-        source_path = consts.extractDir + self._fileattrs["extractFolder"] 
-        dest_path = consts.depositDir + self._fileattrs["extractFolder"] 
-        os.makedirs(dest_path)
+        source_path = f'{consts.extractDir}/{self._fileattrs["folder"]}'
+        dest_path = f'{consts.depositDir}/{self._fileattrs["folder"]}'  
+        os.makedirs(dest_path, exist_ok=True)
         shutil.copy(os.path.join(source_path, self._fileattrs["pdffile"]), os.path.join(dest_path, self._fileattrs["pdffile"]))
         shutil.copy(os.path.join(source_path, self._fileattrs["xmlfile"]), os.path.join(dest_path, self._fileattrs["xmlfile"]))
 
@@ -71,7 +71,7 @@ class depositToEschol:
         print("update supp")
         if "suppFiles" in depositpackage:
             for item in depositpackage["suppFiles"]:
-                item["size"] = supp_info["file"]
+                item["size"] = supp_info[item["file"]]
         return depositpackage
 
 

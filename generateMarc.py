@@ -11,7 +11,7 @@ class createMarc:
     _compattrs = None
     def __init__(self, packageId):
         self._packageId = packageId
-        (gwAttrs, xmlAttrs, compAttrs) = consts.db.getAttrs(packageId)
+        (_,gwAttrs, xmlAttrs, compAttrs) = consts.db.getAttrs(packageId)
         self._gwattrs = json.loads(gwAttrs)
         self._xmlattrs = json.loads(xmlAttrs)
         self._compattrs = json.loads(compAttrs)
@@ -110,7 +110,7 @@ class createMarc:
                     useLastField = True
 
         # check for embargo date and skip or keep going accordingly
-        if setting.tag == '506' and setting.indicator1 == '1' and self._compattrs["embargodate"] is None:
+        if setting.tag == '506' and setting.indicator1 == '1' and ("embargodate" not in self._compattrs or self._compattrs["embargodate"] is None):
             return None
 
         # skip 245 indicator other than the matching tilte indicator

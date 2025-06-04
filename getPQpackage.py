@@ -66,7 +66,7 @@ class pqSfptIntf:
                 # name is proQuest xml
                 xmlname = name
             else:
-                otherfiles.append(name)
+                otherfiles.append(os.path.basename(name))
 
         pdfname = xmlname[:-9] + ".pdf"
         if pdfname not in otherfiles:

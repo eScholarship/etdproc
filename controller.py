@@ -18,7 +18,7 @@ class Controller:
     def buildQueue(self):
         print("bring in files from ")
         #zippath = "C:/Users/myucekul/Downloads/etdadmin_upload_1139353.zip"
-        zippath = os.path.join(consts.downloadDir, "etdadmin_upload_1139353.zip")
+        zippath = os.path.join(consts.downloadDir, "etdadmin_upload_1140749.zip")
         # get the packages
         x = pqSfptIntf()
         #x.getPqPackages()
