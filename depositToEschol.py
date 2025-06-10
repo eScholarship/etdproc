@@ -14,12 +14,15 @@ def cleanResponse(text):
 
 class mintEscholId:
     _packageId = None
+    _pubnum = None
     def __init__(self, packageId):
         self._packageId = packageId
+        self._pubnum = consts.db.getPubNumber(packageId)
 
     def mint(self):
         print("mint if needed")
-        code, escholId = consts.api.createItem(f'etdproc id {self._packageId}')
+        # add pubnum from ProQuest as external id
+        code, escholId = consts.api.createItem(self._pubnum)
         if code == 200:
             consts.db.addEscholRequest(self._packageId, escholId)
             consts.db.saveEscholArk(self._packageId, escholId[-10:])

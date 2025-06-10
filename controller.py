@@ -18,11 +18,11 @@ class Controller:
     def buildQueue(self):
         print("bring in files from ")
         #zippath = "C:/Users/myucekul/Downloads/etdadmin_upload_1139353.zip"
-        zippath = os.path.join(consts.downloadDir, "etdadmin_upload_1140749.zip")
+        #zippath = os.path.join(consts.downloadDir, "etdadmin_upload_1140749.zip")
         # get the packages
         x = pqSfptIntf()
-        #x.getPqPackages()
-        x.unzipFile(zippath)
+        x.getPqPackages()
+        #x.unzipFile(zippath)
         for item in x.filesUnziped:
             xmlpath = x.getFullPathForProQuestXml(item)
             # create entries in DB 

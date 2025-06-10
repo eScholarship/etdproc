@@ -13,6 +13,7 @@ class processQueueImpl:
     _gatewayTasks = []
     _mintTasks = []
     _escholTasks = []
+    _marcTasks = []
     _silsTasks = []
     def __init__(self):
         print("process queues")
@@ -21,6 +22,7 @@ class processQueueImpl:
         self._gatewayTasks = []
         self._mintTasks = []
         self._escholTasks = []
+        self._marcTasks = []
         self._silsTasks = []
         self.fillTasks()
 
@@ -42,6 +44,9 @@ class processQueueImpl:
         if "eschol" in queuedtasks:
             self._escholTasks = queuedtasks["eschol"]
 
+        if "marc" in queuedtasks:
+            self._marcTasks = queuedtasks["marc"]
+
         if "sils" in queuedtasks:
             self._silsTasks = queuedtasks["sils"]
 
@@ -53,6 +58,7 @@ class processQueueImpl:
         self.processGatewayPending()
         self.processMintPending()
         self.processEscholDeposit()
+        self.processMarcGeneration()
         self.processSilsDesposit()
 
         return
@@ -121,17 +127,17 @@ class processQueueImpl:
             try:
                 x = depositToEschol(packageid)
                 x.deposit()
-                consts.db.saveQueueStatus(packageid, "sils")
-                self._silsTasks.append(packageid)
+                consts.db.saveQueueStatus(packageid, "marc")
+                self._marcTasks.append(packageid)
             except Exception as e:
                 callstack = traceback.format_exc()
                 print(callstack)
                 print(e)
                 consts.db.saveQueueStatus(packageid, "eschol-error") 
 
-    def processSilsDesposit(self):
-        print("process sils submission")
-        for packageid in self._silsTasks:
+    def processMarcGeneration(self):
+        print("generate marc records")
+        for packageid in self._marcTasks:
             try:
                 x = createMarc(packageid)
                 # drop and create DBs and add seed data
@@ -141,6 +147,18 @@ class processQueueImpl:
                 y.sendToMerritt()
                 # need to send the generated marc file to Merritt
                 # find out information about FTP for SILS
+                consts.db.saveQueueStatus(packageid, "sils")
+            except Exception as e:
+                callstack = traceback.format_exc()
+                print(callstack)
+                print(e)
+                consts.db.saveQueueStatus(packageid, "marc-error") 
+
+    def processSilsDesposit(self):
+        print("process sils submission")
+        for packageid in self._silsTasks:
+            try:
+                # TBD to ftp for OCLC
                 consts.db.saveQueueStatus(packageid, "done")
             except Exception as e:
                 callstack = traceback.format_exc()
