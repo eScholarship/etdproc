@@ -87,7 +87,6 @@ class depositToEschol:
         # create the deposit package
         depositpackage = {}
         for setting in consts.escholSetting:
-            print(setting)
             if setting.typedata == "const":
                 depositpackage[setting.field] = setting.info
             elif setting.typedata == "xml" and setting.info in self._xmlattrs and self._xmlattrs[setting.info]:

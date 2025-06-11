@@ -140,14 +140,11 @@ class processQueueImpl:
         for packageid in self._marcTasks:
             try:
                 x = createMarc(packageid)
-                # drop and create DBs and add seed data
                 marcfile = x.writeMarcFile()
-                # x._compAttrs["merrittark"]
                 y = marcToMerritt(marcfile, x._compattrs["merrittark"])
                 y.sendToMerritt()
-                # need to send the generated marc file to Merritt
-                # find out information about FTP for SILS
                 consts.db.saveQueueStatus(packageid, "sils")
+                self._silsTasks.append(packageid)
             except Exception as e:
                 callstack = traceback.format_exc()
                 print(callstack)

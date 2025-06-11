@@ -86,5 +86,6 @@ class etdParseGateway:
 
 
 #print("start")
-#x = etdParseGateway("30492756")
+#x = etdParseGateway(1)
+#x.process()
 #print("end")
