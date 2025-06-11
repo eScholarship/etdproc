@@ -1,11 +1,9 @@
+import os
+import json
+import consts
 import paramiko
 import zipfile
 from creds import sftp_creds
-from datetime import datetime
-import os
-from pathlib import Path
-import json
-import consts
 
 class pqSfptIntf:
     filesFound = []

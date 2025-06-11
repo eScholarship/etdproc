@@ -1,5 +1,4 @@
 
-import os
 import json
 import consts
 from getPQpackage import pqSfptIntf
@@ -34,18 +33,27 @@ class Controller:
             x.saveToDb(item, packageId)
 
 
+    def getpubnumFromMC(self, localId, isInitSub):
+        pubnum = localId
+        # the local id may be a combination of pubnum and date from mrc such as 31844343;ucla.etd:PQ23750
+        if "ucla" in localId:
+            pubnum = localId.split(';')[0]
+        
+        packageid = consts.db.getPackageId(pubnum)
+        if packageid and isInitSub:
+            consts.db.saveMerrittLocalId(packageid, localId)
+        return packageid
+
     def processMerrittCallbacks(self):
         # find out unprocess entries from callback table
         queuedMC = consts.db.getUnprocessedMCs()
         for mcid in queuedMC:
             # extract pub number from json and if the stutus is COMPLETED then move the queue status to gw
             data = json.loads(queuedMC[mcid])
-            jobstatus = data["job:jobState"]["job:jobStatus"].lower()
-            pubnum = data["job:jobState"]["job:localID"]
-            packageid = consts.db.getPackageId(pubnum)
+            jobstatus = data["job:jobState"]["job:jobStatus"].lower()                       
             isForInitialSubmission = data["job:jobState"]["job:packageName"].endswith(".zip")
+            packageid = self.getpubnumFromMC(str(data["job:jobState"]["job:localID"]), isForInitialSubmission)
             if isForInitialSubmission and packageid:
-                print(data)
                 if jobstatus == "completed":
                     merrittark = data["job:jobState"]["job:primaryID"]
                     consts.db.saveMerrittArk(packageid, merrittark)

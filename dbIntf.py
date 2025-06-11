@@ -31,6 +31,7 @@ class etdDb:
     updateFileAttrs = "update packages set fileattrs = '{param2}' where id = '{param1}'"
     updateQueueStatus = "update queues set queuename = '{param2}' where packageId = {param1}"  
     updateMerrittArk = "update packages set computedattrs = JSON_SET(computedattrs, '$.merrittark', '{param2}') where id = {param1}"
+    updateMerrittLocalId  = "update packages set computedattrs = JSON_SET(computedattrs, '$.merrittlocalId', '{param2}') where id = {param1}"
     updateEscholArk = "update packages set computedattrs = JSON_SET(computedattrs, '$.escholark', '{param2}') where id = {param1}"
     updateMcProcessed = "update merrittcallbacks set isProcessed = True where id = {param}" 
 
@@ -241,6 +242,13 @@ class etdDb:
         self.cursor.execute(query)
         self.cnxn.commit()
         return   
+
+    def saveMerrittLocalId(self, packageId, localId):
+        print("save merritt localId")
+        query = self.updateMerrittLocalId.format(param1=packageId, param2 = localId)
+        self.cursor.execute(query)
+        self.cnxn.commit()
+        return  
 
     def saveErrorLog(self, packageId, error, details):
         print("save error info")

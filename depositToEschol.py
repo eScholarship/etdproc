@@ -22,6 +22,10 @@ class mintEscholId:
     def mint(self):
         print("mint if needed")
         # add pubnum from ProQuest as external id
+        existingArk = consts.db.getEscholId(self._packageId)
+        if existingArk:
+            print(f'skipping mint; found {existingArk}')
+            return
         code, escholId = consts.api.createItem(self._pubnum)
         if code == 200:
             consts.db.addEscholRequest(self._packageId, escholId)
