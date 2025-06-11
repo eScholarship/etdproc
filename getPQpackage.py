@@ -38,7 +38,7 @@ class pqSfptIntf:
                 remote_path = os.path.join(sftp_creds.username, filename)
                 sftp.get(remote_path, local_path)
                 # tbd - remove the file from sftp site
-                #sftp.remove(remote_file_path)
+                sftp.remove(remote_path)
                 self.unzipFile(local_path)
         return
 

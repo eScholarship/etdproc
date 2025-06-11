@@ -44,7 +44,8 @@ class Controller:
             pubnum = data["job:jobState"]["job:localID"]
             packageid = consts.db.getPackageId(pubnum)
             isForInitialSubmission = data["job:jobState"]["job:packageName"].endswith(".zip")
-            if isForInitialSubmission:
+            if isForInitialSubmission and packageid:
+                print(data)
                 if jobstatus == "completed":
                     merrittark = data["job:jobState"]["job:primaryID"]
                     consts.db.saveMerrittArk(packageid, merrittark)
