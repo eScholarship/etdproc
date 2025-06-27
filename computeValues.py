@@ -1,4 +1,4 @@
-import os
+
 import json
 import dateparser
 import consts
@@ -95,13 +95,17 @@ class etdcomputeValues:
         # date1 when the record was generated
         # year of ETD publication
         # {date}s{year}\\\\cau|||||obm\\||||\||{lang}\d
+        # correct:   250528s2025####cau|||||obm|||||| ||eng|d
+        # check:     250627s2025####cau|||||obm|||||| ||eng|d
+        # incorrect: 250603s2025  cau|||||obm |||| ||eng d
+
         print("create record info")
         date = datetime.now().strftime('%y%m%d')
 
         # xml language need to convert en to eng
         lang = self.getLanguage()
         self._compAttrs["lang"] = lang
-        self._compAttrs["recinfo"]  = f'{date}s{self._compAttrs["pub_year"]}\\\\cau|||||obm\\||||\||{lang}\d'.replace('\\',' ')
+        self._compAttrs["recinfo"]  = f'{date}s{self._compAttrs["pub_year"]}####cau|||||obm|||||| ||{lang}|d'
         return
 
     def splitTile(self, title):
