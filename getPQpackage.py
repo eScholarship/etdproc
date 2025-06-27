@@ -3,6 +3,7 @@ import json
 import consts
 import paramiko
 import zipfile
+import shutil
 from creds import sftp_creds
 
 class pqSfptIntf:
@@ -37,7 +38,10 @@ class pqSfptIntf:
                 sftp.get(remote_path, local_path)
                 # tbd - remove the file from sftp site
                 sftp.remove(remote_path)
-                self.unzipFile(local_path)
+                if self.unzipFile(local_path):
+                    shutil.move(local_path, consts.doneDir)
+                else:
+                    shutil.move(local_path, consts.errorDir)
         return
 
     def isValidZip(self, zfiles):
@@ -81,39 +85,28 @@ class pqSfptIntf:
         zipname = os.path.splitext(os.path.basename(filepath))[0]
         if consts.db.IsZipFilePresent(zipname):
             print(f'Skipping {zipname}')
-            return
+            return False
         print("unzip the file and save the files in a new folder")
         if(zipfile.is_zipfile(filepath) == False):
             print(f'{filepath} is not a zip file')
-            return
-        zfiles = zipfile.ZipFile(filepath, 'r')
-        # inspect the zip file
-        # make sure it has _DATA file
-        if(self.isValidZip(zfiles)):
-            zipname = os.path.splitext(os.path.basename(filepath))[0]
-            extractfolder = os.path.join(consts.extractDir, zipname)
-            zfiles.extractall(extractfolder)
-            self.filesUnziped[zipname] = self.getfileAttrs(zfiles, zipname)
-        else:
-            print(f'{filepath} is not a valid ProQuest package')
-        return
+            return False
+        with zipfile.ZipFile(filepath, 'r') as zfiles:
+            # inspect the zip file
+            # make sure it has _DATA file
+            if(self.isValidZip(zfiles)):
+                zipname = os.path.splitext(os.path.basename(filepath))[0]
+                extractfolder = os.path.join(consts.extractDir, zipname)
+                zfiles.extractall(extractfolder)
+                self.filesUnziped[zipname] = self.getfileAttrs(zfiles, zipname)
+                return True
+            else:
+                print(f'{filepath} is not a valid ProQuest package')
+        return False
 
     def getFullPathForProQuestXml(self, zipname):
         fileatts = self.filesUnziped[zipname]
-
         # get the xml name
         return os.path.join(consts.extractDir, zipname, fileatts["xmlfile"])
-        #for name in names:
-        #    if name[-9:] == "_DATA.xml":
-        #        # keep this file in extract folder
-        #        print(name)
-        #    else:
-        #        # move rest to deposit folder
-        #directory = os.path.join(self.extractDir, zipname) 
-        #for root, _, files in os.walk(directory):
-        #    for file in files:
-        #        relative_path = os.path.relpath(os.path.join(root, file), directory)
-        #        #files_list.append(relative_path)
 
     def saveToDb(self, zipname, packageId):
         print("save fileattrs and create queue item for this")

@@ -194,6 +194,7 @@ class etdParseXml:
         consts.db.savePackage(self._data["pubNumber"], self._zipname, campusId)
         packageid = consts.db.getPackageId(self._data["pubNumber"])
         consts.db.savexmlMetadata(packageid, metadata)
+        consts.db.saveIdentifier(packageid, "PQPubNum",self._data["pubNumber"])
         return packageid
 
 

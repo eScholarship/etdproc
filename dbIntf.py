@@ -23,6 +23,7 @@ class etdDb:
     insertEscholRequest = "insert into escholrequests (packageId, escholId) VALUES ({param1},'{param2}')"
     insertQueue = "insert into queues (packageId) VALUES ('{param1}') "
     insertErrorLog = "insert into errorlog (packageId, message, detail) VALUES ({param1},'{param2}','{param3}') "
+    insertIdentifier = "insert into identifiers (packageId, idtype, idvalue) VALUES ({param1},'{param2}','{param3}') "
     updateEscholRequest = "update escholrequests set depositrequest = '{param2}' where packageId = '{param1}'"
     updateEscholResponse = "update escholrequests set depositresponse = '{param2}' where packageId = '{param1}'"
     updateGwMetadata = "update packages set gwattrs = '{param2}' where id = '{param1}'"
@@ -31,7 +32,7 @@ class etdDb:
     updateFileAttrs = "update packages set fileattrs = '{param2}' where id = '{param1}'"
     updateQueueStatus = "update queues set queuename = '{param2}' where packageId = {param1}"  
     updateMerrittArk = "update packages set computedattrs = JSON_SET(computedattrs, '$.merrittark', '{param2}') where id = {param1}"
-    updateMerrittLocalId  = "update packages set computedattrs = JSON_SET(computedattrs, '$.merrittlocalId', '{param2}') where id = {param1}"
+    #updateMerrittLocalId  = "update packages set computedattrs = JSON_SET(computedattrs, '$.merrittlocalId', '{param2}') where id = {param1}"
     updateEscholArk = "update packages set computedattrs = JSON_SET(computedattrs, '$.escholark', '{param2}') where id = {param1}"
     updateMcProcessed = "update merrittcallbacks set isProcessed = True where id = {param}" 
 
@@ -234,6 +235,7 @@ class etdDb:
         query = self.updateEscholArk.format(param1=packageId, param2 = ark)
         self.cursor.execute(query)
         self.cnxn.commit()
+        self.saveIdentifier(packageId, "EscholId",ark)
         return    
 
     def saveMerrittArk(self, packageId, ark):
@@ -241,14 +243,10 @@ class etdDb:
         query = self.updateMerrittArk.format(param1=packageId, param2 = ark)
         self.cursor.execute(query)
         self.cnxn.commit()
+        self.saveIdentifier(packageId, "MerrittArk",ark)
         return   
 
-    def saveMerrittLocalId(self, packageId, localId):
-        print("save merritt localId")
-        query = self.updateMerrittLocalId.format(param1=packageId, param2 = localId)
-        self.cursor.execute(query)
-        self.cnxn.commit()
-        return  
+
 
     def saveErrorLog(self, packageId, error, details):
         print("save error info")
@@ -271,4 +269,10 @@ class etdDb:
             return row[0]
         return None
 
+    def saveIdentifier(self, packageId, idtype, idvalue):
+        print("save identifier")
+        query = self.insertIdentifier.format(param1=packageId, param2 = idtype, param3= idvalue)
+        self.cursor.execute(query)
+        self.cnxn.commit()
+        return
    

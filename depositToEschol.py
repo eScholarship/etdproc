@@ -26,7 +26,7 @@ class mintEscholId:
         if existingArk:
             print(f'skipping mint; found {existingArk}')
             return
-        code, escholId = consts.api.createItem(self._pubnum)
+        code, escholId = consts.api.createItem(consts.localIdPrefix + self._pubnum)
         if code == 200:
             consts.db.addEscholRequest(self._packageId, escholId)
             consts.db.saveEscholArk(self._packageId, escholId[-10:])

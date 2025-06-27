@@ -44,7 +44,7 @@ class etdToMerritt:
         self._packageId = packageId        
         (zipfile, self._pubnum, etdattrs) = consts.db.getCompAttrs(packageId)
         self._etdattrs = json.loads(etdattrs)
-        self._zipfile = os.path.join( consts.downloadDir, zipfile+".zip")
+        self._zipfile = os.path.join( consts.doneDir, zipfile+".zip")
         # Merritt collection should come from self._compAttrs["merrittbucket"]
         self._collection = creds.merritt_creds.collection + "_content"# temp for testing
 
@@ -76,7 +76,7 @@ class etdToMerritt:
             'responseForm': (None, 'json'),
             'notificationFormat': (None, 'json'),
             'profile': (None, self._collection),
-            'localIdentifier': (None, self._pubnum),
+            'localIdentifier': (None, consts.localIdPrefix + self._pubnum),
         }
 
         # send request

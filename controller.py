@@ -1,6 +1,7 @@
-
+import os
 import json
 import consts
+import shutil
 from getPQpackage import pqSfptIntf
 from parseXml import etdParseXml
 from processQueues import processQueueImpl
@@ -9,19 +10,21 @@ from processQueues import processQueueImpl
 class Controller:
     def __init__(self):
         print("starting controller")
-        self.buildQueue()
+        #self.buildQueue()
         self.processMerrittCallbacks()
         x = processQueueImpl() 
         x.processQueue()
 
     def buildQueue(self):
         print("bring in files from ")
-        #zippath = "C:/Users/myucekul/Downloads/etdadmin_upload_1139353.zip"
-        #zippath = os.path.join(consts.downloadDir, "etdadmin_upload_1140749.zip")
-        # get the packages
         x = pqSfptIntf()
+        #zippath = os.path.join(consts.downloadDir, "etdadmin_upload_1140749.zip")
+        #if x.unzipFile(zippath):
+        #    shutil.move(zippath, consts.doneDir)
+        #else:
+        #    shutil.move(zippath, consts.errorDir)
+        # get the packages
         x.getPqPackages()
-        #x.unzipFile(zippath)
         for item in x.filesUnziped:
             xmlpath = x.getFullPathForProQuestXml(item)
             # create entries in DB 
@@ -39,9 +42,10 @@ class Controller:
         if "ucla" in localId:
             pubnum = localId.split(';')[0]
         
+        # remove prefix to get the number
+        pubnum = pubnum.split(':')[1]
         packageid = consts.db.getPackageId(pubnum)
-        if packageid and isInitSub:
-            consts.db.saveMerrittLocalId(packageid, localId)
+
         return packageid
 
     def processMerrittCallbacks(self):

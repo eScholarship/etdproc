@@ -57,8 +57,8 @@ class etdParseGateway:
         print("save the xml extracted data in ")
         metadata = json.dumps(self._data,ensure_ascii=False)
         consts.db.saveGwMetadata(self._packageId, metadata)
-        return
-
+        # save isbn in identifiers table
+        consts.db.saveIdentifier(self._packageId, "ISBN",self._data["isbn"])
 
     def extractMarcInfo(self):
         print("start - extract")
