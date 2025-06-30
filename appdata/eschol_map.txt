@@ -19,7 +19,7 @@ contributors, compute, escholadvisors
 isbn, gw, isbn
 subjects, gw, subjects
 language, xml, language
-embargoExpires, compute, embargoEndDate
+embargoExpires, compute, embargodate
 rights, compute, cclicence
 suppFiles, compute, escholsupp
 isbn, gw, isbn

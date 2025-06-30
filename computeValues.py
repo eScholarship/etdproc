@@ -79,9 +79,12 @@ class etdcomputeValues:
                 end_date = end_date.date()
             else:
                 self._compAttrs["isPermEmbargoed"] = True
+                self._compAttrs["isEmbargoed"] = True
+                self._compAttrs["embargodate"] = "2999-12-31"
 
         if end_date:
             self._compAttrs["embargodate"] = end_date.strftime('%Y-%m-%d')
+            self._compAttrs["isEmbargoed"] = True
         return
 
     def getLanguage(self):
