@@ -102,6 +102,7 @@ class depositToEschol:
         consts.db.saveEscholRequest(self._packageId, json.dumps(depositpackage,ensure_ascii=False))
         # call API with deposit package
         code, response = consts.api.depositItem(depositpackage)
+        print(response)
         # save result and response in DB
         consts.db.saveEscholResponse(self._packageId, cleanResponse(response))
         # was this successfull or not - check the response

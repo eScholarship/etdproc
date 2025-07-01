@@ -10,7 +10,7 @@ from processQueues import processQueueImpl
 class Controller:
     def __init__(self):
         print("starting controller")
-        #self.buildQueue()
+        self.buildQueue()
         self.processMerrittCallbacks()
         x = processQueueImpl() 
         x.processQueue()
