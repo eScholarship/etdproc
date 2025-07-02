@@ -43,7 +43,8 @@ class Controller:
             pubnum = localId.split(';')[0]
         
         # remove prefix to get the number
-        pubnum = pubnum.split(':')[1]
+        if ':' in pubnum:
+            pubnum = pubnum.split(':')[1]
         packageid = consts.db.getPackageId(pubnum)
 
         return packageid

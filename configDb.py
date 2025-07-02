@@ -4,10 +4,10 @@ import mysql.connector
 import csv
 
 class configDb:
-    #allSqlFiles = ["campuses.sql","packages.sql","actionlog.sql","errorlog.sql","settings.sql","identifiers.sql","merrittcallback.sql","merrittrequest.sql","escholrequest.sql","queues.sql"]
-    allSqlFiles = ["identifiers.sql"]
+    allSqlFiles = ["campuses.sql","packages.sql","errorlog.sql","settings.sql","identifiers.sql","merrittcallback.sql","merrittrequest.sql","escholrequest.sql","queues.sql"]
+    #allSqlFiles = ["identifiers.sql"]
     sqlpath = 'sqlscripts/'
-    datapath = 'appdata/' #TBD
+    datapath = 'appdata/' 
     InsertCampus = "INSERT INTO Campuses (code,instloc,pqcode,namesuffix,escholunit,merrittcol,nameinmarc) VALUES (%s,%s,%s,%s,%s,%s,%s)"
     InsertMarcIn = "INSERT INTO settings (settingtype,field1,field2,field3,field4) VALUES (%s,%s,%s,%s,%s)"
     InsertSilsMap = "INSERT INTO settings (settingtype,field1,field2,field3,field4,field5,field6,info) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
@@ -106,7 +106,7 @@ class configDb:
 
 print("start")
 x = configDb()
-x.createDbs()
+#x.createDbs()
 #x.populateCampuses()
 #x.populateGatewayConfig()
 #x.populateSilsConfig()
