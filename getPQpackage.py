@@ -35,9 +35,13 @@ class pqSfptIntf:
                 # if the zipname is present in DB, skip for now
                 local_path = os.path.join(consts.downloadDir, filename)
                 remote_path = os.path.join(sftp_creds.username, filename)
+                zipname = os.path.splitext(filename)[0]
+                if consts.db.IsZipFilePresent(zipname):
+                    print(f'Skipping {zipname}')
+                    continue
                 sftp.get(remote_path, local_path)
                 # tbd - remove the file from sftp site
-                sftp.remove(remote_path)
+                # sftp.remove(remote_path)
                 if self.unzipFile(local_path):
                     shutil.move(local_path, consts.doneDir)
                 else:
