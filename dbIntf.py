@@ -24,15 +24,14 @@ class etdDb:
     insertQueue = "insert into queues (packageId) VALUES ('{param1}') "
     insertErrorLog = "insert into errorlog (packageId, message, detail) VALUES ({param1},'{param2}','{param3}') "
     insertIdentifier = "insert into identifiers (packageId, idtype, idvalue) VALUES ({param1},'{param2}','{param3}') "
-    updateEscholRequest = "update escholrequests set depositrequest = '{param2}' where packageId = '{param1}'"
-    updateEscholResponse = "update escholrequests set depositresponse = '{param2}' where packageId = '{param1}'"
-    updateGwMetadata = "update packages set gwattrs = '{param2}' where id = '{param1}'"
-    updateXmlMetadata = "update packages set xmlattrs = '{param2}' where id = '{param1}'"
-    updateComputed = "update packages set computedattrs = '{param2}' where id = '{param1}'"
-    updateFileAttrs = "update packages set fileattrs = '{param2}' where id = '{param1}'"
-    updateQueueStatus = "update queues set queuename = '{param2}' where packageId = {param1}"  
+    updateEscholRequest = "update escholrequests set depositrequest = '{param2}', actionTime = NOW() where packageId = '{param1}'"
+    updateEscholResponse = "update escholrequests set depositresponse = '{param2}', actionTime = NOW() where packageId = '{param1}'"
+    updateGwMetadata = "update packages set gwattrs = '{param2}', lastUpdated = NOW() where id = '{param1}'"
+    updateXmlMetadata = "update packages set xmlattrs = '{param2}', lastUpdated = NOW() where id = '{param1}'"
+    updateComputed = "update packages set computedattrs = '{param2}', lastUpdated = NOW() where id = '{param1}'"
+    updateFileAttrs = "update packages set fileattrs = '{param2}', lastUpdated = NOW() where id = '{param1}'"
+    updateQueueStatus = "update queues set queuename = '{param2}', actionTime = NOW() where packageId = {param1}"  
     updateMerrittArk = "update packages set computedattrs = JSON_SET(computedattrs, '$.merrittark', '{param2}') where id = {param1}"
-    #updateMerrittLocalId  = "update packages set computedattrs = JSON_SET(computedattrs, '$.merrittlocalId', '{param2}') where id = {param1}"
     updateEscholArk = "update packages set computedattrs = JSON_SET(computedattrs, '$.escholark', '{param2}') where id = {param1}"
     updateMcProcessed = "update merrittcallbacks set isProcessed = True where id = {param}" 
 
@@ -276,3 +275,7 @@ class etdDb:
         self.cnxn.commit()
         return
    
+#x = etdDb()
+#x.saveEscholRequest(1, '{"X":"Y"}')
+#x.saveGwMetadata(1, '{"X":"Y"}')
+#x.saveQueueStatus(1,"Test")
