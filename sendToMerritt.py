@@ -4,6 +4,7 @@ import os
 import json
 import creds
 import consts
+import time
 import requests
 
 class marcToMerritt:
@@ -30,6 +31,9 @@ class marcToMerritt:
         # send request
         response = requests.post(creds.merritt_creds.url, files=files, auth=(creds.merritt_creds.username, creds.merritt_creds.password),headers={'Accept': 'application/json'})
         print(response)
+        # Throttle the requests to Merritt
+        time.sleep(1) # pause for 1 sec
+
 
 class etdToMerritt:
     _zipfile = None
@@ -61,6 +65,9 @@ class etdToMerritt:
             raise
         finally:
             consts.db.saveMerrittRequest(self._packageId, self._requestattrs, self._responseattrs, status)
+            # Throttle the requests to Merritt
+            time.sleep(2) # pause for 2 sec
+
 
         print("DONE")
 

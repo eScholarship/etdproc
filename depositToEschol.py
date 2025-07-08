@@ -1,5 +1,6 @@
 import os
 import json
+import time
 import shutil
 import consts
 import pathlib
@@ -33,6 +34,8 @@ class mintEscholId:
         else:
             consts.db.saveErrorLog(self._packageId,"Mint operation failed", cleanResponse(escholId))
             raise Exception("Mint operation failed") 
+        # Throttle the requests to eSchol API
+        time.sleep(1) # pause for 1 sec
 
         return escholId
 
@@ -110,6 +113,9 @@ class depositToEschol:
         if code != 200:
             consts.db.saveErrorLog(self._packageId,"deposit failed", "details in escholrequests table")
             raise Exception("desposit failed") 
+
+        # Throttle the requests to eSchol API
+        time.sleep(2) # pause for 2 sec
         return
 
 
