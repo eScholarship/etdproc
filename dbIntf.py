@@ -11,6 +11,7 @@ class etdDb:
     queryAttrs = "select fileattrs, gwattrs, xmlattrs, computedattrs from packages where id= {param}"
     queryXmlAttrs = "select xmlattrs from packages where id='{param}'"
     queryComputedAttrs = "select zipname, pubnum, computedattrs from packages where id ='{param}'"
+    queryFileAttrs = "select zipname, fileattrs from packages where id= {param}"
     queryCampusInfo = "select pqcode,code,instloc,namesuffix, nameinmarc, id from campuses"
     queryCampusId = "select id from campuses where code='{param}'"
     queryEscholId = "select escholId from escholrequests where packageId={param}"
@@ -18,6 +19,7 @@ class etdDb:
     queryUnprocessedMCs = "select id, callbackdata from merrittcallbacks where isProcessed = False"
     queryPubNumber = "SELECT pubnum FROM packages where id = {param}"
     queryPackageZip = "SELECT id FROM packages where zipname = '{param}'"
+    queryDepositResponse = "select depositresponse from escholrequests where packageId={param}"
     insertPackage = "insert into packages (pubnum, zipname, campusId) VALUES ('{param1}','{param2}', {param3}) "
     insertMerrittRequest = "insert into merrittrequests (packageId, request, response, currentstatus) VALUES ({param1},'{param2}','{param3}','{param4}') "
     insertEscholRequest = "insert into escholrequests (packageId, escholId) VALUES ({param1},'{param2}')"
@@ -84,6 +86,13 @@ class etdDb:
             return (row[0], row[1], row[2])
         return None
 
+    def getFileAttrs(self, packageId):
+        print("read file attrs")
+        query = self.queryFileAttrs.format(param=packageId)
+        self.cursor.execute(query)
+        for row in self.cursor:
+            return (row[0], row[1])
+        return None
     def getCampusInfo(self):
         print("read campus info")
         self.cursor.execute(self.queryCampusInfo)
@@ -275,6 +284,15 @@ class etdDb:
         self.cnxn.commit()
         return
    
+
+    def IsDeposited(self, packageId):
+        print("look for deposit message for this")
+        query = self.queryDepositResponse.format(param=packageId)
+        self.cursor.execute(query)
+        for row in self.cursor:
+            return "Deposited." in row[0]
+        return False
+
 #x = etdDb()
 #x.saveEscholRequest(1, '{"X":"Y"}')
 #x.saveGwMetadata(1, '{"X":"Y"}')

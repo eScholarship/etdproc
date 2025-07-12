@@ -13,8 +13,11 @@ class etdcomputeValues:
     def __init__(self, packageId):
         self._packageId = packageId
         self._compAttrs = {}
-        xmlAttrs = consts.db.getxmlAttrs(packageId)
+        # get all attributes and then use the already populated info as appropriate
+        (_, _, xmlAttrs, compAttrs) = consts.db.getAttrs(packageId)
         self._xmlAttrs = json.loads(xmlAttrs)
+        if compAttrs:
+            self._compAttrs = json.loads(compAttrs)
 
     # Update to publication date when xml is populated with that
     def computeDecisionDate(self):
@@ -165,17 +168,7 @@ class etdcomputeValues:
         self._compAttrs["campusname"] = "University of California, " + consts.campusinfo[schoolcode].namesuffix
         self._compAttrs["campusshort"] = consts.campusinfo[schoolcode].code.lower()
         self._compAttrs["control655"] = consts.campusinfo[schoolcode].nameinmarc
-        return
-
-    # this needs to go away from here and moved to when we do eschol and merritt interaction
-    def computeEscholMerritt(self):
-        print("get the eschol url")
-        self._compAttrs["escholark"] = "TBD"
-        self._compAttrs["merrittark"] = "TBD"
         self._compAttrs["merrittbucket"] = self._compAttrs["campusshort"] + "_lib_etd"
-        escholid = None
-        #escholurl = "https://escholarship.org/uc/item/"
-
         return
 
     def computeNotes(self):
@@ -231,7 +224,7 @@ class etdcomputeValues:
         authors = []
         for author in self._xmlAttrs["authset"]:
             values = {}
-            values["nameParts"] = {"fname":author["fname"],"lname":author["surname"]}
+            values["nameParts"] = {"fname":author["fname"],"lname":author["surname"], "mname": author["middle"]}
             values["email"] = author["email"]
             values["orcid"] = author["orcid"]
             authors.append(values)
@@ -253,9 +246,11 @@ class etdcomputeValues:
 
     def getcontributors(self):
         contribs = []
+        # authinfo["middle"]
         for advisor in self._xmlAttrs["advisors"]:
             nameparts = {"fname": advisor["fname"],
-                         "lname": advisor["surname"]}
+                         "lname": advisor["surname"],
+                         "mname": advisor["middle"]}
             contribs.append({"role":"ADVISOR", "nameParts": nameparts})
 
         return contribs
@@ -310,8 +305,7 @@ class etdcomputeValues:
         self.computeIfEmbargoed()
         self.computeRecInfo()
         self.computeTitleComps()
-        self.computeCampusInfo()
-        self.computeEscholMerritt()       
+        self.computeCampusInfo()      
         self.computeNotes()
         self.computeAuthorsAdvisor()
         self.computeDept()

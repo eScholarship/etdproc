@@ -6,4 +6,7 @@ mint, mint-error
 eschol, eschol-error
 marc, marc-error
 sils, sils-error
+reparse, reparse-error
+recomp, recomp-error
+remeta, remeta-error
 done

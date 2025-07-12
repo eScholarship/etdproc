@@ -43,6 +43,7 @@ class graphClient:
 class eschol:
     """Interface to connect to eschol"""
     deposit = "mutation depositItem($input: DepositItemInput!){ depositItem(input: $input) { message } }"
+    replacemeta = "mutation replaceMetadata($input: ReplaceMetadataInput!){ replaceMetadata(input: $input) { message } }"
     mint = "mutation mintProvisionalID($input: MintProvisionalIDInput!){ mintProvisionalID(input: $input) { id } }"
 
     def __init__(self):
@@ -64,4 +65,9 @@ class eschol:
         #depositquery = self.depositMutation.replace("DEP_INPUT",depositInput)
         depositparam = {"input": depositInput}
         code, result = self.client.send(self.deposit, depositparam)
+        return code, result
+
+    def replaceMeta(self, replaceInput):
+        replaceparam = {"input": replaceInput}
+        code, result = self.client.send(self.replacemeta, replaceparam)
         return code, result

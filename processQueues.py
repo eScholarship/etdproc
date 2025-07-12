@@ -1,10 +1,11 @@
 import consts
 import traceback
+from parseXml import reparseXml
 from generateMarc import createMarc
 from parseGateway import etdParseGateway
 from computeValues import etdcomputeValues
 from sendToMerritt import etdToMerritt, marcToMerritt
-from depositToEschol import mintEscholId, depositToEschol
+from depositToEschol import mintEscholId, depositToEschol, replaceEscholMetadata
 
 
 class processQueueImpl:
@@ -24,6 +25,9 @@ class processQueueImpl:
         self._escholTasks = []
         self._marcTasks = []
         self._silsTasks = []
+        self._reparseTasks = []
+        self._recompTasks = []
+        self._remetaTasks = []
         self.fillTasks()
 
     def fillTasks(self):
@@ -50,6 +54,16 @@ class processQueueImpl:
         if "sils" in queuedtasks:
             self._silsTasks = queuedtasks["sils"]
 
+        if "reparse" in queuedtasks:
+            self._reparseTasks = queuedtasks["reparse"]
+
+        if "recomp" in queuedtasks:
+            self._recompTasks = queuedtasks["recomp"]
+
+        if "remeta" in queuedtasks:
+            self._remetaTasks = queuedtasks["remeta"]
+
+
     def processQueue(self):
         print("query to find items with specific status")
         # get all the items where status is not done
@@ -60,6 +74,10 @@ class processQueueImpl:
         self.processEscholDeposit()
         self.processMarcGeneration()
         self.processSilsDesposit()
+
+        self.processReparse()
+        self.processRecomp()
+        self.processRemeta()
 
         return
 
@@ -162,4 +180,54 @@ class processQueueImpl:
                 print(callstack)
                 print(e)
                 consts.db.saveQueueStatus(packageid, "sils-error") 
+
+    def processReparse(self):
+        print("process reparse xml")
+        for packageid in self._reparseTasks:
+            try:
+                a = reparseXml(packageid)
+                a.convertAndSave()
+                consts.db.saveQueueStatus(packageid, "recomp")
+                self._recompTasks.append(packageid)
+            except Exception as e:
+                callstack = traceback.format_exc()
+                print(callstack)
+                print(e)
+                consts.db.saveQueueStatus(packageid, "reparse-error") 
+
+    def processRecomp(self):
+        print("process recompute values")
+        for packageid in self._recompTasks:
+            try:
+                x = etdcomputeValues(packageid)
+                x.saveComputedValues()
+                isMerrittArk = False
+                if "merrittark" in x._compAttrs:
+                    if "ark:" in x._compAttrs["merrittark"]:
+                        isMerrittArk = True
+                if consts.db.IsDeposited(packageid):
+                    consts.db.saveQueueStatus(packageid, "remeta")
+                    self._remetaTasks.append(packageid)
+                elif isMerrittArk:
+                    consts.db.saveQueueStatus(packageid, "gw")
+                else:
+                    consts.db.saveQueueStatus(packageid, "extract")
+            except Exception as e:
+                callstack = traceback.format_exc()
+                print(callstack)
+                print(e)
+                consts.db.saveQueueStatus(packageid, "recomp-error") 
+
+    def processRemeta(self):
+        print("process replace metadata")
+        for packageid in self._remetaTasks:
+            try:
+                x = replaceEscholMetadata(packageid)
+                x.replaceMeta()
+                consts.db.saveQueueStatus(packageid, "done")
+            except Exception as e:
+                callstack = traceback.format_exc()
+                print(callstack)
+                print(e)
+                consts.db.saveQueueStatus(packageid, "remeta-error") 
 

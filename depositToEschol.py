@@ -118,6 +118,47 @@ class depositToEschol:
         time.sleep(2) # pause for 2 sec
         return
 
+class replaceEscholMetadata:
+    _packageId = None
+    _gwattrs = None
+    _xmlattrs = None
+    _compattrs = None
+    def __init__(self, packageId):
+        self._packageId = packageId
+        (_, gwAttrs, xmlAttrs, compAttrs) = consts.db.getAttrs(packageId)
+        self._gwattrs = json.loads(gwAttrs)
+        self._xmlattrs = json.loads(xmlAttrs)
+        self._compattrs = json.loads(compAttrs)
+
+    def replaceMeta(self):
+        print("replace metadata")
+        # create the replace package
+        replacepackage = {}
+        for setting in consts.escholSetting:
+            # skip contentLink and supp
+            if setting.field == 'contentLink' or setting.field == 'contentFileName' or setting.field == 'suppFiles':
+                continue
+            if setting.typedata == "const":
+                replacepackage[setting.field] = setting.info
+            elif setting.typedata == "xml" and setting.info in self._xmlattrs and self._xmlattrs[setting.info]:
+                replacepackage[setting.field] = self._xmlattrs[setting.info]
+            elif setting.typedata == "gw" and setting.info in self._gwattrs and self._gwattrs[setting.info]:
+                replacepackage[setting.field] = self._gwattrs[setting.info]
+            elif setting.typedata == "compute" and setting.info in self._compattrs and self._compattrs[setting.info]:
+                replacepackage[setting.field] = self._compattrs[setting.info]
+
+        print(replacepackage)
+        # call API with replace metadata
+        code, response = consts.api.replaceMeta(replacepackage)
+        print(response)
+
+        if code != 200:
+            consts.db.saveErrorLog(self._packageId,"replace meta failed", cleanResponse(response))
+            raise Exception("replacemeta failed") 
+
+        # Throttle the requests to eSchol API
+        time.sleep(2) # pause for 2 sec
+        return
 
 #x = depositToEschol("30492756")
 ##escholid = x.mint()

@@ -9,11 +9,25 @@
 
 # use the information in the attrs to create marc records
 # use the information to create json for eschol deposit
-
+import os
 import json
 import consts
 import lxml.etree as ET
 
+class reparseXml:
+    _zipname = None
+    _fileatts = None
+    _pqfile = None
+    def __init__(self, packageId):
+        (self._zipname, fattr) = consts.db.getFileAttrs(packageId)
+        self._fileatts = json.loads(fattr)
+        # get file attrs and zipname
+        # build xml path in extract folder
+        self._pqfile = os.path.join(consts.extractDir, self._zipname, self._fileatts["xmlfile"])
+
+    def convertAndSave(self):
+        x = etdParseXml(self._zipname, self._pqfile)
+        x.saveToDb()
 
 class etdParseXml:
     _data = {}
@@ -174,9 +188,12 @@ class etdParseXml:
         # there are multiple keywords
         self._data["keywords"] = []
         keywords = self._xpatheval("/DISS_submission/DISS_description/DISS_categorization/DISS_keyword")
-        for keyword in keywords:
-            if keyword:
-                self._data["keywords"].append(keyword[0].text)
+        # need to split the text by comma
+        if keywords and keywords[0] and keywords[0].text:
+            allkeys = keywords[0].text.split(',') 
+            for keyword in allkeys:
+                if keyword:
+                    self._data["keywords"].append(keyword)
 
         lang = self._xpatheval("/DISS_submission/DISS_description/DISS_categorization/DISS_language")
         if lang:
@@ -190,17 +207,21 @@ class etdParseXml:
         self._data["depositfolder"] = self._zipname
         metadata = json.dumps(self._data,ensure_ascii=False)
         campusId = consts.campusinfo[self._data["inst_code"]].localid
-        # need to insert
-        consts.db.savePackage(self._data["pubNumber"], self._zipname, campusId)
+        # look for packageId using pubNumber
         packageid = consts.db.getPackageId(self._data["pubNumber"])
+        # need to insert
+        if not packageid:
+            consts.db.savePackage(self._data["pubNumber"], self._zipname, campusId)
+            packageid = consts.db.getPackageId(self._data["pubNumber"])
+            consts.db.saveIdentifier(packageid, "PQPubNum",self._data["pubNumber"])
+
         consts.db.savexmlMetadata(packageid, metadata)
-        consts.db.saveIdentifier(packageid, "PQPubNum",self._data["pubNumber"])
         return packageid
 
 
 #print("Start")
-#a = etdParseXml()
-#a.convertToJson("C:/Temp/Bartke_berkeley_0028E_22277_DATA.xml")
+#a = etdParseXml("TEST","C:/Temp/Bartke_berkeley_0028E_22277_DATA.xml")
+##a.convertToJson()
 #a.saveToDb() 
 #print("End")
 
