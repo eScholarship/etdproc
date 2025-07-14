@@ -2,6 +2,7 @@
 import json
 import dateparser
 import consts
+from creds import base_urls
 from datetime import datetime, date, timedelta
 from maps import pq_lang_mapping, cc_url_mapping
 
@@ -259,7 +260,7 @@ class etdcomputeValues:
         if not self._xmlAttrs["attachset"]:
             return None
         suppFiles = []
-        linkbase = f'{consts.depositUrlBase}/{self._xmlAttrs["depositfolder"]}'
+        linkbase = f'{base_urls.depositUrlBase}/{self._xmlAttrs["depositfolder"]}'
         for attachment in self._xmlAttrs["attachset"]:
             filename = attachment['name']
             link = f'{linkbase}/{filename}'
@@ -288,7 +289,7 @@ class etdcomputeValues:
         # TBD - find a link to the file
         self._compAttrs["isPeerReviewed"] = True
         #self._compAttrs["contentLink"] = "https://pub-submit-stg.escholarship.org/etdprocTmp/test.pdf"
-        self._compAttrs["contentLink"] = f'{consts.depositUrlBase}/{self._xmlAttrs["depositfolder"]}/{self._xmlAttrs["binary-name"]}'
+        self._compAttrs["contentLink"] = f'{base_urls.depositUrlBase}/{self._xmlAttrs["depositfolder"]}/{self._xmlAttrs["binary-name"]}'
         self._compAttrs["escholauthors"] = self.getescholAuthors()
         self._compAttrs["escholIds"] = self.getescholIds()
         self._compAttrs["escholunits"] = self.getescholunits()

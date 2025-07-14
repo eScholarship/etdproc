@@ -159,7 +159,7 @@ class processQueueImpl:
             try:
                 x = createMarc(packageid)
                 marcfile = x.writeMarcFile()
-                y = marcToMerritt(marcfile, x._compattrs["merrittark"])
+                y = marcToMerritt(marcfile, x._compattrs["merrittark"], x._compattrs["merrittbucket"])
                 y.sendToMerritt()
                 consts.db.saveQueueStatus(packageid, "sils")
                 self._silsTasks.append(packageid)

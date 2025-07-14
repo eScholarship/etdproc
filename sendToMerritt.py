@@ -7,16 +7,22 @@ import consts
 import time
 import requests
 
+def getMerrittCollection(bucket):
+    collection = bucket
+    if hasattr(creds.merritt_creds, 'collection'):
+        print("Using test Merritt collection")
+        collection = creds.merritt_creds.collection
+    return collection + "_content"
+
 class marcToMerritt:
     _collection = None
     _marcpath = None
     _merrittark = None
-    def __init__(self, marcpath, merrittark):
+    def __init__(self, marcpath, merrittark, merrittbucket):
         print(f'EtdToMerritt start')
         self._marcpath = marcpath   
         self._merrittark = merrittark
-        # Merritt collection should come from self._compAttrs["merrittbucket"]
-        self._collection = creds.merritt_creds.collection + "_content"# temp for testing
+        self._collection = getMerrittCollection(merrittbucket)
 
     def sendToMerritt(self):
         files = {
@@ -49,8 +55,7 @@ class etdToMerritt:
         (zipfile, self._pubnum, etdattrs) = consts.db.getCompAttrs(packageId)
         self._etdattrs = json.loads(etdattrs)
         self._zipfile = os.path.join( consts.doneDir, zipfile+".zip")
-        # Merritt collection should come from self._compAttrs["merrittbucket"]
-        self._collection = creds.merritt_creds.collection + "_content"# temp for testing
+        self._collection = getMerrittCollection(self._compAttrs["merrittbucket"])
 
 
     def process(self):
@@ -101,3 +106,6 @@ class etdToMerritt:
 #assert(os.path.exists(zipfile))
 #x = EtdToMerritt(zipfile, "30492756")
 #x.process()
+
+#x  = getMerrittCollection("ucsd_lib_etd")
+#print(x)

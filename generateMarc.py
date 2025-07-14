@@ -1,5 +1,6 @@
 import json
 import consts
+from creds import base_urls
 from pymarc import Record, Field, Subfield
 
 
@@ -22,7 +23,7 @@ class createMarc:
         if action == "comma":
             return value + ','
         if action == "escholurl":
-            return consts.escholUrlBase + value[-8:]
+            return base_urls.escholUrlBase + value[-8:]
         return value
 
     def generateConst(self, setting, fieldtofill):
