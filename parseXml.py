@@ -189,7 +189,7 @@ class etdParseXml:
         self._data["keywords"] = []
         keywords = self._xpatheval("/DISS_submission/DISS_description/DISS_categorization/DISS_keyword")
         # need to split the text by comma
-        if keywords and keywords[0] and keywords[0].text:
+        if keywords is not None and len(keywords) and keywords[0].text is not None:
             allkeys = keywords[0].text.split(',') 
             for keyword in allkeys:
                 if keyword:
