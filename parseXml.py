@@ -206,7 +206,7 @@ class etdParseXml:
         # look for packageId using pubNumber
         packageid = consts.db.getPackageId(self._data["pubNumber"])
         # need to insert
-        if packageid is not None:
+        if packageid is None:
             consts.db.savePackage(self._data["pubNumber"], self._zipname, campusId)
             packageid = consts.db.getPackageId(self._data["pubNumber"])
             consts.db.saveIdentifier(packageid, "PQPubNum",self._data["pubNumber"])
