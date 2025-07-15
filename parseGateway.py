@@ -15,7 +15,7 @@ class etdParseGateway:
     gwSettings = None
     # this needs to take packageId instead and obtain corresponding pubnum
     def __init__(self, packageId):
-        print("get the path to the folder where content lives")
+        print("get gw info")
         self._data = {}
         self._record = None
         self._packageId = packageId
@@ -54,21 +54,21 @@ class etdParseGateway:
         # let the caller know if okay to proceed
 
     def saveToDb(self):
-        print("save the xml extracted data in ")
+        #print("save the xml extracted data in ")
         metadata = json.dumps(self._data,ensure_ascii=False)
         consts.db.saveGwMetadata(self._packageId, metadata)
         # save isbn in identifiers table
         consts.db.saveIdentifier(self._packageId, "ISBN",self._data["isbn"])
 
     def extractMarcInfo(self):
-        print("start - extract")
+        #print("start - extract")
         # have the parsing settings from DB
         # save the leader as well
         marcMetadata = {}
     
         for setting in consts.gwSettings:
             # get the tag info
-            print(setting.tag + "  " + setting.field)
+            #print(setting.tag + "  " + setting.field)
             if setting.field == '':
                 marcMetadata[setting.attr] = self._record[setting.tag].data
             else:
@@ -80,7 +80,7 @@ class etdParseGateway:
                     marcMetadata[setting.attr] = self._record[setting.tag][setting.field]
             #from the record - read that tag
             # if multiple flag is set - iterate through all
-        print("done - extract")
+        #print("done - extract")
         self._data = marcMetadata
         return marcMetadata
 

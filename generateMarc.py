@@ -27,7 +27,7 @@ class createMarc:
         return value
 
     def generateConst(self, setting, fieldtofill):
-        print("generate a const field")
+        #print("generate a const field")
 
         # see if post processing is needed
         value = self.processvalue(setting.info, setting.action)
@@ -44,7 +44,7 @@ class createMarc:
         # create a field 
         # TBD - I need to work on creating one field with multiple subfields
         if fieldtofill:
-            print("filliing")
+            #print("filliing")
             fieldtofill.subfields.append(Subfield(code=setting.field, value=value))
             return None
         else:
@@ -89,7 +89,7 @@ class createMarc:
 
         value = self.processvalue(attrs[setting.sourcefield], setting.action)
         if fieldtofill:
-            print("filliing")
+            #print("filliing")
             fieldtofill.subfields.append(Subfield(code=setting.field, value=value))
             return None
         else:
@@ -102,7 +102,7 @@ class createMarc:
 
 
     def generateFields(self, setting, lastSetting, lastField):
-        print("generate fields")
+        #print("generate fields")
         # figure out if the last field should be used
         # if not null and has same tag and indicators
         useLastField = False
@@ -135,7 +135,7 @@ class createMarc:
         return None
 
     def fixRecordLeader(self, record):
-        print("fix record leader")
+        #print("fix record leader")
         record.leader[5] = 'n'
         record.leader[6] = 'a'
         record.leader[7] = 'm'

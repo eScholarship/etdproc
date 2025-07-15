@@ -56,7 +56,7 @@ class etdToMerritt:
         (zipfile, self._pubnum, etdattrs) = consts.db.getCompAttrs(packageId)
         self._etdattrs = json.loads(etdattrs)
         self._zipfile = os.path.join( consts.doneDir, zipfile+".zip")
-        self._collection = getMerrittCollection(self._compAttrs["merrittbucket"])
+        self._collection = getMerrittCollection(self._etdattrs["merrittbucket"])
 
 
     def process(self):
