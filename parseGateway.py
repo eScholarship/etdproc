@@ -43,7 +43,7 @@ class etdParseGateway:
             'x-password':pg_creds.password
         }
         response = requests.get(pg_creds.host, params=params)
-        print(response.text)
+        #print(response.text)
         # Convert string to file-like object
         marcxml_io = io.StringIO(response.text)
         recorddata = parse_xml_to_array(marcxml_io)

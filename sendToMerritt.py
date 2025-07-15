@@ -6,6 +6,7 @@ import creds
 import consts
 import time
 import requests
+import maps
 
 def getMerrittCollection(bucket):
     collection = bucket
@@ -36,7 +37,7 @@ class marcToMerritt:
 
         # send request
         response = requests.post(creds.merritt_creds.url, files=files, auth=(creds.merritt_creds.username, creds.merritt_creds.password),headers={'Accept': 'application/json'})
-        print(response)
+        print(response.text)
         # Throttle the requests to Merritt
         time.sleep(1) # pause for 1 sec
 
@@ -93,13 +94,13 @@ class etdToMerritt:
 
         # send request
         response = requests.post(creds.merritt_creds.url, files=files, auth=(creds.merritt_creds.username, creds.merritt_creds.password),headers={'Accept': 'application/json'})
-        print(response)
+        print(response.text)
         
         # save the request info
         files['file'] = None
         self._requestattrs = json.dumps(files)
         # save response
-        self._responseattrs = response.text
+        self._responseattrs = maps.cleanResponse(response.text)
         return
 
 #zipfile = 'C:/Temp/test/zip/etdadmin_upload_1032621.zip'

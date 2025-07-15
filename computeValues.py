@@ -5,6 +5,7 @@ import consts
 from creds import base_urls
 from datetime import datetime, date, timedelta
 from maps import pq_lang_mapping, cc_url_mapping
+from urllib.parse import quote
 
 
 class etdcomputeValues:
@@ -263,9 +264,10 @@ class etdcomputeValues:
         linkbase = f'{base_urls.depositUrlBase}/{self._xmlAttrs["depositfolder"]}'
         for attachment in self._xmlAttrs["attachset"]:
             filename = attachment['name']
-            link = f'{linkbase}/{filename}'
+            # encode the link name
+            link = f'{linkbase}/{filename}'    
             entry = { "file": filename, 
-                     "fetchLink": link, 
+                     "fetchLink": quote(link, safe=":/?=&"), 
                      "title": attachment["descr"],
                      "size": "TBD" # TBD: need to get this from fileattrs
                      }
@@ -289,7 +291,9 @@ class etdcomputeValues:
         # TBD - find a link to the file
         self._compAttrs["isPeerReviewed"] = True
         #self._compAttrs["contentLink"] = "https://pub-submit-stg.escholarship.org/etdprocTmp/test.pdf"
-        self._compAttrs["contentLink"] = f'{base_urls.depositUrlBase}/{self._xmlAttrs["depositfolder"]}/{self._xmlAttrs["binary-name"]}'
+        # encode this link
+        link = f'{base_urls.depositUrlBase}/{self._xmlAttrs["depositfolder"]}/{self._xmlAttrs["binary-name"]}'
+        self._compAttrs["contentLink"] = quote(link, safe=":/?=&")
         self._compAttrs["escholauthors"] = self.getescholAuthors()
         self._compAttrs["escholIds"] = self.getescholIds()
         self._compAttrs["escholunits"] = self.getescholunits()
@@ -317,35 +321,7 @@ class etdcomputeValues:
         consts.db.saveComputedValues(self._packageId, json.dumps(self._compAttrs,ensure_ascii=False))
         return
 
-#print("start")
-#x = etdcomputeValues("30492756")
-#x.saveComputedValues()
-##campuses = ["UCD","UCI","UCM","UCR","UCSC","UCSB","UCSD","UCLA","UCB","UCSF"]
-###campuses = ["UCSF"]
-##for code in campuses:
-##    x.generateComputedValules(code)
-#print("end")
 
-#filedname, type, value
-#sourceName, const, proQuest
-#sourceID, xml, pubNumber
-#submitterEmail, const, etd@ProQuest.uc
-#type, const, ARTICLE,
-#isPeerReviewed, const, true
-#contentLink, xml, binary-name # tbd
-#id, compute, escholark
-#contentFileName, xml, binary-name
-#abstract, gw, abstract  
-#title, xml, title
-#published, compute, pub_date
-#keywords, xml, keywords
-#localIDs, compute, escholIds   # tbd
-#authors, compute, escholauthors   # tbd {nameParts:{fname, lname,mname,suffix}, email, orcid}
-#units, compute, escholunits
-#contributors, compute, escholadvisors
-#isbn, gw, isbn
-#subjects, gw, subjects
-#language, xml, language
-#embargoExpires, compute, embargoEndDate
-#rights, compute, cclicence # tbd
-#suppFiles, compute, escholsupp # tbd
+
+#x = "this is the link with space"
+#print(quote(x))

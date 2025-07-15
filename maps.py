@@ -55,12 +55,19 @@ class campusmap:
         self.localid = p5
 
 
+def cleanResponse(text):
+    # Remove single and double quotes
+    text = text.replace("'", "").replace('"', "")
+    # Limit string length to 900 characters
+    return text[:900]
+
+
 cc_url_mapping = {
         'cc by':'https://creativecommons.org/licenses/by/4.0/',
         'cc by-nc':'https://creativecommons.org/licenses/by-nc/4.0/',
         'cc by-nc-nd':'https://creativecommons.org/licenses/by-nc-nd/4.0/',
         'cc by-nc-sa':'https://creativecommons.org/licenses/by-nc-sa/4.0/',
-        'cc by-nd':' https://creativecommons.org/licenses/by-nd/4.0/',
+        'cc by-nd':'https://creativecommons.org/licenses/by-nd/4.0/',
         'cc by-sa':'https://creativecommons.org/licenses/by-sa/4.0/'
 		}
 

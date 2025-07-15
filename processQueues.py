@@ -85,6 +85,7 @@ class processQueueImpl:
         # extract these
         for packageid in self._fetchedTasks:
             try:
+                consts.db.saveQueueLog(packageid, "fetch") 
                 x = etdcomputeValues(packageid)
                 x.saveComputedValues()
                 # update queue item status
@@ -101,6 +102,7 @@ class processQueueImpl:
         # extract these
         for packageid in self._extractedTasks:
             try:
+                consts.db.saveQueueLog(packageid, "extract") 
                 x = etdToMerritt(packageid)
                 x.process()
                 consts.db.saveQueueStatus(packageid, "merritt")
@@ -115,6 +117,7 @@ class processQueueImpl:
         # extract these
         for packageid in self._gatewayTasks:
             try:
+                consts.db.saveQueueLog(packageid, "gw") 
                 x = etdParseGateway(packageid)
                 if x.process():
                     consts.db.saveQueueStatus(packageid, "mint")
@@ -129,6 +132,7 @@ class processQueueImpl:
         print("process mint requests")
         for packageid in self._mintTasks:
             try:
+                consts.db.saveQueueLog(packageid, "mint") 
                 x = mintEscholId(packageid)
                 x.mint()
                 consts.db.saveQueueStatus(packageid, "eschol")
@@ -143,6 +147,7 @@ class processQueueImpl:
         print("process eschol deposits")
         for packageid in self._escholTasks:
             try:
+                consts.db.saveQueueLog(packageid, "eschol") 
                 x = depositToEschol(packageid)
                 x.deposit()
                 consts.db.saveQueueStatus(packageid, "marc")
@@ -157,6 +162,7 @@ class processQueueImpl:
         print("generate marc records")
         for packageid in self._marcTasks:
             try:
+                consts.db.saveQueueLog(packageid, "marc") 
                 x = createMarc(packageid)
                 marcfile = x.writeMarcFile()
                 y = marcToMerritt(marcfile, x._compattrs["merrittark"], x._compattrs["merrittbucket"])
@@ -174,6 +180,7 @@ class processQueueImpl:
         for packageid in self._silsTasks:
             try:
                 # TBD to ftp for OCLC
+                # consts.db.saveQueueLog(packageid, "sils") 
                 consts.db.saveQueueStatus(packageid, "done")
             except Exception as e:
                 callstack = traceback.format_exc()
@@ -185,6 +192,7 @@ class processQueueImpl:
         print("process reparse xml")
         for packageid in self._reparseTasks:
             try:
+                consts.db.saveQueueLog(packageid, "reparse") 
                 a = reparseXml(packageid)
                 a.convertAndSave()
                 consts.db.saveQueueStatus(packageid, "recomp")
@@ -199,6 +207,7 @@ class processQueueImpl:
         print("process recompute values")
         for packageid in self._recompTasks:
             try:
+                consts.db.saveQueueLog(packageid, "recomp") 
                 x = etdcomputeValues(packageid)
                 x.saveComputedValues()
                 isMerrittArk = False
@@ -222,6 +231,7 @@ class processQueueImpl:
         print("process replace metadata")
         for packageid in self._remetaTasks:
             try:
+                consts.db.saveQueueLog(packageid, "remeta") 
                 x = replaceEscholMetadata(packageid)
                 x.replaceMeta()
                 consts.db.saveQueueStatus(packageid, "done")

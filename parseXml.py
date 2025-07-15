@@ -62,9 +62,8 @@ class etdParseXml:
         print("Done")
 
     def getFirstValue(self, element, path):
-        print("get first value if present")
         values = element.findall(path)
-        if values and len(values) > 0:
+        if values is not None and len(values) > 0:
             return values[0].text
         return None
 
@@ -172,10 +171,10 @@ class etdParseXml:
         self._data["delayed_release"] = self.getFirstValue(repo, "DISS_delayed_release")
         self._data["access_option"] = self.getFirstValue(repo, "DISS_access_option")
         cclic = self._xpatheval("/DISS_submission/DISS_creative_commons_license/DISS_abbreviation")
-        if cclic:
+        if cclic is not None and len(cclic) > 0:
             self._data["cclicense"] = cclic[0].text
         restriction = self._xpatheval("/DISS_submission/DISS_restriction/DISS_sales_restriction")
-        if restriction:
+        if restriction is not None and len(restriction) > 0:
             self._data["sales_restriction_code"] = restriction[0].attrib["code"]
             self._data["sales_restriction_remove"] = restriction[0].attrib["remove"]
         return
@@ -183,7 +182,7 @@ class etdParseXml:
     def addKeywordsDiscipline(self):
         print("add keywords discipline")
         cat_desc =  self._xpatheval("/DISS_submission/DISS_description/DISS_categorization/DISS_category/DISS_cat_desc")
-        if cat_desc:
+        if cat_desc is not None and len(cat_desc) > 0:
             self._data["discipline"] = cat_desc[0].text
         # there are multiple keywords
         self._data["keywords"] = []
@@ -192,11 +191,11 @@ class etdParseXml:
         if keywords is not None and len(keywords) and keywords[0].text is not None:
             allkeys = keywords[0].text.split(',') 
             for keyword in allkeys:
-                if keyword:
+                if keyword is not None:
                     self._data["keywords"].append(keyword)
 
         lang = self._xpatheval("/DISS_submission/DISS_description/DISS_categorization/DISS_language")
-        if lang:
+        if lang is not None and len(lang) > 0:
             self._data["language"] = lang[0].text
 
 
@@ -210,7 +209,7 @@ class etdParseXml:
         # look for packageId using pubNumber
         packageid = consts.db.getPackageId(self._data["pubNumber"])
         # need to insert
-        if not packageid:
+        if packageid is not None:
             consts.db.savePackage(self._data["pubNumber"], self._zipname, campusId)
             packageid = consts.db.getPackageId(self._data["pubNumber"])
             consts.db.saveIdentifier(packageid, "PQPubNum",self._data["pubNumber"])

@@ -24,6 +24,7 @@ class etdDb:
     insertMerrittRequest = "insert into merrittrequests (packageId, request, response, currentstatus) VALUES ({param1},'{param2}','{param3}','{param4}') "
     insertEscholRequest = "insert into escholrequests (packageId, escholId) VALUES ({param1},'{param2}')"
     insertQueue = "insert into queues (packageId) VALUES ('{param1}') "
+    insertQueueLog = "insert into queuelogs (packageId, queuename) VALUES ({param1}, '{param2}') "
     insertErrorLog = "insert into errorlog (packageId, message, detail) VALUES ({param1},'{param2}','{param3}') "
     insertIdentifier = "insert into identifiers (packageId, idtype, idvalue) VALUES ({param1},'{param2}','{param3}') "
     updateEscholRequest = "update escholrequests set depositrequest = '{param2}', actionTime = NOW() where packageId = '{param1}'"
@@ -293,7 +294,15 @@ class etdDb:
             return "Deposited." in row[0]
         return False
 
+    def saveQueueLog(self, packageId, status):
+        print("save the current status")
+        query = self.insertQueueLog.format(param1=packageId, param2 = status)
+        self.cursor.execute(query)
+        self.cnxn.commit()
+        return
+
 #x = etdDb()
+#x.saveQueueLog(1,"eschol")
 #x.saveEscholRequest(1, '{"X":"Y"}')
 #x.saveGwMetadata(1, '{"X":"Y"}')
 #x.saveQueueStatus(1,"Test")
