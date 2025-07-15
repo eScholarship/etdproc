@@ -34,8 +34,7 @@ class pqSfptIntf:
                     print(f'Skipping {zipname}')
                     continue
                 sftp.get(remote_path, local_path)
-                # tbd - remove the file from sftp site
-                # sftp.remove(remote_path)
+                sftp.remove(remote_path)
                 if self.unzipFile(local_path):
                     shutil.move(local_path, consts.doneDir)
                 else:
