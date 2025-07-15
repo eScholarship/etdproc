@@ -21,8 +21,6 @@ class reparseXml:
     def __init__(self, packageId):
         (self._zipname, fattr) = consts.db.getFileAttrs(packageId)
         self._fileatts = json.loads(fattr)
-        # get file attrs and zipname
-        # build xml path in extract folder
         self._pqfile = os.path.join(consts.extractDir, self._zipname, self._fileatts["xmlfile"])
 
     def convertAndSave(self):
@@ -36,7 +34,6 @@ class etdParseXml:
     _pqfile = None
     _zipname = None
     def __init__(self, zipname, pqfile):
-        print("get the path to the folder where content lives")
         self._data = {}
         self._xpatheval = None
         self._pqfile = pqfile
@@ -58,8 +55,8 @@ class etdParseXml:
         self.addContent()
         self.addRights()
         self.addKeywordsDiscipline()
-        print(self._data)
-        print("Done")
+        #print(self._data)
+
 
     def getFirstValue(self, element, path):
         values = element.findall(path)

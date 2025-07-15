@@ -106,7 +106,7 @@ class configDb:
 
 print("start")
 x = configDb()
-x.createDbs()
+#x.createDbs()
 #x.populateCampuses()
 #x.populateGatewayConfig()
 #x.populateSilsConfig()

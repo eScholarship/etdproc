@@ -4,10 +4,12 @@ import time
 import shutil
 import consts
 import pathlib
-import maps
-# work with one package
-# call eschol to mint with pubnumber from ProQuest
 
+def cleanResponse(text):
+    # Remove single and double quotes
+    text = text.replace("'", "").replace('"', "")
+    # Limit string length to 900 characters
+    return text[:900]
 
 class mintEscholId:
     _packageId = None
@@ -103,7 +105,7 @@ class depositToEschol:
         code, response = consts.api.depositItem(depositpackage)
         print(response)
         # save result and response in DB
-        consts.db.saveEscholResponse(self._packageId, maps.cleanResponse(response))
+        consts.db.saveEscholResponse(self._packageId, cleanResponse(response))
         # was this successfull or not - check the response
         # update escholid and url in 
         if code != 200:
@@ -149,7 +151,7 @@ class replaceEscholMetadata:
         print(response)
 
         if code != 200:
-            consts.db.saveErrorLog(self._packageId,"replace meta failed", maps.cleanResponse(response))
+            consts.db.saveErrorLog(self._packageId,"replace meta failed", cleanResponse(response))
             raise Exception("replacemeta failed") 
 
         # Throttle the requests to eSchol API

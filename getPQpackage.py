@@ -10,14 +10,8 @@ class pqSfptIntf:
     filesFound = []
     filesUnziped = []
     def __init__(self):
-        print("created intf")
-        print("connecting")
         self.filesFound = []
         self.filesUnziped = {}
-        #self.transport = paramiko.Transport((sftp_creds.host,sftp_creds.port))
-        # get staged files
-        #self.getStagedFiles()
-        # look over the files and process those
 
     def getPqPackages(self):
         pkey = paramiko.RSAKey.from_private_key_file("/apps/eschol/.ssh/id_rsa")
@@ -87,9 +81,6 @@ class pqSfptIntf:
 
     def unzipFile(self, filepath):
         zipname = os.path.splitext(os.path.basename(filepath))[0]
-        if consts.db.IsZipFilePresent(zipname):
-            print(f'Skipping {zipname}')
-            return False
         print("unzip the file and save the files in a new folder")
         if(zipfile.is_zipfile(filepath) == False):
             print(f'{filepath} is not a zip file')

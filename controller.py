@@ -18,12 +18,6 @@ class Controller:
     def buildQueue(self):
         print("bring in files from ")
         x = pqSfptIntf()
-        #zippath = os.path.join(consts.downloadDir, "etdadmin_upload_1140749.zip")
-        #if x.unzipFile(zippath):
-        #    shutil.move(zippath, consts.doneDir)
-        #else:
-        #    shutil.move(zippath, consts.errorDir)
-        # get the packages
         x.getPqPackages()
         for item in x.filesUnziped:
             xmlpath = x.getFullPathForProQuestXml(item)
@@ -70,23 +64,8 @@ class Controller:
                 print("This is for addition to existing ETD")
             consts.db.markMCprocessed(mcid)
 
-        # also get merrittark and update that entry
-        # if status is QUEUED - leave status as it is
+
         
-
-
-# add to DB and create a queue entry
-
-# process items in fetch state for the package
-# get items in fetch state for next state of processing
-
-
-
-
-
-# fetch - maybe unzip to htdoc for serving purposes
-# parsexml, fetcherror
+# Create the controller to build queue and process all
 c = Controller()
-#c.buildQueue()
-#c.processQueue()
-#c.processMerrittCallbacks()
+

@@ -49,7 +49,7 @@ class etdParseGateway:
         recorddata = parse_xml_to_array(marcxml_io)
         # since the search is by id - expect one record
         for record in recorddata:
-            if record:
+            if record is not None:
                 self._record = record
         # let the caller know if okay to proceed
 
@@ -78,8 +78,7 @@ class etdParseGateway:
                         marcMetadata[setting.attr].append(f[setting.field])
                 else:
                     marcMetadata[setting.attr] = self._record[setting.tag][setting.field]
-            #from the record - read that tag
-            # if multiple flag is set - iterate through all
+
         #print("done - extract")
         self._data = marcMetadata
         return marcMetadata

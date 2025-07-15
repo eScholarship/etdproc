@@ -48,7 +48,6 @@ class etdcomputeValues:
         decision = self.computeDecisionDate()
         self._compAttrs["pub_date"] = decision.strftime('%Y-%m-%d')
         self._compAttrs["pub_year"] = decision.strftime('%Y')
-        #self._compAttrs["pubyear"] = self._compAttrs["pub_year"] + "."
         return decision
 
     def computeIfEmbargoed(self):
@@ -234,6 +233,7 @@ class etdcomputeValues:
 
     def getescholIds(self):
         localIds = []
+        #API doesn't allow ark
         #localIds.append({"id":self._compAttrs["merrittark"], "scheme":"ARK"})
         # what other ids can I provide
         localIds = {"id": self._xmlAttrs["external_id"], "scheme":"OTHER_ID", "subScheme":"proquest"}
@@ -288,10 +288,7 @@ class etdcomputeValues:
 
     def computeEscholValues(self):
         print("compute for eschol deposit json")   
-        # TBD - find a link to the file
         self._compAttrs["isPeerReviewed"] = True
-        #self._compAttrs["contentLink"] = "https://pub-submit-stg.escholarship.org/etdprocTmp/test.pdf"
-        # encode this link
         link = f'{base_urls.depositUrlBase}/{self._xmlAttrs["depositfolder"]}/{self._xmlAttrs["binary-name"]}'
         self._compAttrs["contentLink"] = quote(link, safe=":/?=&")
         self._compAttrs["escholauthors"] = self.getescholAuthors()

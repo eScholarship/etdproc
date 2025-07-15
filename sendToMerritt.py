@@ -6,7 +6,7 @@ import creds
 import consts
 import time
 import requests
-import maps
+
 
 def getMerrittCollection(bucket):
     collection = bucket
@@ -100,13 +100,12 @@ class etdToMerritt:
         files['file'] = None
         self._requestattrs = json.dumps(files)
         # save response
-        self._responseattrs = maps.cleanResponse(response.text)
+        self._responseattrs = response.text
         return
 
 #zipfile = 'C:/Temp/test/zip/etdadmin_upload_1032621.zip'
 #assert(os.path.exists(zipfile))
 #x = EtdToMerritt(zipfile, "30492756")
 #x.process()
-
 #x  = getMerrittCollection("ucsd_lib_etd")
 #print(x)
