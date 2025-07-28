@@ -98,9 +98,10 @@ class etdToMerritt:
         
         # save the request info
         files['file'] = None
-        self._requestattrs = json.dumps(files)
+        # clear single quotes before saving in DB
+        self._requestattrs = json.dumps(files).replace("'", "").replace('"', "")
         # save response
-        self._responseattrs = response.text
+        self._responseattrs = response.text.replace("'", "").replace('"', "")
         return
 
 #zipfile = 'C:/Temp/test/zip/etdadmin_upload_1032621.zip'
