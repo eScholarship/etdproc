@@ -105,10 +105,20 @@ class pqSfptIntf:
     def saveToDb(self, zipname, packageId):
         print("save fileattrs and create queue item for this")
         fileatts = self.filesUnziped[zipname]
+        isparseError = False
         # update fileattr 
+        if packageId is None:
+            consts.db.saveQueueStatus(packageid, "parse-error")
+            pubnum = self._zipname[-20:]
+            consts.db.savePackage(pubnum, self._zipname, 1)
+            packageid = consts.db.getPackageId(pubnum)
+            isparseError = True
         consts.db.savefileattrs(packageId, json.dumps(fileatts,ensure_ascii=False))
         consts.db.saveQueue(packageId)
+        if isparseError:
+            consts.db.saveQueueStatus(packageid, "parse-error")
 
+        return packageId
 #a = pqSfptIntf()
 #a.getStagedFiles()
 

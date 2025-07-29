@@ -19,6 +19,7 @@ class processQueueImpl:
     def __init__(self):
         print("process queues")
         self._fetchedTasks = []
+        self._parseTasks = []
         self._extractedTasks = []
         self._gatewayTasks = []
         self._mintTasks = []
@@ -33,6 +34,10 @@ class processQueueImpl:
     def fillTasks(self):
         print("prepare the queues")
         queuedtasks = consts.db.getAllQueuedTasks()
+
+        if "parse" in queuedtasks:
+            self._parseTasks = queuedtasks["parse"]
+
         if "fetch" in queuedtasks:
             self._fetchedTasks = queuedtasks["fetch"]
 
@@ -67,6 +72,7 @@ class processQueueImpl:
     def processQueue(self):
         print("query to find items with specific status")
         # get all the items where status is not done
+        self.processParse()
         self.processFetched()
         self.processExtracted()
         self.processGatewayPending()
@@ -80,6 +86,23 @@ class processQueueImpl:
         self.processRemeta()
 
         return
+
+    def processParse(self):
+        # extract these
+        for packageid in self._parseTasks:
+            try:
+                consts.db.saveQueueLog(packageid, "parse") 
+                a = reparseXml(packageid)
+                a.convertAndSave()
+                # update queue item status
+                consts.db.saveQueueStatus(packageid, "fetch")
+                self._fetchedTasks.append(packageid)
+            except Exception as e:
+                callstack = traceback.format_exc()
+                print(callstack)
+                print(e)
+                consts.db.saveQueueStatus(packageid, "parse-error")
+            # TBD - error case
 
     def processFetched(self):
         # extract these

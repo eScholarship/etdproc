@@ -1,4 +1,5 @@
 fetch, fetch-error
+parse, parse-error
 extract, extract-error
 merritt, merritt-error
 gw, gw-error

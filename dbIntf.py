@@ -29,6 +29,7 @@ class etdDb:
     insertIdentifier = "insert into identifiers (packageId, idtype, idvalue) VALUES ({param1},'{param2}','{param3}') "
     updateEscholRequest = "update escholrequests set depositrequest = '{param2}', actionTime = NOW() where packageId = '{param1}'"
     updateEscholResponse = "update escholrequests set depositresponse = '{param2}', actionTime = NOW() where packageId = '{param1}'"
+    updatePubNumCampusId = "update packages set pubnum = '{param2}', campusId = '{param3}', lastUpdated = NOW() where id = '{param1}'"
     updateGwMetadata = "update packages set gwattrs = '{param2}', lastUpdated = NOW() where id = '{param1}'"
     updateXmlMetadata = "update packages set xmlattrs = '{param2}', lastUpdated = NOW() where id = '{param1}'"
     updateComputed = "update packages set computedattrs = '{param2}', lastUpdated = NOW() where id = '{param1}'"
@@ -147,6 +148,14 @@ class etdDb:
         for row in self.cursor:
             return row[0]
         return None
+
+
+    def savePubNumCampusId(self, packageId, pubnum, campusId):
+        print("save pub num")       
+        query = self.updatePubNumCampusId.format(param1=packageId, param2 = pubnum, param3 = campusId)
+        self.cursor.execute(query)
+        self.cnxn.commit()
+        return
 
     def saveGwMetadata(self, packageId, metadata):
         print("save marc metadata")       

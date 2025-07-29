@@ -22,7 +22,7 @@ class Controller:
             try:
                 xmlpath = x.getFullPathForProQuestXml(item)
                 # create entries in DB 
-                a = etdParseXml(item, xmlpath)
+                a = etdParseXml(item, xmlpath, None)
                 #a.convertToJson(xmlpath)
                 packageId = a.saveToDb() 
 
@@ -32,7 +32,8 @@ class Controller:
                 callstack = traceback.format_exc()
                 print(callstack)
                 print(e)
-                consts.db.saveErrorLog(1,"parse and save operation failed", item)
+                packageId = x.saveToDb(item, None)
+                consts.db.saveErrorLog(packageId,"parse and save operation failed", item)
         return
 
 

@@ -18,13 +18,15 @@ class reparseXml:
     _zipname = None
     _fileatts = None
     _pqfile = None
+    _packageId = None
     def __init__(self, packageId):
+        self._packageId = packageId
         (self._zipname, fattr) = consts.db.getFileAttrs(packageId)
         self._fileatts = json.loads(fattr)
         self._pqfile = os.path.join(consts.extractDir, self._zipname, self._fileatts["xmlfile"])
 
     def convertAndSave(self):
-        x = etdParseXml(self._zipname, self._pqfile)
+        x = etdParseXml(self._zipname, self._pqfile, self._packageId)
         x.saveToDb()
 
 class etdParseXml:
@@ -33,7 +35,9 @@ class etdParseXml:
     _xpatheval = None
     _pqfile = None
     _zipname = None
-    def __init__(self, zipname, pqfile):
+    _packageId = None
+    def __init__(self, zipname, pqfile, packageId):
+        self._packageId = packageId
         self._data = {}
         self._xpatheval = None
         self._pqfile = pqfile
@@ -204,13 +208,14 @@ class etdParseXml:
         metadata = json.dumps(self._data,ensure_ascii=False)
         campusId = consts.campusinfo[self._data["inst_code"]].localid
         # look for packageId using pubNumber
-        packageid = consts.db.getPackageId(self._data["pubNumber"])
+        packageid = self._packageid
         # need to insert
         if packageid is None:
             consts.db.savePackage(self._data["pubNumber"], self._zipname, campusId)
             packageid = consts.db.getPackageId(self._data["pubNumber"])
             consts.db.saveIdentifier(packageid, "PQPubNum",self._data["pubNumber"])
-
+        else:
+            consts.db.savePubNumCampusId(packageid, self._data["pubNumber"], campusId)
         consts.db.savexmlMetadata(packageid, metadata)
         return packageid
 
