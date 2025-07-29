@@ -109,9 +109,9 @@ class pqSfptIntf:
         # update fileattr 
         if packageId is None:
             isparseError = True
-            # temp pub num for parse-error case
-            pubnum = self._zipname[-20:]
-            consts.db.savePackage(pubnum, self._zipname, 1)
+            # temp pub num and campus for parse-error case
+            pubnum = zipname[-20:]
+            consts.db.savePackage(pubnum, zipname, 1)
             packageId = consts.db.getPackageId(pubnum)
             
         consts.db.savefileattrs(packageId, json.dumps(fileatts,ensure_ascii=False))
