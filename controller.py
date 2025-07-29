@@ -1,7 +1,6 @@
-import os
 import json
 import consts
-import shutil
+import traceback
 from getPQpackage import pqSfptIntf
 from parseXml import etdParseXml
 from processQueues import processQueueImpl
@@ -20,14 +19,21 @@ class Controller:
         x = pqSfptIntf()
         x.getPqPackages()
         for item in x.filesUnziped:
-            xmlpath = x.getFullPathForProQuestXml(item)
-            # create entries in DB 
-            a = etdParseXml(item, xmlpath)
-            #a.convertToJson(xmlpath)
-            packageId = a.saveToDb() 
+            try:
+                xmlpath = x.getFullPathForProQuestXml(item)
+                # create entries in DB 
+                a = etdParseXml(item, xmlpath)
+                #a.convertToJson(xmlpath)
+                packageId = a.saveToDb() 
 
-            # add to queue and indicate status fetch
-            x.saveToDb(item, packageId)
+                # add to queue and indicate status fetch
+                x.saveToDb(item, packageId)
+            except Exception as e:
+                callstack = traceback.format_exc()
+                print(callstack)
+                print(e)
+                consts.db.saveErrorLog(1,"parse and save operation failed", item)
+        return
 
 
     def getpubnumFromMC(self, localId, isInitSub):
