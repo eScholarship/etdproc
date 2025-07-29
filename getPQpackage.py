@@ -108,15 +108,16 @@ class pqSfptIntf:
         isparseError = False
         # update fileattr 
         if packageId is None:
-            consts.db.saveQueueStatus(packageid, "parse-error")
+            isparseError = True
+            # temp pub num for parse-error case
             pubnum = self._zipname[-20:]
             consts.db.savePackage(pubnum, self._zipname, 1)
-            packageid = consts.db.getPackageId(pubnum)
-            isparseError = True
+            packageId = consts.db.getPackageId(pubnum)
+            
         consts.db.savefileattrs(packageId, json.dumps(fileatts,ensure_ascii=False))
         consts.db.saveQueue(packageId)
         if isparseError:
-            consts.db.saveQueueStatus(packageid, "parse-error")
+            consts.db.saveQueueStatus(packageId, "parse-error")
 
         return packageId
 #a = pqSfptIntf()
