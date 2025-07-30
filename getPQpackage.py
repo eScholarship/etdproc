@@ -35,10 +35,17 @@ class pqSfptIntf:
                     continue
                 sftp.get(remote_path, local_path)
                 sftp.remove(remote_path)
+
+                # if the file exists in done folder, remove it 
                 if self.unzipFile(local_path):
-                    shutil.move(local_path, consts.doneDir)
+                    dest_folder = consts.doneDir
                 else:
-                    shutil.move(local_path, consts.errorDir)
+                    dest_folder = consts.errorDir
+
+                dest_file = os.path.join(dest_folder, filename)
+                if os.path.exists(dest_file):
+                    os.remove(dest_file)
+                shutil.move(local_path, consts.doneDir)
         return
 
     def isValidZip(self, zfiles):

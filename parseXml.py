@@ -208,7 +208,7 @@ class etdParseXml:
         metadata = json.dumps(self._data,ensure_ascii=False)
         campusId = consts.campusinfo[self._data["inst_code"]].localid
         # look for packageId using pubNumber
-        packageid = self._packageid
+        packageid = self._packageId
         # need to insert
         if packageid is None:
             consts.db.savePackage(self._data["pubNumber"], self._zipname, campusId)
