@@ -20,6 +20,7 @@ class etdDb:
     queryPubNumber = "SELECT pubnum FROM packages where id = {param}"
     queryPackageZip = "SELECT id FROM packages where zipname = '{param}'"
     queryDepositResponse = "select depositresponse from escholrequests where packageId={param}"
+    queryQueueStatus = "select queuename from queues where packageId = {param}"
     insertPackage = "insert into packages (pubnum, zipname, campusId) VALUES ('{param1}','{param2}', {param3}) "
     insertMerrittRequest = "insert into merrittrequests (packageId, request, response, currentstatus) VALUES ({param1},'{param2}','{param3}','{param4}') "
     insertEscholRequest = "insert into escholrequests (packageId, escholId) VALUES ({param1},'{param2}')"
@@ -232,6 +233,14 @@ class etdDb:
             alltasks[row[0]].append(row[1])
 
         return alltasks
+
+    def getQueueStatus(self, packageid):
+        print("get queue status")
+        query = self.queryQueueStatus.format(param=packageid)
+        self.cursor.execute(query)
+        for row in self.cursor:
+            return row[0]
+        return None
 
     def getxmlAttrs(self, id):
         print("read xml attrs")
