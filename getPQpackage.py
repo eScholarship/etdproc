@@ -4,7 +4,7 @@ import consts
 import paramiko
 import zipfile
 import shutil
-from creds import sftp_creds
+from creds import sftp_creds, ucla_creds
 
 class pqSfptIntf:
     filesFound = []
@@ -17,18 +17,23 @@ class pqSfptIntf:
         pkey = paramiko.RSAKey.from_private_key_file("/apps/eschol/.ssh/id_rsa")
         with paramiko.Transport((sftp_creds.host,sftp_creds.port)) as transport:
             transport.connect(None, sftp_creds.username, pkey=pkey)
-            print("got sftp connection")
-            return self.getFilesAndUnzip(transport)
+            print("got sftp connection with proquest")
+            return self.getFilesAndUnzip(transport, sftp_creds.directory)
+
+        with paramiko.Transport((ucla_creds.host,ucla_creds.port)) as transport:
+            transport.connect(None, ucla_creds.username, pkey=pkey)
+            print("got sftp connection uclaetd")
+            return self.getFilesAndUnzip(transport, ucla_creds.directory)
 
 
-    def getFilesAndUnzip(self, transport):      
+    def getFilesAndUnzip(self, transport, directory):      
         with paramiko.SFTPClient.from_transport(transport) as sftp:
-            self.filesFound = sftp.listdir(sftp_creds.username)
+            self.filesFound = sftp.listdir(directory)
             print(self.filesFound)
             for filename in self.filesFound:
                 # if the zipname is present in DB, skip for now
                 local_path = os.path.join(consts.downloadDir, filename)
-                remote_path = os.path.join(sftp_creds.username, filename)
+                remote_path = os.path.join(directory, filename)
                 zipname = os.path.splitext(filename)[0]
                 if consts.db.IsZipFilePresent(zipname):
                     print(f'Skipping {zipname}')
