@@ -18,13 +18,13 @@ class pqSfptIntf:
         with paramiko.Transport((sftp_creds.host,sftp_creds.port)) as transport:
             transport.connect(None, sftp_creds.username, pkey=pkey)
             print("got sftp connection with proquest")
-            return self.getFilesAndUnzip(transport, sftp_creds.directory)
+            self.getFilesAndUnzip(transport, sftp_creds.directory)
 
         with paramiko.Transport((ucla_creds.host,ucla_creds.port)) as transport:
             transport.connect(None, ucla_creds.username, pkey=pkey)
             print("got sftp connection uclaetd")
-            return self.getFilesAndUnzip(transport, ucla_creds.directory)
-
+            self.getFilesAndUnzip(transport, ucla_creds.directory)
+        return
 
     def getFilesAndUnzip(self, transport, directory):      
         with paramiko.SFTPClient.from_transport(transport) as sftp:

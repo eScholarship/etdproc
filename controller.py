@@ -55,10 +55,14 @@ class Controller:
         queuedMC = consts.db.getUnprocessedMCs()
         for mcid in queuedMC:
             # extract pub number from json and if the stutus is COMPLETED then move the queue status to gw
+            packageid = None
             data = json.loads(queuedMC[mcid])
             jobstatus = data["job:jobState"]["job:jobStatus"].lower()                       
             isForInitialSubmission = data["job:jobState"]["job:packageName"].endswith(".zip")
-            packageid = self.getpubnumFromMC(str(data["job:jobState"]["job:localID"]), isForInitialSubmission)
+            # found a case when local id was not included in callback package for submission after the initial one
+            # no need to process those since merritt id is retrived from the initial submission callback
+            if "job:localID" in data["job:jobState"]:
+                packageid = self.getpubnumFromMC(str(data["job:jobState"]["job:localID"]), isForInitialSubmission)
             if isForInitialSubmission and packageid:
                 if jobstatus == "completed":
                     merrittark = data["job:jobState"]["job:primaryID"]
