@@ -112,7 +112,7 @@ class etdcomputeValues:
         # xml language need to convert en to eng
         lang = self.getLanguage()
         self._compAttrs["lang"] = lang
-        self._compAttrs["recinfo"]  = f'{date}s{self._compAttrs["pub_year"]}####cau|||||obm|||||| ||{lang}|d'
+        self._compAttrs["recinfo"]  = f'{date}s{self._compAttrs["pub_year"]}    cau|||||obm  |||| ||{lang}|d'
         return
 
     def splitTile(self, title):
@@ -144,9 +144,9 @@ class etdcomputeValues:
         # add additional space and colon in case of a split
         if subtitle:
             maintitle = maintitle + " :"
-            subtitle = subtitle + ' /' # need to add for marc
+            subtitle = subtitle + '/' # need to add for marc
         else:
-            maintitle = maintitle + ' /' # need to add for marc
+            maintitle = maintitle + '/' # need to add for marc
         
         titleIndicator = '0'
         if title.startswith("The "):
@@ -183,7 +183,7 @@ class etdcomputeValues:
        
         #strip and add full stop if needed
         notes = advisors.strip('; ') + '. '
-        notes = notes + members.strip('; ') + '.'
+        notes = notes + members.strip('; ')
         self._compAttrs["notes"] = notes
 
     # skip for now and see later how multilanguages are going to be represented in xml

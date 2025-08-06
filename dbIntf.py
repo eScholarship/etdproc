@@ -50,7 +50,7 @@ class etdDb:
         self.cursor = self.cnxn.cursor()
 
     def getGwSetting(self):
-        print("read parse settings")
+        #print("read parse settings")
         self.cursor.execute(self.queryGatewayMap)
         tagInfo = []
         for row in self.cursor:
@@ -58,7 +58,7 @@ class etdDb:
         return tagInfo
 
     def getgenerateSetting(self):
-        print("read generate settings")
+        #print("read generate settings")
         self.cursor.execute(self.querySilsMap)
         recordInfo = []
         for row in self.cursor:
@@ -66,7 +66,7 @@ class etdDb:
         return recordInfo
 
     def getescholSetting(self):
-        print("read eschol settings")
+        #print("read eschol settings")
         self.cursor.execute(self.queryEscholMap)
         tagInfo = []
         for row in self.cursor:
@@ -74,7 +74,7 @@ class etdDb:
         return tagInfo
 
     def getAttrs(self, packageId):
-        print("read all attrs")
+        #print("read all attrs")
         query = self.queryAttrs.format(param=packageId)
         self.cursor.execute(query)
         for row in self.cursor:
@@ -82,7 +82,7 @@ class etdDb:
         return None
     
     def getCompAttrs(self, packageId):
-        print("read computed attrs")
+        #print("read computed attrs")
         query = self.queryComputedAttrs.format(param=packageId)
         self.cursor.execute(query)
         for row in self.cursor:
@@ -90,14 +90,14 @@ class etdDb:
         return None
 
     def getFileAttrs(self, packageId):
-        print("read file attrs")
+        #print("read file attrs")
         query = self.queryFileAttrs.format(param=packageId)
         self.cursor.execute(query)
         for row in self.cursor:
             return (row[0], row[1])
         return None
     def getCampusInfo(self):
-        print("read campus info")
+        #print("read campus info")
         self.cursor.execute(self.queryCampusInfo)
         attrsInfo = {}
         for row in self.cursor:
@@ -105,7 +105,7 @@ class etdDb:
         return attrsInfo
 
     def getCampusId(self, code):
-        print("read campus id based on campus short name")
+        #print("read campus id based on campus short name")
         query = self.queryCampusId.format(param=code)
         self.cursor.execute(query)
         campusid = None
@@ -114,7 +114,7 @@ class etdDb:
         return campusid
 
     def getUnprocessedMCs(self):
-        print("read unprocessed Merritt Callback")
+        #print("read unprocessed Merritt Callback")
         self.cursor.execute(self.queryUnprocessedMCs)
         data = {}
         for row in self.cursor:
@@ -122,7 +122,7 @@ class etdDb:
         return data
 
     def getPubNumber(self, packageId):
-        print("read pub number")
+        #print("read pub number")
         query = self.queryPubNumber.format(param=packageId)
         self.cursor.execute(query)
         for row in self.cursor:
@@ -130,14 +130,14 @@ class etdDb:
         return None
 
     def savePackage(self, pubnum, zipname, campusId):
-        print("create a new package")
+        #print("create a new package")
         query = self.insertPackage.format(param1=pubnum, param2= zipname, param3=campusId)
         self.cursor.execute(query)
         self.cnxn.commit()
         return
 
     def saveMerrittRequest(self, packageId, requestattrs, responseattrs, status):
-        print("save Merritt request")
+        #print("save Merritt request")
         query = self.insertMerrittRequest.format(param1=packageId, param2=requestattrs, param3= responseattrs, param4 = status)
         self.cursor.execute(query)
         self.cnxn.commit()
@@ -152,14 +152,14 @@ class etdDb:
 
 
     def savePubNumCampusId(self, packageId, pubnum, campusId):
-        print("save pub num")       
+        #print("save pub num")       
         query = self.updatePubNumCampusId.format(param1=packageId, param2 = pubnum, param3 = campusId)
         self.cursor.execute(query)
         self.cnxn.commit()
         return
 
     def saveGwMetadata(self, packageId, metadata):
-        print("save marc metadata")       
+        #print("save marc metadata")       
         query = self.updateGwMetadata.format(param1=packageId, param2 = metadata.replace("'","''").replace('\\','\\\\'))
         self.cursor.execute(query)
         self.cnxn.commit()
@@ -167,28 +167,28 @@ class etdDb:
 
 
     def saveComputedValues(self, packageId, metadata):
-        print("save computed metadata")        
+        #print("save computed metadata")        
         query = self.updateComputed.format(param1=packageId, param2 = metadata.replace("'","''").replace('\\','\\\\'))
         self.cursor.execute(query)
         self.cnxn.commit()
         return
 
     def savexmlMetadata(self, packageId, metadata):
-        print("save xml metadata")
+        #print("save xml metadata")
         query = self.updateXmlMetadata.format(param1=packageId, param2 = metadata.replace("'","''").replace('\\','\\\\'))
         self.cursor.execute(query)
         self.cnxn.commit()
         return
 
     def savefileattrs(self, packageId, fileatts):
-        print("save file attrs")
+        #print("save file attrs")
         query = self.updateFileAttrs.format(param1=packageId, param2 = fileatts)
         self.cursor.execute(query)
         self.cnxn.commit()
         return
 
     def getEscholId(self, packageId):
-        print("get eschol id if present")
+        #print("get eschol id if present")
         query = self.queryEscholId.format(param=packageId)
         self.cursor.execute(query)
         for row in self.cursor:
@@ -196,35 +196,35 @@ class etdDb:
         return None
 
     def addEscholRequest(self, packageId, escholId):
-        print("insert a new request")
+        #print("insert a new request")
         query = self.insertEscholRequest.format(param1=packageId, param2 = escholId)
         self.cursor.execute(query)
         self.cnxn.commit()
         return
 
     def saveQueue(self, packageId):
-        print("insert queue")
+        #print("insert queue")
         query = self.insertQueue.format(param1=packageId)
         self.cursor.execute(query)
         self.cnxn.commit()
         return
 
     def saveEscholRequest(self, packageId, request):
-        print("save eschol deposit request and response")
+        #print("save eschol deposit request and response")
         query = self.updateEscholRequest.format(param1=packageId, param2 = request.replace("'","''").replace('\\','\\\\'))
         self.cursor.execute(query)
         self.cnxn.commit()
         return
 
     def saveEscholResponse(self, packageId, response):
-        print("save eschol deposit request and response")
+        #print("save eschol deposit request and response")
         query = self.updateEscholResponse.format(param1=packageId, param2 = response)
         self.cursor.execute(query)
         self.cnxn.commit()
         return
 
     def getAllQueuedTasks(self):
-        print("get any item not yet done")
+        #print("get any item not yet done")
         self.cursor.execute(self.queryQueuedTasks)
         alltasks = {}
         for row in self.cursor:
@@ -235,7 +235,7 @@ class etdDb:
         return alltasks
 
     def getQueueStatus(self, packageid):
-        print("get queue status")
+        #print("get queue status")
         query = self.queryQueueStatus.format(param=packageid)
         self.cursor.execute(query)
         for row in self.cursor:
@@ -243,7 +243,7 @@ class etdDb:
         return None
 
     def getxmlAttrs(self, id):
-        print("read xml attrs")
+        #print("read xml attrs")
         query = self.queryXmlAttrs.format(param=id)
         self.cursor.execute(query)
         for row in self.cursor:
@@ -251,14 +251,14 @@ class etdDb:
         return None
 
     def saveQueueStatus(self, packageId, newstatus):
-        print("save the new status")
+        #print("save the new status")
         query = self.updateQueueStatus.format(param1=packageId, param2 = newstatus)
         self.cursor.execute(query)
         self.cnxn.commit()
         return
 
     def saveEscholArk(self, packageId, ark):
-        print("save eschol ark")
+        #print("save eschol ark")
         query = self.updateEscholArk.format(param1=packageId, param2 = ark)
         self.cursor.execute(query)
         self.cnxn.commit()
@@ -266,24 +266,22 @@ class etdDb:
         return    
 
     def saveMerrittArk(self, packageId, ark):
-        print("save merritt ark")
+        #print("save merritt ark")
         query = self.updateMerrittArk.format(param1=packageId, param2 = ark)
         self.cursor.execute(query)
         self.cnxn.commit()
         self.saveIdentifier(packageId, "MerrittArk",ark)
         return   
 
-
-
     def saveErrorLog(self, packageId, error, details):
-        print("save error info")
+        #print("save error info")
         query = self.insertErrorLog.format(param1=packageId, param2 = error, param3=details)
         self.cursor.execute(query)
         self.cnxn.commit()
         return   
 
     def markMCprocessed(self, mcid):
-        print("save merritt ark")
+        #print("save merritt ark")
         query = self.updateMcProcessed.format(param=mcid)
         self.cursor.execute(query)
         self.cnxn.commit()
@@ -297,7 +295,7 @@ class etdDb:
         return None
 
     def saveIdentifier(self, packageId, idtype, idvalue):
-        print("save identifier")
+        #print("save identifier")
         query = self.insertIdentifier.format(param1=packageId, param2 = idtype, param3= idvalue)
         self.cursor.execute(query)
         self.cnxn.commit()
@@ -305,7 +303,7 @@ class etdDb:
    
 
     def IsDeposited(self, packageId):
-        print("look for deposit message for this")
+        #print("look for deposit message for this")
         query = self.queryDepositResponse.format(param=packageId)
         self.cursor.execute(query)
         for row in self.cursor:
@@ -313,7 +311,7 @@ class etdDb:
         return False
 
     def saveQueueLog(self, packageId, status):
-        print("save the current status")
+        #print("save the current status")
         query = self.insertQueueLog.format(param1=packageId, param2 = status)
         self.cursor.execute(query)
         self.cnxn.commit()

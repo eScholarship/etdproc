@@ -38,10 +38,10 @@ tag, ind1, ind2, field, sourcefield, info, proc
 338,bl,bl,a, const, online resource, none
 338,bl,bl,b, const, cr, none
 338,bl,bl,2, const, rdacarrier, none
-500,bl,bl,a, notes, compute, none
+500,bl,bl,a, notes, compute, dot
 502,bl,bl,b, degree, xml, none
 502,bl,bl,c, campusname, compute, none
-502,bl,bl,d, pub_year, compute, none
+502,bl,bl,d, pub_year, compute, dot
 504,bl,bl,a, const, Includes bibliographical references, dot
 506,0,bl,3, const, Some versions:, none 
 506,0,bl,a, const, Open access versions available from some providers, dot
@@ -54,17 +54,17 @@ tag, ind1, ind2, field, sourcefield, info, proc
 520,3,bl,a, abstract, gw, none
 546,bl,bl,a, languages, compute, none
 588,0,bl,a, const, Metadata from ProQuest and information submitted by author, dot
-650,bl,4,a, subjects, gw, none
+650,bl,4,a, subjects, gw, dot
 653,bl,bl,a, keywords, xml, none 
 655,bl,4, a, genre, compute, none
 655,bl,4, z, control655, compute, none
-655,bl,4, x, dept, compute, none
+655,bl,4, x, dept, compute, dot
 655,bl,7, a, const, Academic theses, dot
 655,bl,7, 2, const, lcgft, none
-700,1,bl, a, advisor, compute, none
+700,1,bl, a, advisor, compute, comma
 710,2,bl, a, campusname, compute, comma
 710,2,bl, e, const, degree granting institution, dot
 856,4,0, z, const, Open Access via eScholarship, none
 856,4,0, u, escholark, compute, escholurl
 856,4,0, 7, const, 0, none
-856,4,0, I, const, (star)Unrestricted online access, none
+856,4,0, l, const, (star)Unrestricted online access, none

@@ -237,9 +237,10 @@ class processQueueImpl:
                 if "merrittark" in x._compAttrs:
                     if "ark:" in x._compAttrs["merrittark"]:
                         isMerrittArk = True
+                # updating to remeta to marc stage for now
                 if consts.db.IsDeposited(packageid):
-                    consts.db.saveQueueStatus(packageid, "remeta")
-                    self._remetaTasks.append(packageid)
+                    consts.db.saveQueueStatus(packageid, "marc")
+                    #self._remetaTasks.append(packageid)
                 elif isMerrittArk:
                     consts.db.saveQueueStatus(packageid, "gw")
                 else:
