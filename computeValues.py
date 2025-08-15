@@ -102,7 +102,7 @@ class etdcomputeValues:
             language = pycountry.languages.get(alpha_2=lang)
             if language:
                 self._compAttrs["languages"] = language.name
-                return lang.alpha_3
+                return language.alpha_3
         return 'eng'
 
     def computeRecInfo(self):
