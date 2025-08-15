@@ -4,8 +4,9 @@ import dateparser
 import consts
 from creds import base_urls
 from datetime import datetime, date, timedelta
-from maps import pq_lang_mapping, cc_url_mapping
+from maps import cc_url_mapping
 from urllib.parse import quote
+import pycountry
 
 
 class etdcomputeValues:
@@ -95,7 +96,14 @@ class etdcomputeValues:
         lang = 'en' # default
         if self._xmlAttrs["language"]:
             lang = self._xmlAttrs["language"]
-        return pq_lang_mapping[lang]
+
+        # set Language only if non-English is specified
+        if lang != 'en':
+            language = pycountry.languages.get(alpha_2=lang)
+            if language:
+                self._compAttrs["languages"] = language.name
+                return lang.alpha_3
+        return 'eng'
 
     def computeRecInfo(self):
         # 240507s2021\\\\cau|||||obm\\||||\||eng\d
@@ -112,7 +120,8 @@ class etdcomputeValues:
         # xml language need to convert en to eng
         lang = self.getLanguage()
         self._compAttrs["lang"] = lang
-        self._compAttrs["recinfo"]  = f'{date}s{self._compAttrs["pub_year"]}    cau|||||obm  |||| ||{lang}|d'
+        # 008 should always be with language eng
+        self._compAttrs["recinfo"]  = f'{date}s{self._compAttrs["pub_year"]}    cau|||||obm  |||| ||eng|d'
         return
 
     def splitTile(self, title):
@@ -143,10 +152,10 @@ class etdcomputeValues:
         maintitle, subtitle = self.splitTile(title)
         # add additional space and colon in case of a split
         if subtitle:
-            maintitle = maintitle + " :"
-            subtitle = subtitle + ' /' # need to add for marc
+            maintitle = maintitle.strip() + " :"
+            subtitle = subtitle.strip() + ' /' # need to add for marc
         else:
-            maintitle = maintitle + ' /' # need to add for marc
+            maintitle = maintitle.strip() + ' /' # need to add for marc
         
         titleIndicator = '0'
         if title.startswith("The "):
@@ -176,7 +185,7 @@ class etdcomputeValues:
         # need to create notes based on xml info about advisors 
         advisors = "Advisor(s): "
         members = "Committee members: "
-        if len(self._xmlAttrs["advisors"]):
+        if len(self._xmlAttrs["advisors"]) == 0:
             self._compAttrs["notes"] = None
             return
 
@@ -188,20 +197,13 @@ class etdcomputeValues:
         #strip and add full stop if needed
         notes = advisors.strip('; ')
         if len(self._xmlAttrs["members"]):
-            notes = '. ' + notes + members.strip('; ')
+            notes = notes + '. ' + members.strip('; ')
         self._compAttrs["notes"] = notes
         return
 
-    # skip for now and see later how multilanguages are going to be represented in xml
-    # May need a mapping for language code to language   
-    # # iso639 should works 
-    def computeLanguages(self, languages):
-        self._compAttrs["languages"] = None
-        # less important - open text list of languages
-        if languages and languages != "English":
-            return languages
+    def computeAbstract(self):
+        self._compAttrs["abstract"] = "\n\n".join(self._xmlAttrs["abstractLines"])
 
-        return None
 
     def computeAuthorsAdvisor(self):
         # need to compile the list from xml information - lastname, first middle format
@@ -317,7 +319,7 @@ class etdcomputeValues:
         self.computeNotes()
         self.computeAuthorsAdvisor()
         self.computeDept()
-        self.computeLanguages(None) #TBD
+        self.computeAbstract()
         self.computeEscholValues()
         # does this depend upon the degree?
         self._compAttrs["genre"] = "Dissertations, Academic"

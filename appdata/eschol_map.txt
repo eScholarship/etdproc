@@ -8,7 +8,7 @@ isPeerReviewed, compute, isPeerReviewed
 contentLink, compute, contentLink
 id, compute, escholark
 contentFileName, xml, binary-name
-abstract, gw, abstract  
+abstract, compute, abstract  
 title, xml, title
 published, compute, pub_date
 keywords, xml, keywords
@@ -16,7 +16,6 @@ localIDs, compute, escholIds
 authors, compute, escholauthors
 units, compute, escholunits
 contributors, compute, escholadvisors
-isbn, gw, isbn
 subjects, gw, subjects
 language, xml, language
 embargoExpires, compute, embargodate
