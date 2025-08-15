@@ -144,9 +144,9 @@ class etdcomputeValues:
         # add additional space and colon in case of a split
         if subtitle:
             maintitle = maintitle + " :"
-            subtitle = subtitle + '/' # need to add for marc
+            subtitle = subtitle + ' /' # need to add for marc
         else:
-            maintitle = maintitle + '/' # need to add for marc
+            maintitle = maintitle + ' /' # need to add for marc
         
         titleIndicator = '0'
         if title.startswith("The "):
@@ -174,17 +174,23 @@ class etdcomputeValues:
 
     def computeNotes(self):
         # need to create notes based on xml info about advisors 
-        advisors = "Advisors: "
+        advisors = "Advisor(s): "
         members = "Committee members: "
+        if len(self._xmlAttrs["advisors"]):
+            self._compAttrs["notes"] = None
+            return
+
         for advisor in self._xmlAttrs["advisors"]:
             advisors = advisors + f'{advisor["surname"]}, {advisor["fname"]}; '
         for member in self._xmlAttrs["members"]:
             members = members + f'{member["surname"]}, {member["fname"]}; '
        
         #strip and add full stop if needed
-        notes = advisors.strip('; ') + '. '
-        notes = notes + members.strip('; ')
+        notes = advisors.strip('; ')
+        if len(self._xmlAttrs["members"]):
+            notes = '. ' + notes + members.strip('; ')
         self._compAttrs["notes"] = notes
+        return
 
     # skip for now and see later how multilanguages are going to be represented in xml
     # May need a mapping for language code to language   

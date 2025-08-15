@@ -193,7 +193,7 @@ class etdParseXml:
             allkeys = keywords[0].text.split(',') 
             for keyword in allkeys:
                 if keyword is not None:
-                    self._data["keywords"].append(keyword)
+                    self._data["keywords"].append(keyword.strip())
 
         lang = self._xpatheval("/DISS_submission/DISS_description/DISS_categorization/DISS_language")
         if lang is not None and len(lang) > 0:
