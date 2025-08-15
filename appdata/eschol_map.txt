@@ -8,7 +8,7 @@ isPeerReviewed, compute, isPeerReviewed
 contentLink, compute, contentLink
 id, compute, escholark
 contentFileName, xml, binary-name
-abstract, compute, abstract  
+abstract, gw, abstract  
 title, xml, title
 published, compute, pub_date
 keywords, xml, keywords
