@@ -65,7 +65,7 @@ class createMarc:
         ind1 = " " if setting.indicator1 == "bl" else setting.indicator1
         ind2 = " " if setting.indicator2 == "bl" else setting.indicator2
 
-        if attrs[setting.sourcefield] is None:
+        if setting.sourcefield not in attrs or attrs[setting.sourcefield] is None:
             print("NOT PRESENT " +  setting.sourcefield)
             return None
         # create a field 
