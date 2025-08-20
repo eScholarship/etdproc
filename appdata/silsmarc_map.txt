@@ -7,7 +7,7 @@ tag, ind1, ind2, field, sourcefield, info, proc
 024,7,bl,2, const, ark, none
 024,8,bl,a,escholark,compute, none
 040,bl,bl,a, const, SCPER, none
-040,bl,bl,b, lang, compute, none
+040,bl,bl,b, const, eng, none
 040,bl,bl,e, const, rda, none
 040,bl,bl,e, const, pn, none
 040,bl,bl,c, const, SCPER, none

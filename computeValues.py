@@ -120,8 +120,7 @@ class etdcomputeValues:
         # xml language need to convert en to eng
         lang = self.getLanguage()
         self._compAttrs["lang"] = lang
-        # 008 should always be with language eng
-        self._compAttrs["recinfo"]  = f'{date}s{self._compAttrs["pub_year"]}    cau|||||obm  |||| ||eng|d'
+        self._compAttrs["recinfo"]  = f'{date}s{self._compAttrs["pub_year"]}    cau|||||obm  |||| ||{lang}|d'
         return
 
     def splitTile(self, title):
