@@ -168,7 +168,10 @@ class createMarc:
 
     def writeMarcFile(self):
         record = self.generateRecord()
-        filepath = f'{consts.marcDir}/{self._compattrs["campusshort"]}-{self._xmlattrs["pubNumber"]}.mrc'
+        mrcname =  f'{self._compattrs["campusshort"]}-{self._xmlattrs["pubNumber"]}.mrc'
+        # save in identifier table 
+        consts.db.saveIdentifier(self._packageId, "MarcName",mrcname)
+        filepath = f'{consts.marcDir}/{mrcname}'
         with open(filepath, 'wb') as data:
             data.write(record.as_marc21())
         return filepath

@@ -1,6 +1,44 @@
 import consts
 import paramiko
+import traceback
 from creds import oclc_creds
+
+class uploadToOCLCftp:
+    _countSent = 0
+    _packageIds = None
+    def __init__(self, packageIds):
+        self._countSent = 0
+        self._packageIds = packageIds
+        self.connectAndUpload()
+
+    def connectAndUpload(self):
+        with paramiko.Transport((oclc_creds.host,oclc_creds.port)) as transport:
+            transport.connect(None, oclc_creds.username, oclc_creds.key)
+            with paramiko.SFTPClient.from_transport(transport) as sftp:
+                self.uploadFiles(sftp)
+        return
+        
+
+    def uploadFiles(self, sftp):
+        sftp.chdir(oclc_creds.uploaddir) 
+        for packageid in self._packageIds:
+            try:
+                mrcname = consts.db.getMarcName(packageid)
+                assert(mrcname)
+                inpath = f'{consts.marcDir}/{mrcname}'
+                outpath = f'{oclc_creds.uploaddir}/{oclc_creds.nameprefix}{mrcname}' 
+                #print(inpath)
+                #print(outpath)
+                sftp.put(inpath, outpath)
+                consts.db.saveQueueStatus(packageid, "done")
+                self._countSent += 1
+            except Exception as e:
+                callstack = traceback.format_exc()
+                print(callstack)
+                print(e)
+                consts.db.saveQueueStatus(packageid, "sils-error") 
+
+
 
 class uploadToFTP:
     _packageId = None

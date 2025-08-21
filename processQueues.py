@@ -1,7 +1,9 @@
 import consts
 import traceback
+from creds import oclc_creds
 from parseXml import reparseXml
 from generateMarc import createMarc
+from sendToSILS import uploadToOCLCftp
 from parseGateway import etdParseGateway
 from computeValues import etdcomputeValues
 from sendToMerritt import etdToMerritt, marcToMerritt
@@ -200,16 +202,12 @@ class processQueueImpl:
 
     def processSilsDesposit(self):
         print("process sils submission")
-        for packageid in self._silsTasks:
-            try:
-                # TBD to ftp for OCLC
-                # consts.db.saveQueueLog(packageid, "sils") 
+        if oclc_creds.sentToOclc == False:
+            for packageid in self._silsTasks:
                 consts.db.saveQueueStatus(packageid, "done")
-            except Exception as e:
-                callstack = traceback.format_exc()
-                print(callstack)
-                print(e)
-                consts.db.saveQueueStatus(packageid, "sils-error") 
+        else:
+            x = uploadToOCLCftp(self._silsTasks)
+            print(f'Sent {x._countSent} files to OCLC')
 
     def processReparse(self):
         print("process reparse xml")
