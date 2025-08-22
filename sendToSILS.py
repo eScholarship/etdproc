@@ -22,6 +22,10 @@ class uploadToOCLCftp:
     def uploadFiles(self, sftp):
         sftp.chdir(oclc_creds.uploaddir) 
         for packageid in self._packageIds:
+            if consts.db.isOclcsenddone(packageid):
+                print(f'Skipping OCLC FTP for package id {packageid}')
+                consts.db.saveQueueStatus(packageid, "done")
+                continue
             try:
                 mrcname = consts.db.getMarcName(packageid)
                 assert(mrcname)
@@ -32,6 +36,8 @@ class uploadToOCLCftp:
                 sftp.put(inpath, outpath)
                 consts.db.saveQueueStatus(packageid, "done")
                 self._countSent += 1
+                # record that sils operation is completed
+                consts.db.saveQueueLog(packageid, "sils") 
             except Exception as e:
                 callstack = traceback.format_exc()
                 print(callstack)

@@ -21,6 +21,7 @@ class etdDb:
     queryPackageZip = "SELECT id FROM packages where zipname = '{param}'"
     queryDepositResponse = "select depositresponse from escholrequests where packageId={param}"
     queryQueueStatus = "select queuename from queues where packageId = {param}"
+    querySilsInLog = "select queuename from queuelogs where queuename = 'sils' and packageId = {param}"
     queryMarcName = "select idvalue from identifiers where packageId = {param} and idtype = 'MarcName'"
     insertPackage = "insert into packages (pubnum, zipname, campusId) VALUES ('{param1}','{param2}', {param3}) "
     insertMerrittRequest = "insert into merrittrequests (packageId, request, response, currentstatus) VALUES ({param1},'{param2}','{param3}','{param4}') "
@@ -298,9 +299,12 @@ class etdDb:
     def IsZipFilePresent(self, zipname):        
         query = self.queryPackageZip.format(param=zipname)
         self.cursor.execute(query)
-        for row in self.cursor:
-            return row[0]
-        return None
+        return any(self.cursor)
+
+    def IsOclcsenddone(self, packageid):
+        query = self.querySilsInLog.format(param=packageid)
+        self.cursor.execute(query)
+        return any(self.cursor)
 
     def saveIdentifier(self, packageId, idtype, idvalue):
         #print("save identifier")
