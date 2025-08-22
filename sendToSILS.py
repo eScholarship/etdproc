@@ -22,7 +22,7 @@ class uploadToOCLCftp:
     def uploadFiles(self, sftp):
         sftp.chdir(oclc_creds.uploaddir) 
         for packageid in self._packageIds:
-            if consts.db.isOclcsenddone(packageid):
+            if consts.db.IsOclcsenddone(packageid):
                 print(f'Skipping OCLC FTP for package id {packageid}')
                 consts.db.saveQueueStatus(packageid, "done")
                 continue
