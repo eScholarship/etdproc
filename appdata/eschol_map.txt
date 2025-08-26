@@ -3,7 +3,7 @@ sourceName, const, etd_proc
 sourceID, xml, pubNumber
 sourceURL, const, dissertations.umi.com
 submitterEmail, const, etd@ProQuest.uc
-type, const, ARTICLE,
+type, const, ETD
 isPeerReviewed, compute, isPeerReviewed
 contentLink, compute, contentLink
 id, compute, escholark
