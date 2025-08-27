@@ -24,6 +24,8 @@ class createMarc:
             return value + ','
         if action == "escholurl":
             return base_urls.escholUrlBase + value[-8:]
+        if action == 'dash':
+            return value.replace('-','')
         return value
 
     def generateConst(self, setting, fieldtofill):

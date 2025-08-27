@@ -49,7 +49,7 @@ tag, ind1, ind2, field, sourcefield, info, proc
 506,0,bl,2, const, star, none
 506,1,bl,a, const, Embargoed until, none
 506,1,bl,f, const, embargoed access, none
-506,1,bl,g, embargodate, compute, none
+506,1,bl,g, embargodate, compute, dash
 506,1,bl,2, const, coarar, none
 520,3,bl,a, abstract, compute, none
 546,bl,bl,a, languages, compute, none
