@@ -2,7 +2,7 @@ import consts
 import paramiko
 import traceback
 from datetime import date
-from pymarc import MARCReader
+from pymarc import MARCReader, MARCWriter
 from creds import oclc_creds
 
 class uploadToOCLCftp:
@@ -36,6 +36,7 @@ class uploadToOCLCftp:
         self._combinedPath = f'{consts.marcDir}/{self._combinedName}'
         # Create a FileWriter for the output
         with open(self._combinedPath, 'wb') as out_fh:
+            writer = MARCWriter(out_fh)
             for packageid in self._packageIds:
                 if consts.db.IsOclcsenddone(packageid):
                     print(f'Skipping OCLC FTP for package id {packageid}')
@@ -48,9 +49,9 @@ class uploadToOCLCftp:
                     with open(inpath, 'rb') as in_fh:
                         reader = MARCReader(in_fh)
                         for record in reader:
-                            out_fh.write(record.as_marc21())
+                            writer.write(record)
                     self._combinedIds.append(packageid)
-
+            writer.close()
 
     def uploadFiles(self, sftp):
         sftp.chdir(oclc_creds.uploaddir) 

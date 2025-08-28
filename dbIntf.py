@@ -299,12 +299,14 @@ class etdDb:
     def IsZipFilePresent(self, zipname):        
         query = self.queryPackageZip.format(param=zipname)
         self.cursor.execute(query)
-        return any(self.cursor)
+        rows = list(self.cursor)  # forces full fetch
+        return bool(rows)
 
     def IsOclcsenddone(self, packageid):
         query = self.querySilsInLog.format(param=packageid)
         self.cursor.execute(query)
-        return any(self.cursor)
+        rows = list(self.cursor)  # forces full fetch
+        return bool(rows)
 
     def saveIdentifier(self, packageId, idtype, idvalue):
         #print("save identifier")

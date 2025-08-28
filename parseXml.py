@@ -143,7 +143,7 @@ class etdParseXml:
         lines = self._xpatheval("/DISS_submission/DISS_content/DISS_abstract/DISS_para")
         self._data["abstractLines"] = []
         for line in lines:
-            self._data["abstractLines"].append(line.text)
+            self._data["abstractLines"].append(line.text.strip())
         return
 
     def addContent(self):

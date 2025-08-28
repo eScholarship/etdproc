@@ -201,7 +201,7 @@ class etdcomputeValues:
         return
 
     def computeAbstract(self):
-        self._compAttrs["abstract"] = "\n\n".join(self._xmlAttrs["abstractLines"])
+        self._compAttrs["abstract"] = " ".join(self._xmlAttrs["abstractLines"])
 
 
     def computeAuthorsAdvisor(self):
