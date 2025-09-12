@@ -48,7 +48,8 @@ class etdDb:
                         host=creds.etdDb.server,
                         database=creds.etdDb.database,
                         charset='utf8mb4',
-                        port=creds.etdDb.port)
+                        port=creds.etdDb.port, 
+                        auth_plugin='mysql_native_password')
         self.cursor = self.cnxn.cursor()
 
     def getGwSetting(self):

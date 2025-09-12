@@ -149,7 +149,7 @@ class createMarc:
     def generateRecord(self):
         print("generate one record")
         # from pymarc import Record, Field, Subfield
-        record = Record()
+        record = Record(force_utf8= True)
         lastSetting = None
         lastField = None
 

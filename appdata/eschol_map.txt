@@ -22,3 +22,4 @@ embargoExpires, compute, embargodate
 rights, compute, cclicence
 suppFiles, compute, escholsupp
 isbn, gw, isbn
+thesisDept, xml, inst_contact
