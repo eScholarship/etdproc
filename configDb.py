@@ -4,20 +4,22 @@ import mysql.connector
 import csv
 
 class configDb:
-    #allSqlFiles = ["campuses.sql","packages.sql","errorlog.sql","settings.sql","identifiers.sql","merrittcallback.sql","merrittrequest.sql","escholrequest.sql","queues.sql"]
-    allSqlFiles = ["queuelogs.sql"]
+    #allSqlFiles = ["campuses.sql","packages.sql","errorlog.sql","settings.sql","identifiers.sql","merrittcallback.sql","merrittrequest.sql","escholrequest.sql","queues.sql","queuelogs.sql"]
+    allSqlFiles = ["config.sql"]
     sqlpath = 'sqlscripts/'
     datapath = 'appdata/' 
     InsertCampus = "INSERT INTO Campuses (code,instloc,pqcode,namesuffix,escholunit,merrittcol,nameinmarc) VALUES (%s,%s,%s,%s,%s,%s,%s)"
     InsertMarcIn = "INSERT INTO settings (settingtype,field1,field2,field3,field4) VALUES (%s,%s,%s,%s,%s)"
     InsertSilsMap = "INSERT INTO settings (settingtype,field1,field2,field3,field4,field5,field6,info) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
     InsertEscholMap = "INSERT INTO settings (settingtype,field1,field2,info) VALUES (%s,%s,%s,%s)"
+    InsertHarvestMap = "INSERT INTO settings (settingtype,field1,field2,field3,field4,field5,field6,info) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
     def __init__(self):
         self.cnxn = mysql.connector.connect(user=creds.etdDb.username, 
                         password=creds.etdDb.password,
                         host=creds.etdDb.server,
                         database=creds.etdDb.database,
-                        port=creds.etdDb.port)
+                        port=creds.etdDb.port,
+                        auth_plugin='mysql_native_password')
         self.cursor = self.cnxn.cursor()
 
 
@@ -104,6 +106,25 @@ class configDb:
         self.cursor.executemany(self.InsertEscholMap, params)
         self.cnxn.commit()
 
+    def populateHarvestConfig(self):
+        print("populate HarvestConfig")
+        params = []
+        with open(self.datapath +'harvest_map.txt', newline='') as f:
+            reader = csv.reader(f)
+            next(reader)
+            for row in reader:
+                print(row)
+                tag = row[0].strip()
+                ind1 = row[1].strip()
+                ind2 = row[2].strip()
+                field = row[3].strip()
+                destfield = row[4].strip()
+                escholfield = row[5].strip()
+                actionfield = row[6].strip()
+                params.append(('HarvestIn',tag,ind1,ind2,field,destfield,actionfield,escholfield,))
+        self.cursor.executemany(self.InsertHarvestMap, params)
+        self.cnxn.commit()
+
 print("start")
 x = configDb()
 #x.createDbs()
@@ -111,4 +132,5 @@ x = configDb()
 #x.populateGatewayConfig()
 #x.populateSilsConfig()
 #x.populateEscholConfig()
+x.populateHarvestConfig()
 print("end")
