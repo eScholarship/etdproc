@@ -10,6 +10,7 @@ campusinfo = db.getCampusInfo()
 silsSettings = db.getgenerateSetting()
 gwSettings = db.getGwSetting()
 escholSetting = db.getescholSetting()
+configs = db.getConfigs()
 
 downloadDir = '/apps/eschol/etdproc/zip/download'
 extractDir = '/apps/eschol/etdproc/zip/extract'

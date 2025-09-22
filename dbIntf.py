@@ -24,6 +24,7 @@ class etdDb:
     querySilsInLog = "select queuename from queuelogs where queuename = 'sils' and packageId = {param}"
     queryMarcName = "select idvalue from identifiers where packageId = {param} and idtype = 'MarcName'"
     queryConfig = "select ckey, cvalue from config"
+    queryHarvestRecord = "select rawvalue from harvestlog where identifier = '{param1}' and idtype = '{param2}'"
     insertPackage = "insert into packages (pubnum, zipname, campusId) VALUES ('{param1}','{param2}', {param3}) "
     insertMerrittRequest = "insert into merrittrequests (packageId, request, response, currentstatus) VALUES ({param1},'{param2}','{param3}','{param4}') "
     insertEscholRequest = "insert into escholrequests (packageId, escholId) VALUES ({param1},'{param2}')"
@@ -32,6 +33,7 @@ class etdDb:
     insertErrorLog = "insert into errorlog (packageId, message, detail) VALUES ({param1},'{param2}','{param3}') "
     insertConfig = "insert into config (ckey, cvalue) VALUES ('{param1}','{param2}') "
     insertIdentifier = "insert into identifiers (packageId, idtype, idvalue) VALUES ({param1},'{param2}','{param3}') "
+    insertHarvestRecord = "insert into harvestlog (identifier, datestamp, rawvalue) VALUES ('{param1}','{param2}','{param3}') "
     updateEscholRequest = "update escholrequests set depositrequest = '{param2}', actionTime = NOW() where packageId = '{param1}'"
     updateEscholResponse = "update escholrequests set depositresponse = '{param2}', actionTime = NOW() where packageId = '{param1}'"
     updatePubNumCampusId = "update packages set pubnum = '{param2}', campusId = '{param3}', lastUpdated = NOW() where id = '{param1}'"
@@ -44,6 +46,7 @@ class etdDb:
     updateEscholArk = "update packages set computedattrs = JSON_SET(computedattrs, '$.escholark', '{param2}') where id = {param1}"
     updateMcProcessed = "update merrittcallbacks set isProcessed = True where id = {param}" 
     updateConfig = "update config set cvalue = {param2} where ckey = {param1}" 
+
 
     def __init__(self):
         self.cnxn = mysql.connector.connect(user=creds.etdDb.username, 
@@ -353,6 +356,21 @@ class etdDb:
         self.cursor.execute(query)
         self.cnxn.commit()
         return
+
+    def getHarvestRecord(self, oaiid, stamp):
+        query = self.queryHarvestRecord.format(param1=oaiid, param2=stamp)
+        self.cursor.execute(query)
+        for row in self.cursor:
+            return row[0]
+        return None
+
+    def addHarvestRecord(self, oaiid, stamp, marcxml):
+        query = self.insertHarvestRecord.format(param1=oaiid, param2 = stamp, param3 = marcxml)
+        self.cursor.execute(query)
+        self.cnxn.commit()
+        return
+
+
 #x = etdDb()
 #x.saveQueueLog(1,"eschol")
 #x.saveEscholRequest(1, '{"X":"Y"}')
