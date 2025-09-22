@@ -10,7 +10,7 @@ sickle = Sickle('https://uclibraries.alma.exlibrisgroup.com/view/oai/01UCS_NETWO
 from_date = '2025-09-01'
 listparams = {'metadataPrefix' : 'marc21',
               'set': 'UCETDs',
-              'from': '2025-09-15'}
+              'from': '2025-09-18'}
 
 # Harvest records from a specific set and metadata format
 #records = sickle.ListRecords(metadataPrefix='marc21', set='UCETDs',from=from_date)

@@ -3,6 +3,7 @@ import datetime
 from sickle import Sickle
 from sickle.models import Record
 from lxml import etree
+from sickle.oaiexceptions import NoRecordsMatch
 
 class harvertMarc:
     _sickle = None
@@ -18,7 +19,13 @@ class harvertMarc:
 
     def getFeedAndSave(self):
         print("get feed and save")
-        records = self._sickle.ListRecords(**self._listparams)
+        records = None
+        try:
+            records = self._sickle.ListRecords(**self._listparams)
+        except NoRecordsMatch:
+            print("Nothing to harvest")
+            return
+
         # Iterate through records and print basic info
         for i, record in enumerate(records):
             print(f"\nRecord #{i+1}")
@@ -37,12 +44,7 @@ class harvertMarc:
             metadata_elem = xml_root.find('.//{http://www.openarchives.org/OAI/2.0/}metadata')
             marcxml = etree.tostring(metadata_elem[0], encoding='utf-8')
             # add if it is not present
-            consts.db.addHarvestRecord(oaiid, stamp, marcxml)
-            #print("Deleted:", record.header.deleted)
-            #print("Raw Metadata:\n", record.raw)
-            # if the identifier and date 
-            # IsHarvestRecordPresent(oaiid, stamp)
-            # addHarvestRecord(oaiid, stamp, marcxml_str)
+            consts.db.addHarvestRecord(oaiid, stamp, marcxml.decode('utf-8'))
 
         # once all records are processed, update the date
         currentdate = datetime.date.today().strftime('%Y-%m-%d')
@@ -50,3 +52,6 @@ class harvertMarc:
 
 x = harvertMarc()
 x.getFeedAndSave()
+
+#currentdate = datetime.date.today().strftime('%Y-%m-%d')
+#consts.db.saveConfig('harvest.fromdate', currentdate)
