@@ -50,8 +50,8 @@ class harvertMarc:
         currentdate = datetime.date.today().strftime('%Y-%m-%d')
         consts.db.saveConfig('harvest.fromdate', currentdate)
 
-x = harvertMarc()
-x.getFeedAndSave()
+# x = harvertMarc()
+# x.getFeedAndSave()
 
 #currentdate = datetime.date.today().strftime('%Y-%m-%d')
 #consts.db.saveConfig('harvest.fromdate', currentdate)

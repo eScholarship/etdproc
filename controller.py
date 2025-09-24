@@ -4,13 +4,14 @@ import traceback
 from getPQpackage import pqSfptIntf
 from parseXml import etdParseXml
 from processQueues import processQueueImpl
-
+from harvestMarc import harvertMarc
 
 class Controller:
     def __init__(self):
         print("starting controller")
         self.buildQueue()
         self.processMerrittCallbacks()
+        self.OaiHarvest()
         x = processQueueImpl() 
         x.processQueue()
 
@@ -75,7 +76,10 @@ class Controller:
                 print("This is for addition to existing ETD")
             consts.db.markMCprocessed(mcid)
 
-
+    def OaiHarvest(self):
+        print("run OAI harvest")
+        x = harvertMarc()
+        x.getFeedAndSave()
         
 # Create the controller to build queue and process all
 c = Controller()
