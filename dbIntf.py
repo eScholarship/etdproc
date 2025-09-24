@@ -1,12 +1,13 @@
 import creds
 import mysql.connector
-from maps import pqmap, silsmap, campusmap, escholmap
+from maps import pqmap, silsmap, campusmap, escholmap, harvestmap
 
 
 class etdDb:
     queryGatewayMap = "select field1,field2,field3,field4 from settings where settingtype='Gateway'"
     querySilsMap = "select field1,field2,field3,field4,field5,field6,info from settings where settingtype='MarcOut'"
     queryEscholMap = "select field1,field2,info from settings where settingtype='EscholOut'"
+    queryHarvestMap = "select field1,field2,field3,field4,field5,field6,info from settings where settingtype='HarvestIn'"
     queryPackage = "select id from packages where pubnum='{param}' and isInvalid = '0'"
     queryAttrs = "select fileattrs, gwattrs, xmlattrs, computedattrs from packages where id= {param}"
     queryXmlAttrs = "select xmlattrs from packages where id='{param}'"
@@ -17,6 +18,7 @@ class etdDb:
     queryEscholId = "select escholId from escholrequests where packageId={param}"
     queryQueuedTasks = "select queuename, packageId from queues where queuename != 'done' and RIGHT(queuename, 6) != '-error'"
     queryUnprocessedMCs = "select id, callbackdata from merrittcallbacks where isProcessed = False"
+    queryUnprocessedOai = "select identifier, datestamp from harvestlog where isProcessed = False"
     queryPubNumber = "SELECT pubnum FROM packages where id = {param}"
     queryPackageZip = "SELECT id FROM packages where zipname = '{param}'"
     queryDepositResponse = "select depositresponse from escholrequests where packageId={param}"
@@ -82,6 +84,14 @@ class etdDb:
         for row in self.cursor:
             tagInfo.append(escholmap(row[0],row[1],row[2]))
         return tagInfo
+
+    def getoaiSetting(self):
+        self.cursor.execute(self.queryHarvestMap)
+        tagInfo = []
+        for row in self.cursor:
+            tagInfo.append(harvestmap(row[0],row[1],row[2],row[3],row[4],row[5],row[6]))
+        return tagInfo
+
 
     def getConfigs(self):
         print("get configs")
@@ -366,13 +376,18 @@ class etdDb:
         return None
 
     def addHarvestRecord(self, oaiid, stamp, marcxml):
-        #query = self.insertHarvestRecord.format(param1=oaiid, param2 = stamp, param3 = marcxml)
-        query = self.insertHarvestRecord
-        #print(query)
-        self.cursor.execute(query,(oaiid, stamp, marcxml))
+        self.cursor.execute(self.insertHarvestRecord,(oaiid, stamp, marcxml))
         self.cnxn.commit()
         return
 
+    def getUnprocessedOai(self):
+        self.cursor.execute(self.queryUnprocessedOai)
+        oaiids = []
+        for row in self.cursor:
+            oaiids.append((row[0],row[1]))
+        return oaiids
+
+    # save harvest attr json
 
 #x = etdDb()
 #x.saveQueueLog(1,"eschol")

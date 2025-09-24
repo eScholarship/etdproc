@@ -190,8 +190,8 @@ class processQueueImpl:
                 consts.db.saveQueueLog(packageid, "marc") 
                 x = createMarc(packageid)
                 marcfile = x.writeMarcFile()
-                y = marcToMerritt(marcfile, x._compattrs["merrittark"], x._compattrs["merrittbucket"])
-                y.sendToMerritt()
+                y = marcToMerritt(x._compattrs["merrittark"], x._compattrs["merrittbucket"])
+                y.sendFileToMerritt(marcfile)
                 consts.db.saveQueueStatus(packageid, "sils")
                 self._silsTasks.append(packageid)
             except Exception as e:

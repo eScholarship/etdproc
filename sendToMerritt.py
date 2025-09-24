@@ -6,7 +6,7 @@ import creds
 import consts
 import time
 import requests
-
+from io import BytesIO
 
 def getMerrittCollection(bucket):
     collection = bucket
@@ -17,17 +17,31 @@ def getMerrittCollection(bucket):
 
 class marcToMerritt:
     _collection = None
-    _marcpath = None
     _merrittark = None
-    def __init__(self, marcpath, merrittark, merrittbucket):
-        print(f'EtdToMerritt start')
-        self._marcpath = marcpath   
+    def __init__(self, merrittark, merrittbucket):
+        print(f'EtdToMerritt start') 
         self._merrittark = merrittark
         self._collection = getMerrittCollection(merrittbucket)
 
-    def sendToMerritt(self):
+    def sendFileToMerritt(self, marcpath):
         files = {
-            'file': open(self._marcpath, 'rb'),
+            'file': open(marcpath, 'rb'),
+            'submitter': (None, creds.merritt_creds.username),
+            'responseForm': (None, 'json'),
+            'notificationFormat': (None, 'json'),
+            'profile': (None, self._collection),
+            'primaryIdentifier':(None, self._merrittark),
+        }
+
+        # send request
+        response = requests.post(creds.merritt_creds.url, files=files, auth=(creds.merritt_creds.username, creds.merritt_creds.password),headers={'Accept': 'application/json'})
+        print(response.text)
+        # Throttle the requests to Merritt
+        time.sleep(1) # pause for 1 sec
+
+    def sendXmlToMerritt(self, marcxml):
+        files = {
+            'file': ('oclcmarc.xml', BytesIO(marcxml.encode('utf-8'))),
             'submitter': (None, creds.merritt_creds.username),
             'responseForm': (None, 'json'),
             'notificationFormat': (None, 'json'),
