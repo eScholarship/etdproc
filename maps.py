@@ -55,7 +55,7 @@ class harvestmap:
         self.indicator1 = p2
         self.indicator2 = p3
         self.field = p4
-        self.sourcefield = p5
+        self.destfield = p5
         self.action = p6
         self.escholfield = p7
 
