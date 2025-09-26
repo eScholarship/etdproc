@@ -13,6 +13,7 @@ class processOai:
             #saveInMerritt(marcxml)
             attrs = self.getAttributes(marcxml)
             # find the matching Package id
+            packageId = self.getPackageId(attrs["isbn"])
             # fill attrs and package id
             # see if there is another record for this package id
             # if so, add the package for oaiupdate queue
@@ -32,12 +33,20 @@ class processOai:
 
     def getValue(self, marc, setting):
         if setting.indicator1 == 'bl' and setting.indicator2 == 'bl':
-            return marc[setting.tag][setting.field]
+            if setting.field in marc[setting.tag]:
+                return marc[setting.tag][setting.field]
+            else:
+                return None
         else:
             for field in marc.get_fields(setting.tag):
                 if field.indicators[0] == setting.indicator1:
                     return field[setting.field]
         return None
+
+    def getPackageId(self, isbn):
+        # get the id from identifiers
+        return None
+
 # get all the id and stamp where isProcessed is False
 
 # for each of these, get the raw data and parse the data to extract values and prepare json

@@ -2,4 +2,9 @@ tag, ind1, ind2, field, destfield, escholfield, proc
 020,bl,bl,a,isbn, isbn, none
 024,7,bl,a,merrittark,none, none
 024,8,bl,a,escholark,id, none
-506,1,bl,g, embargodate, embargoExpires, none
+245,bl,bl,a, maintitle, title, combine
+245,bl,bl,b, subtitle, title, combine
+245,bl,bl,c, authors, authors, nameparts
+506,1,bl,g, embargodate, embargoExpires, dash
+520,3,bl,a, abstract, abstract, none
+700,1,bl, a, advisor, contributors, nameparts

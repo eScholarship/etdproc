@@ -27,6 +27,7 @@ class etdDb:
     queryMarcName = "select idvalue from identifiers where packageId = {param} and idtype = 'MarcName'"
     queryConfig = "select ckey, cvalue from config"
     queryHarvestRecord = "select rawvalue from harvestlog where identifier = '{param1}' and datestamp = '{param2}'"
+    queryIdentifer = "select packageid from identifiers where idvalue = '{param1}' and idtype = '{param2}'"
     insertPackage = "insert into packages (pubnum, zipname, campusId) VALUES ('{param1}','{param2}', {param3}) "
     insertMerrittRequest = "insert into merrittrequests (packageId, request, response, currentstatus) VALUES ({param1},'{param2}','{param3}','{param4}') "
     insertEscholRequest = "insert into escholrequests (packageId, escholId) VALUES ({param1},'{param2}')"
@@ -387,6 +388,12 @@ class etdDb:
             oaiids.append((row[0],row[1]))
         return oaiids
 
+    def getpackagebyisbn(self, isbn):
+        query = self.queryIdentifer.format(param1=isbn, param2="ISBN")
+        self.cursor.execute(query)
+        for row in self.cursor:
+            return row[0]
+        return None
     # save harvest attr json
 
 #x = etdDb()
