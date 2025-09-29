@@ -1,4 +1,5 @@
 import consts
+import json
 from lxml import etree
 from io import BytesIO
 from pymarc import parse_xml_to_array
@@ -7,17 +8,19 @@ from sendToMerritt import marcToMerritt
 class processOai:
     def parseMarcInfo(self):
         print("start")
+        # should I get unprocessed and null attrs
         allids = consts.db.getUnprocessedOai()
         for (i,d) in allids:
             marcxml = consts.db.getHarvestRecord(i,d)
             #saveInMerritt(marcxml)
             attrs = self.getAttributes(marcxml)
             # find the matching Package id
-            packageId = self.getPackageId(attrs["isbn"])
+            packageId = consts.db.getpackagebyisbn(attrs["isbn"])
             # fill attrs and package id
-            # see if there is another record for this package id
-            # if so, add the package for oaiupdate queue
-            # use the harvest map to complete attrs
+            consts.db.saveHarvestAttr(i,d, json.dumps(attrs,ensure_ascii=False), packageId)
+            
+            if packageId is not None:
+                consts.db.saveQueueStatus(packageId, "oaiupdate")
         print("end")
 
     def getAttributes(self, marcxml):
@@ -43,9 +46,7 @@ class processOai:
                     return field[setting.field]
         return None
 
-    def getPackageId(self, isbn):
-        # get the id from identifiers
-        return None
+# create a table for oaioverride
 
 # get all the id and stamp where isProcessed is False
 

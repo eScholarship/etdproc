@@ -4,8 +4,8 @@ import mysql.connector
 import csv
 
 class configDb:
-    #allSqlFiles = ["campuses.sql","packages.sql","errorlog.sql","settings.sql","identifiers.sql","merrittcallback.sql","merrittrequest.sql","escholrequest.sql","queues.sql","queuelogs.sql", "config.sql"]
-    allSqlFiles = ["config.sql","harvestlog.sql"]
+    #allSqlFiles = ["campuses.sql","packages.sql","errorlog.sql","settings.sql","identifiers.sql","merrittcallback.sql","merrittrequest.sql","escholrequest.sql","queues.sql","queuelogs.sql", "config.sql","harvestlog.sql"]
+    allSqlFiles = ["oaioverride.sql",]
     sqlpath = 'sqlscripts/'
     datapath = 'appdata/' 
     InsertCampus = "INSERT INTO Campuses (code,instloc,pqcode,namesuffix,escholunit,merrittcol,nameinmarc) VALUES (%s,%s,%s,%s,%s,%s,%s)"
@@ -127,7 +127,7 @@ class configDb:
 
 print("start")
 x = configDb()
-#x.createDbs()
+x.createDbs()
 #x.populateCampuses()
 #x.populateGatewayConfig()
 #x.populateSilsConfig()

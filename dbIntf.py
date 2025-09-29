@@ -18,7 +18,7 @@ class etdDb:
     queryEscholId = "select escholId from escholrequests where packageId={param}"
     queryQueuedTasks = "select queuename, packageId from queues where queuename != 'done' and RIGHT(queuename, 6) != '-error'"
     queryUnprocessedMCs = "select id, callbackdata from merrittcallbacks where isProcessed = False"
-    queryUnprocessedOai = "select identifier, datestamp from harvestlog where isProcessed = False"
+    queryUnprocessedOai = "select identifier, datestamp from harvestlog where isProcessed = False and attrs is null"
     queryPubNumber = "SELECT pubnum FROM packages where id = {param}"
     queryPackageZip = "SELECT id FROM packages where zipname = '{param}'"
     queryDepositResponse = "select depositresponse from escholrequests where packageId={param}"
@@ -50,7 +50,7 @@ class etdDb:
     updateEscholArk = "update packages set computedattrs = JSON_SET(computedattrs, '$.escholark', '{param2}') where id = {param1}"
     updateMcProcessed = "update merrittcallbacks set isProcessed = True where id = {param}" 
     updateConfig = "update config set cvalue = '{param2}' where ckey = '{param1}'" 
-
+    updateHarvestAttrs = "update harvestlog set attrs = %s, packageId = %s where identifier = %s and datestamp = %s"
 
     def __init__(self):
         self.cnxn = mysql.connector.connect(user=creds.etdDb.username, 
@@ -391,11 +391,18 @@ class etdDb:
     def getpackagebyisbn(self, isbn):
         query = self.queryIdentifer.format(param1=isbn, param2="ISBN")
         self.cursor.execute(query)
+        result = None
         for row in self.cursor:
-            return row[0]
-        return None
+            result = row[0]
+        return result
     # save harvest attr json
-
+    def saveHarvestAttr(self, i, d, attrs, packageId):
+        print("save info")
+        #self.cursor.fetchall() 
+        #query = self.updateHarvestAttrs.format(param1=i, param2 = d, param3 = attrs, param4 = packageId)
+        self.cursor.execute(self.updateHarvestAttrs, (attrs, packageId, i, d))
+        self.cnxn.commit()
+        return
 #x = etdDb()
 #x.saveQueueLog(1,"eschol")
 #x.saveEscholRequest(1, '{"X":"Y"}')
