@@ -59,6 +59,17 @@ class harvestmap:
         self.action = p6
         self.escholfield = p7
 
+class harvestEntry: 
+    identifier = None 
+    datestamp = None 
+    attrs = None 
+    isProcessed = None
+    def __init__(self, p1,p2,p3,p4):
+        self.identifier = p1
+        self.datestamp = p2
+        self.attrs = p3
+        self.isProcessed = p4
+
 class campusmap:
     code = None 
     instloc = None 

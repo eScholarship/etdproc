@@ -2,7 +2,7 @@
 
 CREATE TABLE oaiOverride (
 	Id INTEGER NOT NULL AUTO_INCREMENT,
-    packageId int Unique NOT NULL,
+    packageId int NOT NULL,
 	marcattrs JSON NOT NULL,
     escholattrs JSON NOT NULL,
     actionTime datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,

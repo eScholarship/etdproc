@@ -3,7 +3,7 @@ import json
 from lxml import etree
 from io import BytesIO
 from pymarc import parse_xml_to_array
-from sendToMerritt import marcToMerritt
+
 
 class processOai:
     def parseMarcInfo(self):
@@ -59,10 +59,7 @@ class processOai:
 # If there are multiple oai records, then check which fields are updated and then update the corresponding info before adding the article for remeta
 
 
-# def saveInMerritt(marcxml):
-#     print("save xml in Merritt")
-#     y = marcToMerritt('ark:/99999/fk4h14st5d', "this")
-#     y.sendXmlToMerritt(marcxml)
+
 
 x = processOai()
 x.parseMarcInfo()

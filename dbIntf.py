@@ -1,6 +1,6 @@
 import creds
 import mysql.connector
-from maps import pqmap, silsmap, campusmap, escholmap, harvestmap
+from maps import pqmap, silsmap, campusmap, escholmap, harvestmap, harvestEntry
 
 
 class etdDb:
@@ -28,6 +28,7 @@ class etdDb:
     queryConfig = "select ckey, cvalue from config"
     queryHarvestRecord = "select rawvalue from harvestlog where identifier = '{param1}' and datestamp = '{param2}'"
     queryIdentifer = "select packageid from identifiers where idvalue = '{param1}' and idtype = '{param2}'"
+    queryHarvestEntries = "select identifier, datestamp, attrs, isProcessed from harvestlog where packageId = {param} order by datestamp desc limit 2"
     insertPackage = "insert into packages (pubnum, zipname, campusId) VALUES ('{param1}','{param2}', {param3}) "
     insertMerrittRequest = "insert into merrittrequests (packageId, request, response, currentstatus) VALUES ({param1},'{param2}','{param3}','{param4}') "
     insertEscholRequest = "insert into escholrequests (packageId, escholId) VALUES ({param1},'{param2}')"
@@ -37,7 +38,7 @@ class etdDb:
     insertConfig = "insert into config (ckey, cvalue) VALUES ('{param1}','{param2}') "
     insertIdentifier = "insert into identifiers (packageId, idtype, idvalue) VALUES ({param1},'{param2}','{param3}') "
     insertHarvestRecord = "insert into harvestlog (identifier, datestamp, rawvalue) VALUES (%s, %s, %s) "
-    #insertHarvestRecord = "insert into harvestlog (identifier, datestamp, rawvalue) VALUES ('{param1}','{param2}','{param3}') "
+    insertOaiOverride = "insert into oaioverride (packageId, marcattrs, escholattrs) VALUES (%s, %s, %s) "
     updateEscholRequest = "update escholrequests set depositrequest = '{param2}', actionTime = NOW() where packageId = '{param1}'"
     updateEscholResponse = "update escholrequests set depositresponse = '{param2}', actionTime = NOW() where packageId = '{param1}'"
     updatePubNumCampusId = "update packages set pubnum = '{param2}', campusId = '{param3}', lastUpdated = NOW() where id = '{param1}'"
@@ -51,6 +52,7 @@ class etdDb:
     updateMcProcessed = "update merrittcallbacks set isProcessed = True where id = {param}" 
     updateConfig = "update config set cvalue = '{param2}' where ckey = '{param1}'" 
     updateHarvestAttrs = "update harvestlog set attrs = %s, packageId = %s where identifier = %s and datestamp = %s"
+    updateOaiProcessed = "update harvestlog set isProcessed = 1 where identifier = '{param1}' and datestamp = '{param2}'"
 
     def __init__(self):
         self.cnxn = mysql.connector.connect(user=creds.etdDb.username, 
@@ -395,12 +397,29 @@ class etdDb:
         for row in self.cursor:
             result = row[0]
         return result
-    # save harvest attr json
+
     def saveHarvestAttr(self, i, d, attrs, packageId):
-        print("save info")
-        #self.cursor.fetchall() 
-        #query = self.updateHarvestAttrs.format(param1=i, param2 = d, param3 = attrs, param4 = packageId)
         self.cursor.execute(self.updateHarvestAttrs, (attrs, packageId, i, d))
+        self.cnxn.commit()
+        return
+
+    def getlastTwoHarvestEntries(self, packageId):
+        query = self.queryHarvestEntries.format(param=packageId)
+        self.cursor.execute(query)
+        entries = []
+        for row in self.cursor:
+            entries.append(harvestEntry(row[0],row[1], row[2], row[3]))
+        return entries
+
+    def markOaiProcessed(self, i, d):
+        query = self.updateOaiProcessed.format(param1=i, param2=d)
+        self.cursor.execute(query)
+        self.cnxn.commit()
+        return
+
+    # addOaiOverride(self._package, self._newValues, self._escholValues)
+    def addOaiOverride(self, packageId, marcValues, escholValues):
+        self.cursor.execute(self.insertOaiOverride,(packageId, marcValues, escholValues))
         self.cnxn.commit()
         return
 #x = etdDb()

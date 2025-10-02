@@ -6,6 +6,7 @@ from generateMarc import createMarc
 from sendToSILS import uploadToOCLCftp
 from parseGateway import etdParseGateway
 from computeValues import etdcomputeValues
+from oaiupdate import OaiUpdate
 from sendToMerritt import etdToMerritt, marcToMerritt
 from depositToEschol import mintEscholId, depositToEschol, replaceEscholMetadata
 
@@ -18,6 +19,10 @@ class processQueueImpl:
     _escholTasks = []
     _marcTasks = []
     _silsTasks = []
+    _reparseTasks = []
+    _recompTasks = []
+    _remetaTasks = []
+    _oaiupdateTasks = []
     def __init__(self):
         print("process queues")
         self._fetchedTasks = []
@@ -31,6 +36,7 @@ class processQueueImpl:
         self._reparseTasks = []
         self._recompTasks = []
         self._remetaTasks = []
+        self._oaiupdateTasks = []
         self.fillTasks()
 
     def fillTasks(self):
@@ -70,6 +76,8 @@ class processQueueImpl:
         if "remeta" in queuedtasks:
             self._remetaTasks = queuedtasks["remeta"]
 
+        if "oaiupdate" in queuedtasks:
+            self._oaiupdateTasks = queuedtasks["oaiupdate"]
 
     def processQueue(self):
         print("query to find items with specific status")
@@ -83,6 +91,7 @@ class processQueueImpl:
         self.processMarcGeneration()
         self.processSilsDesposit()
 
+        self.processOaiUpdate()
         self.processReparse()
         self.processRecomp()
         self.processRemeta()
@@ -262,4 +271,19 @@ class processQueueImpl:
                 print(callstack)
                 print(e)
                 consts.db.saveQueueStatus(packageid, "remeta-error") 
+
+
+    def processOaiUpdate(self):
+        print("process oai updates")
+        for packageid in self._oaiupdateTasks:
+            try:
+                consts.db.saveQueueLog(packageid, "oaiupdate") 
+                x = OaiUpdate(packageid)
+                x.process()
+                #consts.db.saveQueueStatus(packageid, "done")
+            except Exception as e:
+                callstack = traceback.format_exc()
+                print(callstack)
+                print(e)
+                consts.db.saveQueueStatus(packageid, "oaiupdate-error") 
 
