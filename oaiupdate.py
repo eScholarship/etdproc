@@ -105,5 +105,5 @@ class OaiUpdate:
             result.append(x)
         return result
 
-x = OaiUpdate(50)
-x.process()
+# x = OaiUpdate(50)
+# x.process()

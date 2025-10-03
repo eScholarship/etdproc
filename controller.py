@@ -5,6 +5,7 @@ from getPQpackage import pqSfptIntf
 from parseXml import etdParseXml
 from processQueues import processQueueImpl
 from harvestMarc import harvertMarc
+from processOai import processOai
 
 class Controller:
     def __init__(self):
@@ -80,6 +81,9 @@ class Controller:
         print("run OAI harvest")
         x = harvertMarc()
         x.getFeedAndSave()
+        print("process OAI harvest")
+        y = processOai()
+        y.parseMarcInfo()
         
 # Create the controller to build queue and process all
 c = Controller()

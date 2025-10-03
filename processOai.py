@@ -46,20 +46,6 @@ class processOai:
                     return field[setting.field]
         return None
 
-# create a table for oaioverride
 
-# get all the id and stamp where isProcessed is False
-
-# for each of these, get the raw data and parse the data to extract values and prepare json
-
-# determine the package related to the OAI record 
-# save the xml in Merritt - now that the data is in memory. 
-# add the package id in queue for oaiupdate queue
-# when processing oaiupdate figure out the metadata values to update 
-# If there are multiple oai records, then check which fields are updated and then update the corresponding info before adding the article for remeta
-
-
-
-
-x = processOai()
-x.parseMarcInfo()
+# x = processOai()
+# x.parseMarcInfo()
