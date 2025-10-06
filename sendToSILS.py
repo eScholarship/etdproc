@@ -49,7 +49,8 @@ class uploadToOCLCftp:
                     with open(inpath, 'rb') as in_fh:
                         reader = MARCReader(in_fh)
                         for record in reader:
-                            writer.write(record)
+                            if record:
+                               writer.write(record)
                     self._combinedIds.append(packageid)
             writer.close()
 
