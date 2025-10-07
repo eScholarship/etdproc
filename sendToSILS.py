@@ -20,7 +20,7 @@ class uploadToOCLCftp:
     def connectAndUpload(self):
         if len(self._packageIds) < 1:
             return
-        with paramiko.Transport((consts.configs['oclc_creds.host'],consts.configs['oclc_creds.port'])) as transport:
+        with paramiko.Transport((consts.configs['oclc_creds.host'],int(consts.configs['oclc_creds.port']))) as transport:
             transport.connect(None, consts.configs['oclc_creds.username'], consts.configs['oclc_creds.key'])
             with paramiko.SFTPClient.from_transport(transport) as sftp:
                 self.combineMrcFiles()
@@ -85,7 +85,7 @@ class uploadToFTP:
 
     def testConnection(self):
         print("test connection to the OCLC ftp")
-        with paramiko.Transport((consts.configs['oclc_creds.host'],consts.configs['oclc_creds.port'])) as transport:
+        with paramiko.Transport((consts.configs['oclc_creds.host'],int(consts.configs['oclc_creds.port']))) as transport:
             transport.connect(None, consts.configs['oclc_creds.username'], consts.configs['oclc_creds.key'])
             print("got sftp connection")
             #self.testListDir(transport)

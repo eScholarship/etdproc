@@ -15,12 +15,12 @@ class pqSfptIntf:
 
     def getPqPackages(self):
         pkey = paramiko.RSAKey.from_private_key_file("/apps/eschol/.ssh/id_rsa")
-        with paramiko.Transport((consts.configs['sftp_creds.host'],consts.configs['sftp_creds.port'])) as transport:
+        with paramiko.Transport((consts.configs['sftp_creds.host'],int(consts.configs['sftp_creds.port']))) as transport:
             transport.connect(None, consts.configs['sftp_creds.username'], pkey=pkey)
             print("got sftp connection with proquest")
             self.getFilesAndUnzip(transport, consts.configs['sftp_creds.directory'])
 
-        with paramiko.Transport((consts.configs['ucla_creds.host'],consts.configs['ucla_creds.port'])) as transport:
+        with paramiko.Transport((consts.configs['ucla_creds.host'],int(consts.configs['ucla_creds.port']))) as transport:
             transport.connect(None, consts.configs['ucla_creds.username'], pkey=pkey)
             print("got sftp connection uclaetd")
             self.getFilesAndUnzip(transport, consts.configs['ucla_creds.directory'])
