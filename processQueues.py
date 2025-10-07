@@ -210,7 +210,7 @@ class processQueueImpl:
 
     def processSilsDesposit(self):
         print("process sils submission")
-        if consts.configs['oclc_creds.sentToOclc'] == False:
+        if consts.configs['oclc_creds.sentToOclc'] != 'True':
             for packageid in self._silsTasks:
                 consts.db.saveQueueStatus(packageid, "done")
         else:
