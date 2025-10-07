@@ -3,7 +3,6 @@ import io
 import json
 import consts
 import requests
-from creds import pg_creds
 from pymarc.marcxml import record_to_xml, parse_xml_to_array
 
 
@@ -39,10 +38,10 @@ class etdParseGateway:
             'maximumRecords': 30,
             'startRecord':1,
             'query':f'rec.identifier="{self._pubNumber}"',
-            'x-username':pg_creds.username,
-            'x-password':pg_creds.password
+            'x-username':consts.configs['pg_creds.username'],
+            'x-password':consts.configs['pg_creds.password']
         }
-        response = requests.get(pg_creds.host, params=params)
+        response = requests.get(consts.configs['pg_creds.host'], params=params)
         #print(response.text)
         # Convert string to file-like object
         marcxml_io = io.StringIO(response.text)

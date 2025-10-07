@@ -4,7 +4,7 @@ import consts
 import paramiko
 import zipfile
 import shutil
-from creds import sftp_creds, ucla_creds
+
 
 class pqSfptIntf:
     filesFound = []
@@ -15,15 +15,15 @@ class pqSfptIntf:
 
     def getPqPackages(self):
         pkey = paramiko.RSAKey.from_private_key_file("/apps/eschol/.ssh/id_rsa")
-        with paramiko.Transport((sftp_creds.host,sftp_creds.port)) as transport:
-            transport.connect(None, sftp_creds.username, pkey=pkey)
+        with paramiko.Transport((consts.configs['sftp_creds.host'],consts.configs['sftp_creds.port'])) as transport:
+            transport.connect(None, consts.configs['sftp_creds.username'], pkey=pkey)
             print("got sftp connection with proquest")
-            self.getFilesAndUnzip(transport, sftp_creds.directory)
+            self.getFilesAndUnzip(transport, consts.configs['sftp_creds.directory'])
 
-        with paramiko.Transport((ucla_creds.host,ucla_creds.port)) as transport:
-            transport.connect(None, ucla_creds.username, pkey=pkey)
+        with paramiko.Transport((consts.configs['ucla_creds.host'],consts.configs['ucla_creds.port'])) as transport:
+            transport.connect(None, consts.configs['ucla_creds.username'], pkey=pkey)
             print("got sftp connection uclaetd")
-            self.getFilesAndUnzip(transport, ucla_creds.directory)
+            self.getFilesAndUnzip(transport, consts.configs['ucla_creds.directory'])
         return
 
     def getFilesAndUnzip(self, transport, directory):      

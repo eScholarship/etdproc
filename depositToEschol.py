@@ -4,6 +4,8 @@ import time
 import shutil
 import consts
 import pathlib
+from escholClient import eschol
+api = eschol()
 
 def cleanResponse(text):
     # Remove single and double quotes
@@ -25,7 +27,7 @@ class mintEscholId:
         if existingArk:
             print(f'skipping mint; found {existingArk}')
             return
-        code, escholId = consts.api.createItem(consts.localIdPrefix + self._pubnum)
+        code, escholId = api.createItem(consts.localIdPrefix + self._pubnum)
         if code == 200:
             consts.db.addEscholRequest(self._packageId, escholId)
             consts.db.saveEscholArk(self._packageId, escholId[-10:])
@@ -102,7 +104,7 @@ class depositToEschol:
         # save the package in DB
         consts.db.saveEscholRequest(self._packageId, json.dumps(depositpackage,ensure_ascii=False))
         # call API with deposit package
-        code, response = consts.api.depositItem(depositpackage)
+        code, response = api.depositItem(depositpackage)
         print(response)
         # save result and response in DB
         consts.db.saveEscholResponse(self._packageId, cleanResponse(response))
@@ -147,7 +149,7 @@ class replaceEscholMetadata:
 
         print(replacepackage)
         # call API with replace metadata
-        code, response = consts.api.replaceMeta(replacepackage)
+        code, response = api.replaceMeta(replacepackage)
         print(response)
 
         if code != 200:

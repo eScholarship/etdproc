@@ -1,10 +1,8 @@
 
 from dbIntf import etdDb
-from escholClient import eschol
 
 # move to const file
 db = etdDb()
-api = eschol()
 
 campusinfo = db.getCampusInfo()
 silsSettings = db.getgenerateSetting()

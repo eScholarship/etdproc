@@ -1,6 +1,5 @@
 import consts
 import traceback
-from creds import oclc_creds
 from parseXml import reparseXml
 from generateMarc import createMarc
 from sendToSILS import uploadToOCLCftp
@@ -211,7 +210,7 @@ class processQueueImpl:
 
     def processSilsDesposit(self):
         print("process sils submission")
-        if oclc_creds.sentToOclc == False:
+        if consts.configs['oclc_creds.sentToOclc'] == False:
             for packageid in self._silsTasks:
                 consts.db.saveQueueStatus(packageid, "done")
         else:

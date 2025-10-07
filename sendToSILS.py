@@ -3,7 +3,6 @@ import paramiko
 import traceback
 from datetime import date
 from pymarc import MARCReader, MARCWriter
-from creds import oclc_creds
 
 class uploadToOCLCftp:
     _countSent = 0
@@ -21,8 +20,8 @@ class uploadToOCLCftp:
     def connectAndUpload(self):
         if len(self._packageIds) < 1:
             return
-        with paramiko.Transport((oclc_creds.host,oclc_creds.port)) as transport:
-            transport.connect(None, oclc_creds.username, oclc_creds.key)
+        with paramiko.Transport((consts.configs['oclc_creds.host'],consts.configs['oclc_creds.port'])) as transport:
+            transport.connect(None, consts.configs['oclc_creds.username'], consts.configs['oclc_creds.key'])
             with paramiko.SFTPClient.from_transport(transport) as sftp:
                 self.combineMrcFiles()
                 self.uploadFiles(sftp)
@@ -55,9 +54,9 @@ class uploadToOCLCftp:
             writer.close()
 
     def uploadFiles(self, sftp):
-        sftp.chdir(oclc_creds.uploaddir) 
+        sftp.chdir(consts.configs['oclc_creds.uploaddir']) 
         try:
-            outpath = f'{oclc_creds.uploaddir}/{oclc_creds.nameprefix}{self._combinedName}' 
+            outpath = f"{consts.configs['oclc_creds.uploaddir']}/{consts.configs['oclc_creds.nameprefix']}{self._combinedName}" 
             print(f'Sending combined file to {outpath}')
             sftp.put(self._combinedPath, outpath)
             for packageid in self._combinedIds:
@@ -86,8 +85,8 @@ class uploadToFTP:
 
     def testConnection(self):
         print("test connection to the OCLC ftp")
-        with paramiko.Transport((oclc_creds.host,oclc_creds.port)) as transport:
-            transport.connect(None, oclc_creds.username, oclc_creds.key)
+        with paramiko.Transport((consts.configs['oclc_creds.host'],consts.configs['oclc_creds.port'])) as transport:
+            transport.connect(None, consts.configs['oclc_creds.username'], consts.configs['oclc_creds.key'])
             print("got sftp connection")
             #self.testListDir(transport)
             self.testUploadFiles(transport)
@@ -95,7 +94,7 @@ class uploadToFTP:
     def testListDir(self, transport):
         print("test list directory")
         with paramiko.SFTPClient.from_transport(transport) as sftp:
-            self.filesFound = sftp.listdir(oclc_creds.uploaddir)
+            self.filesFound = sftp.listdir(consts.configs['oclc_creds.uploaddir'])
             print(self.filesFound)
             for filename in self.filesFound:
                 print(filename)
@@ -105,12 +104,12 @@ class uploadToFTP:
     def testUploadFiles(self, transport):
         print("test upload files")
         with paramiko.SFTPClient.from_transport(transport) as sftp:
-            sftp.chdir(oclc_creds.uploaddir)
+            sftp.chdir(consts.configs['oclc_creds.uploaddir'])
             # update filename
             root = "C:/Temp/OCLC/"
             files = ["ETDS-30492756.mrc","ETDS-31847224.mrc","ETDS-31845828.mrc"]
             for file in files:
-                outpath = f'{oclc_creds.uploaddir}/{oclc_creds.nameprefix}{file}' 
+                outpath = f"{consts.configs['oclc_creds.uploaddir']}/{consts.configs['oclc_creds.nameprefix']}{file}"
                 print(outpath)
                 sftp.put(root+file, outpath)
 

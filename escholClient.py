@@ -1,7 +1,7 @@
-import creds
 import requests
 import json
 import traceback
+import consts
 
 ########################################
 #
@@ -14,10 +14,10 @@ class graphClient:
         self.cookies = None
         self.headers = {'Accept': 'application/json',
                    'Content-Type': 'application/json',
-                   'Privileged':creds.eschol.privKey
+                   'Privileged':consts.configs['eschol.privKey']
                    }
-        if creds.eschol.cookie:
-            self.cookies = dict(ACCESS_COOKIE=creds.eschol.cookie)
+        if "eschol.cookie" in consts.configs:
+            self.cookies = dict(ACCESS_COOKIE=consts.configs['eschol.cookie'])
 
     def send(self, query, param):
         data = {'query': query, "variables": param}
@@ -47,7 +47,7 @@ class eschol:
     mint = "mutation mintProvisionalID($input: MintProvisionalIDInput!){ mintProvisionalID(input: $input) { id } }"
 
     def __init__(self):
-        self.client = graphClient(creds.eschol.url)
+        self.client = graphClient(consts.configs['eschol.url'])
 
     def createItem(self, pubId):
         # to do create etd_proc

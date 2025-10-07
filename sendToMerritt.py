@@ -2,7 +2,6 @@
 import re
 import os
 import json
-import creds
 import consts
 import time
 import requests
@@ -10,9 +9,9 @@ from io import BytesIO
 
 def getMerrittCollection(bucket):
     collection = bucket
-    if hasattr(creds.merritt_creds, 'collection'):
+    if 'merritt_creds.collection' in consts.configs:
         print("Using test Merritt collection")
-        collection = creds.merritt_creds.collection
+        collection = consts.configs['merritt_creds.collection']
     return collection + "_content"
 
 class marcToMerritt:
@@ -26,7 +25,7 @@ class marcToMerritt:
     def sendFileToMerritt(self, marcpath):
         files = {
             'file': open(marcpath, 'rb'),
-            'submitter': (None, creds.merritt_creds.username),
+            'submitter': (None, consts.configs['merritt_creds.username']),
             'responseForm': (None, 'json'),
             'notificationFormat': (None, 'json'),
             'profile': (None, self._collection),
@@ -34,7 +33,7 @@ class marcToMerritt:
         }
 
         # send request
-        response = requests.post(creds.merritt_creds.url, files=files, auth=(creds.merritt_creds.username, creds.merritt_creds.password),headers={'Accept': 'application/json'})
+        response = requests.post(consts.configs['merritt_creds.url'], files=files, auth=(consts.configs['merritt_creds.username'], consts.configs['merritt_creds.password']),headers={'Accept': 'application/json'})
         print(response.text)
         # Throttle the requests to Merritt
         time.sleep(1) # pause for 1 sec
@@ -42,7 +41,7 @@ class marcToMerritt:
     def sendXmlToMerritt(self, marcxml):
         files = {
             'file': ('oclcmarc.xml', BytesIO(marcxml.encode('utf-8'))),
-            'submitter': (None, creds.merritt_creds.username),
+            'submitter': (None, consts.configs['merritt_creds.username']),
             'responseForm': (None, 'json'),
             'notificationFormat': (None, 'json'),
             'profile': (None, self._collection),
@@ -50,7 +49,7 @@ class marcToMerritt:
         }
 
         # send request
-        response = requests.post(creds.merritt_creds.url, files=files, auth=(creds.merritt_creds.username, creds.merritt_creds.password),headers={'Accept': 'application/json'})
+        response = requests.post(consts.configs['merritt_creds.url'], files=files, auth=(consts.configs['merritt_creds.username'], consts.configs['merritt_creds.password']),headers={'Accept': 'application/json'})
         print(response.text)
         # Throttle the requests to Merritt
         time.sleep(1) # pause for 1 sec
@@ -96,7 +95,7 @@ class etdToMerritt:
         files = {
             'file': open(self._zipfile, 'rb'),
             'type':(None, 'container'),
-            'submitter': (None, creds.merritt_creds.username),
+            'submitter': (None, consts.configs['merritt_creds.username']),
             'title': (None, re.sub(r'[^a-zA-Z0-9 ]', '', self._etdattrs["maintitle"].replace("'", "").replace('"', ""))), 
             'date':(None, self._etdattrs["pub_date"]),
             'creator': (None, self._etdattrs["creators"].replace("'", "").replace('"', "")),
@@ -107,7 +106,7 @@ class etdToMerritt:
         }
 
         # send request
-        response = requests.post(creds.merritt_creds.url, files=files, auth=(creds.merritt_creds.username, creds.merritt_creds.password),headers={'Accept': 'application/json'})
+        response = requests.post(consts.configs['merritt_creds.url'], files=files, auth=(consts.configs['merritt_creds.username'], consts.configs['merritt_creds.password']),headers={'Accept': 'application/json'})
         print(response.text)
         
         # save the request info
