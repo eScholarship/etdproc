@@ -10,14 +10,15 @@ class OaiUpdate:
     _escholValues = {}
     _packageid = None
     _oaiattrs = []
-
+    IdNames = ["isbn", "merrittark", "escholark"]
     def __init__(self, packageid):
         print("starting")
+        # get all the entries with this package id
         self._entries = consts.db.getlastTwoHarvestEntries(packageid)
         self._packageid = packageid
 
     def process(self):
-        # get all the entries with this package id
+        
         if len(self._entries) == 0:
              raise Exception("No harvest entry found!")
         # if there is only one then nothing else to do
@@ -27,11 +28,13 @@ class OaiUpdate:
         else:
             self._newValues = json.loads(self._entries[0].attrs)
             self._oldValues = json.loads(self._entries[1].attrs)
-            self.addOaiOverride()
-            self.saveInMerritt()
-            consts.db.saveQueueStatus(self._packageid, "oaioverride")
-        # if there are more than one entries, then diff the jsons to find out what has changed
-        # based on what has changed, create an entry in oaioverride table
+            if self.addOaiOverride():
+                print("Found actionble change")
+                self.saveInMerritt()
+                consts.db.saveQueueStatus(self._packageid, "oaioverride")
+            else:
+                consts.db.saveQueueStatus(self._packageid, "done")
+
         consts.db.markOaiProcessed(self._entries[0].identifier, self._entries[0].datestamp)
         return
 
@@ -45,14 +48,18 @@ class OaiUpdate:
 
     def addOaiOverride(self):
         print("add OAI override")
+
         for key in self._newValues:
-            print(self._newValues[key])
-            print(self._oldValues[key])
             if self._newValues[key] != self._oldValues[key]:
                 print("need to add to oaioverride")
+                print(self._newValues[key])
+                print(self._oldValues[key])
+                if key in self.IdNames:
+                    raise Exception("Id must not be changed!") 
                 # need to save the values as they come and also the transformed entity
                 self._oaiattrs.append(key)
-        self.fillOverrides()
+
+        return self.fillOverrides()
 
     def fillOverrides(self):
         print("fill the overrides")
@@ -60,15 +67,20 @@ class OaiUpdate:
         for setting in consts.oaiSetting:
             # if the destfield is present in self._oaiattrs
             if setting.destfield in self._oaiattrs:
-                self.addEscholValue(setting)
-
-                
+                self.addEscholValue(setting)               
         # save the new values and escholvalues in override table
-        consts.db.addOaiOverride(self._packageid, json.dumps(self._newValues,ensure_ascii=False), json.dumps(self._escholValues,ensure_ascii=False))
+        if len(self._escholValues.keys()):
+            consts.db.addOaiOverride(self._packageid, json.dumps(self._newValues,ensure_ascii=False), json.dumps(self._escholValues,ensure_ascii=False))
+            return True
+        return False
 
     def addEscholValue(self, setting):
-        # TBD need to make sure that the identifiers are not present in the changed things
         value = self._newValues[setting.destfield]
+        if value is None:
+            if setting.escholfield not in self._escholValues:
+                self._escholValues[setting.escholfield] = None
+            return
+
         if setting.action == 'combine':
             # this is for title
             value = self._newValues["maintitle"].strip(" /:")
