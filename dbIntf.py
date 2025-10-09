@@ -29,6 +29,7 @@ class etdDb:
     queryHarvestRecord = "select rawvalue from harvestlog where identifier = '{param1}' and datestamp = '{param2}'"
     queryIdentifer = "select packageid from identifiers where idvalue = '{param1}' and idtype = '{param2}'"
     queryHarvestEntries = "select identifier, datestamp, attrs, isProcessed from harvestlog where packageId = {param} order by datestamp desc limit 2"
+    queryOaiOverride = "select escholattrs from oaioverride where packageId = {param} order by actionTime desc limit 1"
     insertPackage = "insert into packages (pubnum, zipname, campusId) VALUES ('{param1}','{param2}', {param3}) "
     insertMerrittRequest = "insert into merrittrequests (packageId, request, response, currentstatus) VALUES ({param1},'{param2}','{param3}','{param4}') "
     insertEscholRequest = "insert into escholrequests (packageId, escholId) VALUES ({param1},'{param2}')"
@@ -422,6 +423,15 @@ class etdDb:
         self.cursor.execute(self.insertOaiOverride,(packageId, marcValues, escholValues))
         self.cnxn.commit()
         return
+
+    def getOaiOverride(self, packageId):
+        query = self.queryOaiOverride.format(param=packageId)
+        self.cursor.execute(query)
+        result = None
+        for row in self.cursor:
+            result = row[0]
+        return result
+
 #x = etdDb()
 #x.saveQueueLog(1,"eschol")
 #x.saveEscholRequest(1, '{"X":"Y"}')

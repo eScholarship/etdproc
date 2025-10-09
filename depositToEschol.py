@@ -123,12 +123,16 @@ class replaceEscholMetadata:
     _gwattrs = None
     _xmlattrs = None
     _compattrs = None
+    _oaioverride = None
     def __init__(self, packageId):
         self._packageId = packageId
         (_, gwAttrs, xmlAttrs, compAttrs) = consts.db.getAttrs(packageId)
         self._gwattrs = json.loads(gwAttrs)
         self._xmlattrs = json.loads(xmlAttrs)
         self._compattrs = json.loads(compAttrs)
+        override = consts.db.getOaiOverride(packageId)
+        if override:
+            self._oaioverride = json.loads(override)
 
     def replaceMeta(self):
         print("replace metadata")
@@ -146,8 +150,9 @@ class replaceEscholMetadata:
                 replacepackage[setting.field] = self._gwattrs[setting.info]
             elif setting.typedata == "compute" and setting.info in self._compattrs and self._compattrs[setting.info]:
                 replacepackage[setting.field] = self._compattrs[setting.info]
-
-        # if override exists for the package, make use of the info
+            # if override exists for the package, make use of the info
+            if self._oaioverride and setting.field in self._oaioverride:
+                replacepackage[setting.field] = self._oaioverride[setting.field]
 
         print(replacepackage)
         # call API with replace metadata
@@ -162,10 +167,6 @@ class replaceEscholMetadata:
         time.sleep(2) # pause for 2 sec
         return
 
-#x = depositToEschol("30492756")
-##escholid = x.mint()
-#escholid = "ark:/13030/qtttddfsch"
-#y = x.deposit(escholid)
-#print(y)
-#print("done")
+# x = replaceEscholMetadata(50)
+# x.replaceMeta()
 
