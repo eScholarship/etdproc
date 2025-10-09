@@ -12,7 +12,6 @@ class OaiUpdate:
     _oaiattrs = []
     IdNames = ["isbn", "merrittark", "escholark"]
     def __init__(self, packageid):
-        print("starting")
         # get all the entries with this package id
         self._entries = consts.db.getlastTwoHarvestEntries(packageid)
         self._packageid = packageid

@@ -147,6 +147,8 @@ class replaceEscholMetadata:
             elif setting.typedata == "compute" and setting.info in self._compattrs and self._compattrs[setting.info]:
                 replacepackage[setting.field] = self._compattrs[setting.info]
 
+        # if override exists for the package, make use of the info
+
         print(replacepackage)
         # call API with replace metadata
         code, response = api.replaceMeta(replacepackage)

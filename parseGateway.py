@@ -48,9 +48,18 @@ class etdParseGateway:
         recorddata = parse_xml_to_array(marcxml_io)
         # since the search is by id - expect one record
         for record in recorddata:
-            if record is not None:
+            if record is not None and self.isThesisRecord(record):
+                # check to make sure this record belong to thesis
                 self._record = record
         # let the caller know if okay to proceed
+
+
+    def isThesisRecord(self, record):
+        if "260" in record and "b" in record["260"]:
+            if "ProQuest Dissertations & Theses" in record["260"]["b"]:
+                return True
+
+        return False
 
     def saveToDb(self):
         #print("save the xml extracted data in ")
@@ -83,7 +92,7 @@ class etdParseGateway:
         return marcMetadata
 
 
-#print("start")
-#x = etdParseGateway(1)
-#x.process()
-#print("end")
+# print("start")
+# x = etdParseGateway(16)
+# x.process()
+# print("end")
