@@ -1,4 +1,4 @@
-
+import re
 import consts
 import json
 from sendToMerritt import marcToMerritt
@@ -10,14 +10,18 @@ class OaiUpdate:
     _escholValues = {}
     _packageid = None
     _oaiattrs = []
-    IdNames = ["isbn", "merrittark", "escholark"]
+    IdKeys = ["isbn", "merrittark", "escholark"]
+    IgnoreKeys = ["abstract"]
     def __init__(self, packageid):
         # get all the entries with this package id
         self._entries = consts.db.getlastTwoHarvestEntries(packageid)
         self._packageid = packageid
+        self._newValues = {}
+        self._oldValues = {}
+        self._escholValues = {}
+        self._oaiattrs = []
 
-    def process(self):
-        
+    def process(self):       
         if len(self._entries) == 0:
              raise Exception("No harvest entry found!")
         # if there is only one then nothing else to do
@@ -44,21 +48,45 @@ class OaiUpdate:
         y = marcToMerritt(etdattrs["merrittark"], etdattrs["merrittbucket"])
         marcxml = consts.db.getHarvestRecord(self._entries[0].identifier, self._entries[0].datestamp)
         y.sendXmlToMerritt(marcxml)
+        return
+
 
     def addOaiOverride(self):
         print("add OAI override")
 
         for key in self._newValues:
-            if self._newValues[key] != self._oldValues[key]:
+            if self.areValuesDifferent(key) and key not in self.IgnoreKeys:
                 print("need to add to oaioverride")
                 print(self._newValues[key])
                 print(self._oldValues[key])
-                if key in self.IdNames:
+                if key in self.IdKeys:
                     raise Exception("Id must not be changed!") 
                 # need to save the values as they come and also the transformed entity
                 self._oaiattrs.append(key)
+        if len(self._oaiattrs) > 0:
+            return self.fillOverrides()
+        return False
 
-        return self.fillOverrides()
+
+    def areValuesDifferent(self, key):
+        if self._newValues[key] == None and self._oldValues[key] == None:
+            return False
+
+        if not (self._newValues[key] and self._oldValues[key]):
+            return True
+
+        # normalize text and compare
+        oldvalue = self.normalize(self._oldValues[key])
+        newvalue = self.normalize(self._newValues[key])
+
+        return oldvalue != newvalue
+
+
+    def normalize(self, text):
+        # Remove punctuation and normalize whitespace
+        text = re.sub(r'[^\w\s]', '', text)  # Remove punctuation
+        text = re.sub(r'\s+', ' ', text)     # Collapse whitespace
+        return text.strip()
 
     def fillOverrides(self):
         print("fill the overrides")
@@ -93,6 +121,7 @@ class OaiUpdate:
             value = self.getNameparts(setting, value)
 
         self._escholValues[setting.escholfield] = value
+        return
 
     def getNameparts(self, setting, value):
         result = []
@@ -116,5 +145,5 @@ class OaiUpdate:
             result.append(x)
         return result
 
-# x = OaiUpdate(50)
+# x = OaiUpdate(2151)
 # x.process()
