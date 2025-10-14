@@ -2,13 +2,16 @@ import os
 import creds
 import paramiko
 from datetime import datetime
+from pymarc import MARCReader, XMLWriter, Field
 
-from pymarc import MARCReader, MARCWriter
+# oclcDir = '/apps/eschol/etdproc/oclc/in/'
+# almaDir = '/apps/eschol/etdproc/oclc/out/'
+oclcDir = './out/in/'
+almaDir = './out/out/'
 
 class connectAlma:
     key_path = None
     private_key = None
-    _outdir = './out/out/'
     _fileset = []
     def __init__(self, fileset):
         # Path to your private key file (e.g., id_rsa)
@@ -31,7 +34,7 @@ class connectAlma:
         with paramiko.SFTPClient.from_transport(transport) as sftp:
             for filename in self._fileset:
                 print(f'uploading {filename}')
-                local_path = os.path.join(self._outdir, filename)
+                local_path = os.path.join(almaDir, filename)
                 remote_path = f"{creds.alma_creds.directory}/{filename}"
                 #sftp.put(local_path, remote_path)
 
@@ -70,35 +73,31 @@ class connectOCLC:
             sftp.get(remote_path, local_path)
 
 class recalculateLength:
-    _indir = './out/in/'
-    _outdir = './out/out/'
     _fileForUpload = []
     def __init__(self):
         print("starting")
         self._fileForUpload = []
-    # def process(self):
-    #     print("look at everything in in folder")
-    #     print("resave")
-    #     print("upload")
 
     def process(self):
-        for filename in os.listdir(self._indir):
-            in_path = os.path.join(self._indir, filename)
-            out_path = os.path.join(self._outdir, filename)
+        for filename in os.listdir(oclcDir):
+            in_path = os.path.join(oclcDir, filename)
+            filename_xml = filename.replace(".mrc", ".xml")
+            out_path = os.path.join(almaDir, filename_xml)
             print(f"Reading: {filename}")
             self.writeFile(in_path, out_path)
-            self._fileForUpload.append(filename)
+            self._fileForUpload.append(filename_xml)
 
         return self._fileForUpload
 
     def writeFile(self, file_path, out_path):
         with open(out_path, 'wb') as out_fh:
-            writer = MARCWriter(out_fh)
+            writer = XMLWriter(out_fh)
             
             with open(file_path, 'rb') as fh:
                 reader = MARCReader(fh)
                 for record in reader:
                     if record:
+                        record.force_utf8 = True
                         writer.write(record)
             writer.close()
 
