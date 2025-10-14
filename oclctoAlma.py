@@ -38,7 +38,6 @@ class connectAlma:
                 sftp.put(local_path, remote_path)
 
 class connectOCLC:
-    _localdir = './out/in'
     _fromdate = None
     def __init__(self):
         print("get the file to upload")
@@ -67,7 +66,7 @@ class connectOCLC:
         modified_time = datetime.fromtimestamp(attr.st_mtime)
         if modified_time > self._fromdate:
             remote_path = os.path.join(creds.oclc_creds.downloadfolder, attr.filename)
-            local_path = os.path.join(self._localdir, attr.filename)
+            local_path = os.path.join(oclcDir, attr.filename)
             print(attr.filename, "last modified:", modified_time)
             sftp.get(remote_path, local_path)
 
