@@ -1,24 +1,23 @@
 import os
 import creds
 import paramiko
-from datetime import datetime
+from datetime import datetime, timedelta
 from pymarc import MARCReader, XMLWriter, Field
 
-# oclcDir = '/apps/eschol/etdproc/oclc/in/'
-# almaDir = '/apps/eschol/etdproc/oclc/out/'
-oclcDir = './out/in/'
-almaDir = './out/out/'
+oclcDir = '/apps/eschol/etdproc/oclc/in/'
+almaDir = '/apps/eschol/etdproc/oclc/out/'
+keyfile = '/apps/eschol/.ssh/AlmaNZftp_rsa.txt'
+# oclcDir = './out/in/'
+# almaDir = './out/out/'
+# keyfile = "./appdata/AlmaNZftp_rsa.txt"
+
 
 class connectAlma:
-    key_path = None
     private_key = None
     _fileset = []
     def __init__(self, fileset):
-        # Path to your private key file (e.g., id_rsa)
-        self.key_path = "./appdata/AlmaNZftp_rsa.txt"
         self._fileset = fileset
-        # Load the private key
-        self.private_key = paramiko.RSAKey.from_private_key_file(self.key_path)
+        self.private_key = paramiko.RSAKey.from_private_key_file(keyfile)
 
     def process(self):
         print("test connection to the ALMA ftp")
@@ -36,14 +35,15 @@ class connectAlma:
                 print(f'uploading {filename}')
                 local_path = os.path.join(almaDir, filename)
                 remote_path = f"{creds.alma_creds.directory}/{filename}"
-                #sftp.put(local_path, remote_path)
+                sftp.put(local_path, remote_path)
 
 class connectOCLC:
     _localdir = './out/in'
     _fromdate = None
     def __init__(self):
         print("get the file to upload")
-        self._fromdate = datetime.strptime(creds.oclc_creds.downloadfromdate, "%Y-%m-%d")
+        self._fromdate = datetime.now() - timedelta(days=5)
+        print("From date:", self._fromdate.strftime("%Y-%m-%d"))
 
 
     def fetch(self):
@@ -52,7 +52,6 @@ class connectOCLC:
             transport.connect(None, creds.oclc_creds.username, creds.oclc_creds.key)
             print("got sftp connection")
             self.processfetch(transport)
-            #self.testUploadFiles(transport)
 
 
     def processfetch(self, transport):
@@ -101,19 +100,22 @@ class recalculateLength:
                         writer.write(record)
             writer.close()
 
-print("start")  
-# get the files from OCLC
-# x = connectOCLC()
-# x.fetch()
-x = recalculateLength()
-fileset = x.process()
-if len(fileset):
-    y = connectAlma(fileset)
-    y.process()
-# x = connectAlma()
-# x.testConnection()
-# Resave the record
+def clearDir(dirpath):
+    for filename in os.listdir(dirpath):
+        file_path = os.path.join(dirpath, filename)
+        os.remove(file_path)
 
-# save the file in another ftp
+def processOclcToAlma():
+    print("start processOclcToAlma") 
+    clearDir(almaDir)
+    clearDir(oclcDir)
+    x = connectOCLC()
+    x.fetch()
+    x = recalculateLength()
+    fileset = x.process()
+    if len(fileset):
+        y = connectAlma(fileset)
+        y.process()
+    print("end processOclcToAlma")
 
-print("end")
+processOclcToAlma()
