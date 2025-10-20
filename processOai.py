@@ -13,13 +13,13 @@ class processOai:
         for (i,d) in allids:
             marcxml = consts.db.getHarvestRecord(i,d)
             #saveInMerritt(marcxml)
-            attrs = self.getAttributes(marcxml)
+            attrs, isInvalid = self.getAttributes(marcxml)
             # find the matching Package id
             packageId = consts.db.getpackagebyisbn(attrs["isbn"])
             # fill attrs and package id
-            consts.db.saveHarvestAttr(i,d, json.dumps(attrs,ensure_ascii=False), packageId)
+            consts.db.saveHarvestAttr(i,d, json.dumps(attrs,ensure_ascii=False), packageId, isInvalid)
             
-            if packageId is not None:
+            if packageId and not isInvalid:
                 consts.db.saveQueueStatus(packageId, "oaiupdate")
         print("end")
 
@@ -28,11 +28,13 @@ class processOai:
         marc_stream = BytesIO(marcxml.encode('utf-8'))
         marc_records = parse_xml_to_array(marc_stream)
         attrs = {}
+        isWorldCatUpdate = False
         for marc in marc_records:
             for setting in consts.oaiSetting:
                 attrs[setting.destfield] = self.getValue(marc,setting)
-        print(attrs)
-        return attrs
+            isWorldCatUpdate = "908" in marc
+
+        return attrs, isWorldCatUpdate
 
     def getValue(self, marc, setting):
         if setting.indicator1 == 'bl' and setting.indicator2 == 'bl':

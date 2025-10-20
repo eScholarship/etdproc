@@ -28,7 +28,7 @@ class etdDb:
     queryConfig = "select ckey, cvalue from config"
     queryHarvestRecord = "select rawvalue from harvestlog where identifier = '{param1}' and datestamp = '{param2}'"
     queryIdentifer = "select packageid from identifiers where idvalue = '{param1}' and idtype = '{param2}'"
-    queryHarvestEntries = "select identifier, datestamp, attrs, isProcessed from harvestlog where packageId = {param} order by datestamp desc limit 2"
+    queryHarvestEntries = "select identifier, datestamp, attrs, isProcessed from harvestlog where packageId = {param} and isInvalid = False order by datestamp desc limit 2"
     queryOaiOverride = "select escholattrs from oaioverride where packageId = {param} order by actionTime desc limit 1"
     insertPackage = "insert into packages (pubnum, zipname, campusId) VALUES ('{param1}','{param2}', {param3}) "
     insertMerrittRequest = "insert into merrittrequests (packageId, request, response, currentstatus) VALUES ({param1},'{param2}','{param3}','{param4}') "
@@ -52,7 +52,7 @@ class etdDb:
     updateEscholArk = "update packages set computedattrs = JSON_SET(computedattrs, '$.escholark', '{param2}') where id = {param1}"
     updateMcProcessed = "update merrittcallbacks set isProcessed = True where id = {param}" 
     updateConfig = "update config set cvalue = '{param2}' where ckey = '{param1}'" 
-    updateHarvestAttrs = "update harvestlog set attrs = %s, packageId = %s where identifier = %s and datestamp = %s"
+    updateHarvestAttrs = "update harvestlog set attrs = %s, packageId = %s, isInvalid = %s where identifier = %s and datestamp = %s"
     updateOaiProcessed = "update harvestlog set isProcessed = 1 where identifier = '{param1}' and datestamp = '{param2}'"
 
     def __init__(self):
@@ -399,8 +399,8 @@ class etdDb:
             result = row[0]
         return result
 
-    def saveHarvestAttr(self, i, d, attrs, packageId):
-        self.cursor.execute(self.updateHarvestAttrs, (attrs, packageId, i, d))
+    def saveHarvestAttr(self, i, d, attrs, packageId, isInvalid):
+        self.cursor.execute(self.updateHarvestAttrs, (attrs, packageId, isInvalid, i, d))
         self.cnxn.commit()
         return
 

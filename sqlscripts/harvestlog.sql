@@ -8,6 +8,7 @@ CREATE TABLE harvestLog (
     packageId int NULL,
     attrs JSON NULL,
     isProcessed bit NOT NULL DEFAULT 0,
+    isInvalid bit NOT NULL DEFAULT 0,
     actionTime datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (identifier, datestamp)
 );
