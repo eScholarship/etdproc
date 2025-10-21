@@ -5,7 +5,9 @@ import shutil
 import consts
 import pathlib
 from escholClient import eschol
+
 api = eschol()
+MAX_GRAPHQL_INT = 2_147_483_647  # 2^31 - 1
 
 def cleanResponse(text):
     # Remove single and double quotes
@@ -62,26 +64,31 @@ class depositToEschol:
         shutil.copy(os.path.join(source_path, self._fileattrs["xmlfile"]), os.path.join(dest_path, self._fileattrs["xmlfile"]))
 
         traversepath = pathlib.Path(source_path)
-        # TBD - For other files find location in the director tree and also update the byte size in 
+        # For other files find location in the director tree and also update the byte size in 
         # os.path.getsize(file_path)
         supp_info = {}
         for item in traversepath.rglob("*"):
             if item.is_file():
                 if item.name in self._fileattrs["supp"]:
                     print(item.name)
-                    print(os.path.getsize(item))
-                    # copy the files
+                    print(os.path.getsize(item))                    
                     item_dest = os.path.join(dest_path, item.name)
                     item_size = os.path.getsize(item)
-                    shutil.copy(item, item_dest)
-                    supp_info[item.name] = item_size
+                    # copy the files only if it is less than 2G
+                    if item_size < MAX_GRAPHQL_INT:
+                        shutil.copy(item, item_dest)
+                        supp_info[item.name] = item_size
         return supp_info
 
     def updateSupp(self, depositpackage, supp_info):
         print("update supp")
         if "suppFiles" in depositpackage:
             for item in depositpackage["suppFiles"]:
-                item["size"] = supp_info[item["file"]]
+                if item["file"] in supp_info:
+                    item["size"] = supp_info[item["file"]]
+                else: # remove from the supp file list 
+                    item["size"] = 0
+        depositpackage["suppFiles"] = [item for item in depositpackage["suppFiles"] if item.get("size", 0) != 0]
         return depositpackage
 
 
@@ -110,6 +117,7 @@ class depositToEschol:
         consts.db.saveEscholResponse(self._packageId, cleanResponse(response))
         # was this successfull or not - check the response
         # update escholid and url in 
+
         if code != 200:
             consts.db.saveErrorLog(self._packageId,"deposit failed", "details in escholrequests table")
             raise Exception("desposit failed") 
@@ -167,6 +175,5 @@ class replaceEscholMetadata:
         time.sleep(2) # pause for 2 sec
         return
 
-# x = replaceEscholMetadata(50)
-# x.replaceMeta()
+
 
