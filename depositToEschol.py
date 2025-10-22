@@ -88,7 +88,7 @@ class depositToEschol:
                     item["size"] = supp_info[item["file"]]
                 else: # remove from the supp file list 
                     item["size"] = 0
-        depositpackage["suppFiles"] = [item for item in depositpackage["suppFiles"] if item.get("size", 0) != 0]
+            depositpackage["suppFiles"] = [item for item in depositpackage["suppFiles"] if item.get("size", 0) != 0]
         return depositpackage
 
 

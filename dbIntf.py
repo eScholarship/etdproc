@@ -156,7 +156,8 @@ class etdDb:
         #print("read pub number")
         query = self.queryPubNumber.format(param=packageId)
         self.cursor.execute(query)
-        for row in self.cursor:
+        rows = self.cursor.fetchall()  # forces full fetch
+        for row in rows:
             return row[0]
         return None
 
@@ -177,7 +178,8 @@ class etdDb:
     def getPackageId(self,pubnum):
         query = self.queryPackage.format(param=pubnum)
         self.cursor.execute(query)
-        for row in self.cursor:
+        rows = self.cursor.fetchall()  # forces full fetch
+        for row in rows:
             return row[0]
         return None
 
@@ -222,14 +224,16 @@ class etdDb:
         #print("get eschol id if present")
         query = self.queryEscholId.format(param=packageId)
         self.cursor.execute(query)
-        for row in self.cursor:
+        rows = self.cursor.fetchall()  # forces full fetch
+        for row in rows:
             return row[0]
         return None
 
     def getMarcName(self, packageId):
         query = self.queryMarcName.format(param=packageId)
         self.cursor.execute(query)
-        for row in self.cursor:
+        rows = self.cursor.fetchall()  # forces full fetch
+        for row in rows:
             return row[0]
         return None
 
@@ -276,7 +280,8 @@ class etdDb:
         #print("get queue status")
         query = self.queryQueueStatus.format(param=packageid)
         self.cursor.execute(query)
-        for row in self.cursor:
+        rows = self.cursor.fetchall()  # forces full fetch
+        for row in rows:
             return row[0]
         return None
 
@@ -284,7 +289,8 @@ class etdDb:
         #print("read xml attrs")
         query = self.queryXmlAttrs.format(param=id)
         self.cursor.execute(query)
-        for row in self.cursor:
+        rows = self.cursor.fetchall()  # forces full fetch
+        for row in rows:
             return row[0]
         return None
 
@@ -328,13 +334,13 @@ class etdDb:
     def IsZipFilePresent(self, zipname):        
         query = self.queryPackageZip.format(param=zipname)
         self.cursor.execute(query)
-        rows = list(self.cursor)  # forces full fetch
+        rows = self.cursor.fetchall()  # forces full fetch
         return bool(rows)
 
     def IsOclcsenddone(self, packageid):
         query = self.querySilsInLog.format(param=packageid)
         self.cursor.execute(query)
-        rows = list(self.cursor)  # forces full fetch
+        rows = self.cursor.fetchall()  # forces full fetch
         return bool(rows)
 
     def saveIdentifier(self, packageId, idtype, idvalue):
@@ -349,7 +355,8 @@ class etdDb:
         #print("look for deposit message for this")
         query = self.queryDepositResponse.format(param=packageId)
         self.cursor.execute(query)
-        for row in self.cursor:
+        rows = self.cursor.fetchall()  # forces full fetch
+        for row in rows:
             return "Deposited." in row[0]
         return False
 
@@ -375,7 +382,8 @@ class etdDb:
     def getHarvestRecord(self, oaiid, stamp):
         query = self.queryHarvestRecord.format(param1=oaiid, param2=stamp)
         self.cursor.execute(query)
-        for row in self.cursor:
+        rows = self.cursor.fetchall()  # forces full fetch
+        for row in rows:
             return row[0]
         return None
 
