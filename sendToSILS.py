@@ -46,7 +46,7 @@ class uploadToOCLCftp:
                     assert(mrcname)
                     inpath = f'{consts.marcDir}/{mrcname}'
                     with open(inpath, 'rb') as in_fh:
-                        reader = MARCReader(in_fh)
+                        reader = MARCReader(in_fh, to_unicode=True, force_utf8=True, utf8_handling='replace')
                         for record in reader:
                             if record:
                                writer.write(record)

@@ -25,6 +25,8 @@ class createMarc:
             return consts.configs['base_urls.escholUrlBase'] + value[-8:]
         if action == 'dash':
             return value.replace('-','')
+        if action == 'tab':
+            return value.replace('\t', ' ')
         return value
 
     def generateConst(self, setting, fieldtofill):
