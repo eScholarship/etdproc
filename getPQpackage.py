@@ -115,7 +115,7 @@ class pqSfptIntf:
         return os.path.join(consts.extractDir, zipname, fileatts["xmlfile"])
 
     def saveToDb(self, zipname, packageId):
-        print("save fileattrs and create queue item for this")
+        #print("save fileattrs and create queue item for this")
         fileatts = self.filesUnziped[zipname]
         isparseError = False
         # update fileattr 

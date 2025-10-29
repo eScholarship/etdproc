@@ -45,7 +45,6 @@ class etdParseXml:
         self.convertToJson()
 
     def convertToJson(self):
-        print("convert from proquest to marc")
         # run xslt on the given file
         dom = ET.parse(self._pqfile)
         self._xpatheval = ET.XPathEvaluator(dom)
@@ -148,7 +147,7 @@ class etdParseXml:
 
     def addContent(self):
         # get the binary
-        print("add content info here")
+        #print("add content info here")
         content = self._xpatheval("/DISS_submission/DISS_content")[0]
         # get all the attachments
         binary = content.findall("DISS_binary")[0]
@@ -181,7 +180,7 @@ class etdParseXml:
         return
 
     def addKeywordsDiscipline(self):
-        print("add keywords discipline")
+        #print("add keywords discipline")
         cat_desc =  self._xpatheval("/DISS_submission/DISS_description/DISS_categorization/DISS_category/DISS_cat_desc")
         if cat_desc is not None and len(cat_desc) > 0:
             self._data["discipline"] = cat_desc[0].text

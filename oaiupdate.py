@@ -11,7 +11,10 @@ class OaiUpdate:
     _packageid = None
     _oaiattrs = []
     IdKeys = ["isbn", "merrittark", "escholark"]
-    IgnoreKeys = ["abstract"]
+    # Leaving this mechanism to exclude some keys if needed. 
+    # This was used before to exclude 
+    IgnoreKeys = []
+    #IgnoreKeys = ["abstract"]
     def __init__(self, packageid):
         # get all the entries with this package id
         self._entries = consts.db.getlastTwoHarvestEntries(packageid)
