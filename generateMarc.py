@@ -1,7 +1,6 @@
 import json
 import consts
-from pymarc import Record, Field, Subfield
-
+from pymarc import Record, Field, Subfield, MARCWriter
 
 
 class createMarc:
@@ -175,13 +174,16 @@ class createMarc:
         # save in identifier table 
         consts.db.saveIdentifier(self._packageId, "MarcName",mrcname)
         filepath = f'{consts.marcDir}/{mrcname}'
-        with open(filepath, 'wb') as data:
-            data.write(record.as_marc21())
+        with open(filepath, 'wb') as fh:
+            w = MARCWriter(fh)
+            w.write(record)
+            w.close()
+
         return filepath
 
 #print("start - create")
 
-#x = createMarc("30492756")
-#x.writeMarcFile()
+# x = createMarc(17)
+# x.writeMarcFile()
 
 #print("end -- crate")
