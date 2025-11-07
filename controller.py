@@ -89,7 +89,7 @@ class Controller:
 
     def purgeExtracted(self):
         print("purging old")
-        folders = consts.db.getDoneFolders()
+        folders = consts.db.getOldDoneFolders()
         for folder in folders:
             dir_path = os.path.join(consts.extractDir, folder)
             if os.path.exists(dir_path):

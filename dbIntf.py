@@ -442,8 +442,7 @@ class etdDb:
         return result
 
     def getOldDoneFolders(self):
-        query = self.getInfo.format(self.querydonefolders)
-        self.cursor.execute(self.querydone)
+        self.cursor.execute(self.querydonefolders)
         folder = []
         for row in self.cursor:
             folder.append(row[0])
