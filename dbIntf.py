@@ -30,6 +30,7 @@ class etdDb:
     queryIdentifer = "select packageid from identifiers where idvalue = '{param1}' and idtype = '{param2}'"
     queryHarvestEntries = "select identifier, datestamp, attrs, isProcessed from harvestlog where packageId = {param} and isInvalid = False order by datestamp desc limit 2"
     queryOaiOverride = "select escholattrs from oaioverride where packageId = {param} order by actionTime desc limit 1"
+    querydonefolders = "select zipname from packages where id in (select packageId from queues where queuename = 'done' and actionTime < NOW() - INTERVAL 30 DAY);"
     insertPackage = "insert into packages (pubnum, zipname, campusId) VALUES ('{param1}','{param2}', {param3}) "
     insertMerrittRequest = "insert into merrittrequests (packageId, request, response, currentstatus) VALUES ({param1},'{param2}','{param3}','{param4}') "
     insertEscholRequest = "insert into escholrequests (packageId, escholId) VALUES ({param1},'{param2}')"
@@ -439,6 +440,14 @@ class etdDb:
         for row in self.cursor:
             result = row[0]
         return result
+
+    def getOldDoneFolders(self):
+        query = self.getInfo.format(self.querydonefolders)
+        self.cursor.execute(self.querydone)
+        folder = []
+        for row in self.cursor:
+            folder.append(row[0])
+        return folder
 
 #x = etdDb()
 #x.saveQueueLog(1,"eschol")

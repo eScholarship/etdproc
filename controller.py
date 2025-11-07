@@ -1,3 +1,5 @@
+import os
+import shutil
 import json
 import consts
 import traceback
@@ -84,7 +86,20 @@ class Controller:
         print("process OAI harvest")
         y = processOai()
         y.parseMarcInfo()
+
+    def purgeExtracted(self):
+        print("purging old")
+        folders = consts.db.getDoneFolders()
+        for folder in folders:
+            dir_path = os.path.join(consts.extractDir, folder)
+            if os.path.exists(dir_path):
+                try:
+                    shutil.rmtree(dir_path)
+                    print(f"Deleted: {dir_path}")
+                except Exception as e:
+                    print(f"Failed to delete {dir_path}: {e}")
         
 # Create the controller to build queue and process all
 c = Controller()
+c.purgeExtracted()
 
