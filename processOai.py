@@ -4,7 +4,9 @@ from lxml import etree
 from io import BytesIO
 from pymarc import parse_xml_to_array
 
-
+# ============================================================
+# Find out which OAI entries are not fully processed and take action
+# ============================================================
 class processOai:
     def parseMarcInfo(self):
         print("start")

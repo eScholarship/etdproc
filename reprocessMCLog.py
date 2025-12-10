@@ -8,7 +8,9 @@ import mysql.connector
 import argparse
 
 
-
+# ============================================================
+# Utility script to grab Merritt Callback info from Apache log if needed 
+# ============================================================
 class processLog:
     logEntries = []
     insertInfo = "insert into merrittcallbacks (jid, callbackdata) VALUES ('{param1}','{param2}') "

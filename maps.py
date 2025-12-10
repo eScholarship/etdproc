@@ -1,5 +1,7 @@
 
-
+# ============================================================
+# A number of small class that organize mapping settings from DB   
+# ============================================================
 class pqmap:
     tag = None
     field = None

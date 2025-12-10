@@ -9,7 +9,9 @@ from oaiupdate import OaiUpdate
 from sendToMerritt import etdToMerritt, marcToMerritt
 from depositToEschol import mintEscholId, depositToEschol, replaceEscholMetadata
 
-
+# ============================================================
+# This is the main class that goes through queued ETD items and processes
+# ============================================================
 class processQueueImpl:
     _fetchedTasks = []
     _extractedTasks = []

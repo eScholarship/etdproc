@@ -2,7 +2,21 @@ import json
 import consts
 from pymarc import Record, Field, Subfield, MARCWriter
 
-
+# ============================================================
+# Class Name: createMarc
+# Description:
+#     Prepare MARC21 file for an ETD.
+#
+# Attributes:
+#     packageId (int): Id of the ETD in packages table.
+#
+# Usage:
+#     x = createMarc(packageId)
+#     x.writeMarcFile()
+#
+# Notes:
+#     - The mapping from attributes to marc tags is driven by settings table
+# ============================================================
 class createMarc:
     _packageId = None
     _gwattrs = None

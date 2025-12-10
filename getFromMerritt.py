@@ -6,6 +6,12 @@ import time
 from datetime import datetime
 import pytz
 
+
+# ============================================================
+# This is a utility to download from Merritt if needed. 
+# The ETD files are removed from disk 30 days after complete processing.
+# If there is a need to reprocess xml, we can download from Merritt and reprocess.
+# ============================================================
 def waitForMerritt(anticipated_time_str):
     if not anticipated_time_str:
         print(" No anticipated-availability-time found in response.")

@@ -29,6 +29,24 @@ class reparseXml:
         x = etdParseXml(self._zipname, self._pqfile, self._packageId)
         x.saveToDb()
 
+# ============================================================
+# Class Name: etdParseXml
+# Description:
+#     Parse ProQuest XML, add a new package entry and save xmlattrs.
+#
+# Attributes:
+#     packageId (int): Id is provided for reparse scenario
+#     zipfile (str): Name of file from ProQuest
+#     pqfile (str): Path of ProQuest XML to parse
+#
+# Usage:
+#     x = etdParseXml(packageId, zipname, pqfile)
+#     x.process()
+#
+# Notes:
+#     - It is possible that ProQuest return multiple records. 
+#     Need to look at specific field to make sure the record corresponds to ETD
+# ============================================================
 class etdParseXml:
     _data = {}
     _dbparams = []

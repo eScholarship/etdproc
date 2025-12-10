@@ -3,6 +3,22 @@ import consts
 import json
 from sendToMerritt import marcToMerritt
 
+# ============================================================
+# Class Name: OaiUpdate
+# Description:
+#     Process OAI update to create override for eschol metadata.
+#
+# Attributes:
+#     packageId (int): Id of the ETD in packages table.
+#
+# Usage:
+#     x = OaiUpdate(packageId)
+#     x.process()
+#
+# Notes:
+#     - Checks last two OAI entries for ETD to determine the values
+#     that are update and require override
+# ============================================================
 class OaiUpdate:
     _entries = []
     _newValues = {}

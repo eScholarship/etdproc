@@ -1,6 +1,11 @@
 
 from dbIntf import etdDb
 
+# ============================================================
+# Create sigleton that are utilized in rest of the application
+# DB connection is created and kept alive for all the steps
+# for ETD processing 
+# ============================================================
 db = etdDb()
 
 campusinfo = db.getCampusInfo()

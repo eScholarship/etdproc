@@ -7,6 +7,10 @@ import time
 import requests
 from io import BytesIO
 
+
+# ============================================================
+# Sends individual ETD MARC21 files to Merritt
+# ============================================================
 def getMerrittCollection(bucket):
     collection = bucket
     if 'merritt_creds.collection' in consts.configs:

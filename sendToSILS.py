@@ -4,6 +4,9 @@ import traceback
 from datetime import date
 from pymarc import MARCReader, MARCWriter
 
+# ============================================================
+# Uploads consolidated MARC file to OCLC 
+# ============================================================
 class uploadToOCLCftp:
     _countSent = 0
     _packageIds = None

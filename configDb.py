@@ -3,6 +3,17 @@ import creds
 import mysql.connector
 import csv
 
+
+# ============================================================
+# Class Name: configDb
+# Description:
+#     Create tables and seed with config data
+#
+# Notes:
+#     - This class is used only at the instance setup time
+#     - This is the place we can add or update tables by
+#       uncommenting appropriate parts of the file to execute
+# ============================================================
 class configDb:
     #allSqlFiles = ["campuses.sql","packages.sql","errorlog.sql","settings.sql","identifiers.sql","merrittcallback.sql","merrittrequest.sql","escholrequest.sql","queues.sql","queuelogs.sql", "config.sql","harvestlog.sql"]
     allSqlFiles = ["oaioverride.sql",]
@@ -13,6 +24,10 @@ class configDb:
     InsertSilsMap = "INSERT INTO settings (settingtype,field1,field2,field3,field4,field5,field6,info) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
     InsertEscholMap = "INSERT INTO settings (settingtype,field1,field2,info) VALUES (%s,%s,%s,%s)"
     InsertHarvestMap = "INSERT INTO settings (settingtype,field1,field2,field3,field4,field5,field6,info) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
+
+    # ============================================================
+    # Create connection and cursor for database interaction 
+    # ============================================================
     def __init__(self):
         self.cnxn = mysql.connector.connect(user=creds.etdDb.username, 
                         password=creds.etdDb.password,
@@ -22,7 +37,9 @@ class configDb:
                         auth_plugin='mysql_native_password')
         self.cursor = self.cnxn.cursor()
 
-
+    # ============================================================
+    # Load sql scripts and execute 
+    # ============================================================
     def createDbs(self):
         print("Let's create db and init it as needed ")
         for file in self.allSqlFiles:
@@ -32,7 +49,9 @@ class configDb:
             print(y)
         self.cursor.close()
 
-    
+    # ============================================================
+    # Seed data for campuses and campus attributes from data file
+    # ============================================================   
     def populateCampuses(self):
         print("populate campuses")
         params = []
@@ -54,6 +73,10 @@ class configDb:
         self.cursor.executemany(self.InsertCampus, params)
         self.cnxn.commit()
 
+    # ============================================================
+    # Gateway mapping is information for parsing the data from 
+    # ProQuest Gateway to useable info
+    # ============================================================
     def populateGatewayConfig(self):
         print("populate GatewayConfig")
         params = []
@@ -71,6 +94,10 @@ class configDb:
         self.cursor.executemany(self.InsertMarcIn, params)
         self.cnxn.commit()
 
+    # ============================================================
+    # SILS mapping is information needed to build MARC record
+    # from XML, computed info, and Gateway data
+    # ============================================================
     def populateSilsConfig(self):
         print("populate SilsConfig")
         params = []
@@ -91,6 +118,9 @@ class configDb:
         self.cursor.executemany(self.InsertSilsMap, params)
         self.cnxn.commit()
 
+    # ============================================================
+    # Load mapping for building eschol deposit package from source info
+    # ============================================================
     def populateEscholConfig(self):
         print("populate EscholConfig")
         params = []
@@ -106,6 +136,10 @@ class configDb:
         self.cursor.executemany(self.InsertEscholMap, params)
         self.cnxn.commit()
 
+    # ============================================================
+    # Load mapping to translate OAI harvest info to eschol deposit
+    # data field
+    # ============================================================
     def populateHarvestConfig(self):
         print("populate HarvestConfig")
         params = []
@@ -126,8 +160,8 @@ class configDb:
         self.cnxn.commit()
 
 print("start")
-x = configDb()
-x.createDbs()
+# x = configDb()
+# x.createDbs()
 #x.populateCampuses()
 #x.populateGatewayConfig()
 #x.populateSilsConfig()

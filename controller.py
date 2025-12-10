@@ -9,7 +9,22 @@ from processQueues import processQueueImpl
 from harvestMarc import harvertMarc
 from processOai import processOai
 
+# ============================================================
+# Class Name: Controller
+# Description:
+#     This is the starting point of ETD processor.
+#
+# Steps for ETD Processing:
+#     - Harvest files from ProQuest
+#     - Look for unprocessed Merritt callback and process 
+#     - Harvest updates from ALMA OAI feed
+#     - Process all queued items
+# ============================================================
+
 class Controller:
+    # ============================================================
+    # Perform all the tasks needed for one ETD proc
+    # ============================================================
     def __init__(self):
         print("starting controller")
         self.buildQueue()
@@ -18,6 +33,9 @@ class Controller:
         x = processQueueImpl() 
         x.processQueue()
 
+    # ============================================================
+    # Grab the incoming ProQuest packages and add to queue for further processing
+    # ============================================================
     def buildQueue(self):
         print("bring in files from ")
         x = pqSfptIntf()
@@ -40,7 +58,11 @@ class Controller:
                 consts.db.saveErrorLog(packageId,"parse and save operation failed", item)
         return
 
-
+    # ============================================================
+    # Find the pub number by processing the local id in Merritt response
+    # The local id contains the prefix added by ETD processor
+    # For UCLA items there are additional strings added to the id
+    # ============================================================
     def getpubnumFromMC(self, localId, isInitSub):
         pubnum = localId
         # the local id may be a combination of pubnum and date from mrc such as 31844343;ucla.etd:PQ23750
@@ -54,6 +76,11 @@ class Controller:
 
         return packageid
 
+    # ============================================================
+    # Merritt callback is handled by a Flask app that saved the 
+    # incoming post payload in DB. Here we parse the payload to extract
+    # information and progress ETD to next stege in ETD process pipeline 
+    # ============================================================
     def processMerrittCallbacks(self):
         # find out unprocess entries from callback table
         queuedMC = consts.db.getUnprocessedMCs()
@@ -79,6 +106,9 @@ class Controller:
                 print("This is for addition to existing ETD")
             consts.db.markMCprocessed(mcid)
 
+    # ============================================================
+    # Call OAI endpoint to get the feed and save new or updated entries in DB
+    # ============================================================
     def OaiHarvest(self):
         print("run OAI harvest")
         x = harvertMarc()
@@ -87,6 +117,12 @@ class Controller:
         y = processOai()
         y.parseMarcInfo()
 
+    # ============================================================
+    # Delete ETD files that are completely processed. 
+    # If there is a need to reprocess ETD, the process will
+    # include downloading files from Merritt and populating extracted
+    # folder directory
+    # ============================================================
     def purgeExtracted(self):
         print("purging old")
         folders = consts.db.getOldDoneFolders()

@@ -9,19 +9,43 @@ from escholClient import eschol
 api = eschol()
 MAX_GRAPHQL_INT = 2_147_483_647  # 2^31 - 1
 
+# ============================================================
+# Clean and trim response from API before saving in DB
+# ============================================================
 def cleanResponse(text):
     # Remove single and double quotes
     text = text.replace("'", "").replace('"', "")
     # Limit string length to 900 characters
     return text[:900]
 
+# ============================================================
+# Class Name: mintEscholId
+# Description:
+#     Mint eschol ark if needed
+#
+# Attributes:
+#     packageId (int): Id of the ETD in packages table.
+#
+# Usage:
+#     x = mintEscholId(packageId)
+#     x.mint()
+#
+# Notes:
+#     - Check if ark is available and if not create. 
+# ============================================================
 class mintEscholId:
     _packageId = None
     _pubnum = None
+    # ============================================================
+    # Get ProQuest pubnum. pubnum with prefix becomes external id in eschol
+    # ============================================================
     def __init__(self, packageId):
         self._packageId = packageId
         self._pubnum = consts.db.getPubNumber(packageId)
 
+    # ============================================================
+    # Send Mint request and save the eschol ark for the ETD
+    # ============================================================
     def mint(self):
         print("mint if needed")
         # add pubnum from ProQuest as external id
@@ -40,13 +64,36 @@ class mintEscholId:
         time.sleep(1) # pause for 1 sec
 
         return escholId
-
+# ============================================================
+# Class Name: depositToEschol
+# Description:
+#     Prepare paylod for eschol and deposit
+#
+# Attributes:
+#     packageId (int): Id of the ETD in packages table.
+#
+# Methods:
+#     deposit():
+#         Send data eschol
+#
+# Usage:
+#     x = depositToEschol(packageId)
+#     x.deposit()
+#
+# Notes:
+#     - In addition to packaging info various attribs, it also places 
+#     - files in right location for escholAPI to pull from. The file size
+#     - is also update. 
+# ============================================================
 class depositToEschol:
     _packageId = None
     _fileattrs = None
     _gwattrs = None
     _xmlattrs = None
     _compattrs = None
+    # ============================================================
+    # Load all attributes for a package
+    # ============================================================
     def __init__(self, packageId):
         self._packageId = packageId
         (fileattrs, gwAttrs, xmlAttrs, compAttrs) = consts.db.getAttrs(packageId)
@@ -55,6 +102,10 @@ class depositToEschol:
         self._xmlattrs = json.loads(xmlAttrs)
         self._compattrs = json.loads(compAttrs)
 
+    # ============================================================
+    # Files need to be a folder accessible to escholAPI via url
+    # Supplementary files larger than max allowed by escholAPI are removed
+    # ============================================================
     def copyFilesToDepositDir(self):
         # copy pdf from extract folder to deposit one
         source_path = f'{consts.extractDir}/{self._fileattrs["folder"]}'
@@ -80,6 +131,9 @@ class depositToEschol:
                         supp_info[item.name] = item_size
         return supp_info
 
+    # ============================================================
+    # Update the info for supplementary by popularing size 
+    # ============================================================
     def updateSupp(self, depositpackage, supp_info):
         print("update supp")
         if "suppFiles" in depositpackage:
@@ -91,7 +145,9 @@ class depositToEschol:
             depositpackage["suppFiles"] = [item for item in depositpackage["suppFiles"] if item.get("size", 0) != 0]
         return depositpackage
 
-
+    # ============================================================
+    # Use the mapping between eschol json and attrs to create payload
+    # ============================================================
     def deposit(self):
         print("deposit")
         # create the deposit package
@@ -126,12 +182,35 @@ class depositToEschol:
         time.sleep(2) # pause for 2 sec
         return
 
+# ============================================================
+# Class Name: replaceEscholMetadata
+# Description:
+#     Package information for eschol and replace metadata
+#
+# Attributes:
+#     packageId (int): Id of the ETD in packages table.
+#
+# Methods:
+#     replaceMeta():
+#         Send metadata eschol
+#
+# Usage:
+#     x = replaceEscholMetadata(packageId)
+#     x.replaceMeta()
+#
+# Notes:
+#     - In addition to packaging info various attribs, it also 
+#     look at the overrides and update. 
+# ============================================================
 class replaceEscholMetadata:
     _packageId = None
     _gwattrs = None
     _xmlattrs = None
     _compattrs = None
     _oaioverride = None
+    # ============================================================
+    # Load all attributes and overrides
+    # ============================================================
     def __init__(self, packageId):
         self._packageId = packageId
         (_, gwAttrs, xmlAttrs, compAttrs) = consts.db.getAttrs(packageId)
@@ -142,6 +221,9 @@ class replaceEscholMetadata:
         if override:
             self._oaioverride = json.loads(override)
 
+    # ============================================================
+    # Prepare payload for replace metadata and send 
+    # ============================================================
     def replaceMeta(self):
         print("replace metadata")
         # create the replace package

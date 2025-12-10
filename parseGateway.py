@@ -5,7 +5,23 @@ import consts
 import requests
 from pymarc.marcxml import record_to_xml, parse_xml_to_array
 
-
+# ============================================================
+# Class Name: etdParseGateway
+# Description:
+#     Query ProQuest gateway for info on specific ETD by pubnum.
+#
+# Attributes:
+#     packageId (int): Id of the ETD in packages table.
+#
+#
+# Usage:
+#     x = etdParseGateway(packageId)
+#     x.process()
+#
+# Notes:
+#     - It is possible that ProQuest return multiple records. 
+#     Need to look at specific field to make sure the record corresponds to ETD
+# ============================================================
 class etdParseGateway:
     _data = None
     _record = None

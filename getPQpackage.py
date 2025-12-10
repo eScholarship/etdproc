@@ -5,7 +5,22 @@ import paramiko
 import zipfile
 import shutil
 
-
+# ============================================================
+# Class Name: pqSfptIntf
+# Description:
+#     Download zip files from ProQuest and UCLA folder.
+#     Make sure the package is valid and prepare fileinfo json
+#
+# Attributes:
+#     packageId (int): Id of the ETD in packages table.
+#
+# Usage:
+#     x = pqSfptIntf()
+#     x.getPqPackages()
+#     x.saveToDb(packageId,)
+# Notes:
+#     - ProQuest XML needs to be successfully parsed for Package table entry. 
+# ============================================================
 class pqSfptIntf:
     filesFound = []
     filesUnziped = []

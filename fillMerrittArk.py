@@ -3,6 +3,12 @@ import consts
 
 print("start")
 
+# ============================================================
+# This is a utility function that is used when Merritt Callback 
+# is not able to deliver package becuase of error from load balancer.
+# The workaround is to get merritt ark from Merritt website and 
+# use this function to populate ark and move ETD further in processing.  
+# ============================================================
 def fillArk(pid, ark):
     # make sure ark follows the pattern
     if not ark.startswith('ark:/'):

@@ -11,7 +11,10 @@ keyfile = '/apps/eschol/.ssh/AlmaNZftp_rsa.txt'
 # almaDir = './out/out/'
 # keyfile = "./appdata/AlmaNZftp_rsa.txt"
 
-
+# ============================================================
+# This is a separate utility that runs to convert intermediate 
+# files from OCLC to MARCXML for import in SILS
+# ============================================================
 class connectAlma:
     private_key = None
     _fileset = []

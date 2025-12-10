@@ -7,11 +7,37 @@ from maps import cc_url_mapping
 from urllib.parse import quote
 import pycountry
 
-
+# ============================================================
+# Class Name: etdcomputeValues
+# Description:
+#     Purpose of this class is to encapsulate functionlity to build transformed data value 
+#     to send to the various destination systems.
+#
+# Attributes:
+#     packageId (int): Id of the ETD in packages table.
+#
+# Methods:
+#     saveComputedValues():
+#         Performs transformations and save in DB.
+#     method_two():
+#         Describe what this method does.
+#
+# Usage:
+#     x = etdcomputeValues(packageId)
+#     x.saveComputedValues()
+#
+# Notes:
+#     - Normally this functionality is used once for an ETD.
+#     - It is possible to set ETD in recompute state; usually 
+#     - done after compute bug fix or functionality change
+# ============================================================
 class etdcomputeValues:
     _xmlAttrs = None
     _packageId = None
     _compAttrs = {}
+    # ============================================================
+    # Load xml attributes for computation and transformation 
+    # ============================================================
     def __init__(self, packageId):
         self._packageId = packageId
         self._compAttrs = {}
@@ -21,7 +47,9 @@ class etdcomputeValues:
         if compAttrs:
             self._compAttrs = json.loads(compAttrs)
 
-    # Update to publication date when xml is populated with that
+    # ============================================================
+    # Update to publication date when xml is populated with that 
+    # ============================================================
     def computeDecisionDate(self):
         print("Compute all dates - acceptance and decision dates")
         # get the decision date and use that as publication date
@@ -43,6 +71,9 @@ class etdcomputeValues:
 
         return decision
 
+    # ============================================================
+    # Find decision data and save pub date and year 
+    # ============================================================
     def computeDates(self):
         print("compute publication date and year")
         decision = self.computeDecisionDate()
@@ -50,6 +81,10 @@ class etdcomputeValues:
         self._compAttrs["pub_year"] = decision.strftime('%Y')
         return decision
 
+
+    # ============================================================
+    # Process various fields to find embargo date 
+    # ============================================================
     def computeIfEmbargoed(self):
         self._compAttrs["isEmbargoed"] = False
         self._compAttrs["isPermEmbargoed"] = False
@@ -91,6 +126,10 @@ class etdcomputeValues:
             self._compAttrs["isEmbargoed"] = True
         return
 
+    # ============================================================
+    # Default language is en. The language code in xml is two letter code
+    # Need to determine three letter code for downstream systems
+    # ============================================================
     def getLanguage(self):
         lang = 'en' # default
         if self._xmlAttrs["language"]:
@@ -104,6 +143,10 @@ class etdcomputeValues:
                 return language.alpha_3
         return 'eng'
 
+    # ============================================================
+    # This is record info that becomes part of MARC record
+    # The field implementation is based on input from RM team 
+    # ============================================================
     def computeRecInfo(self):
         # 240507s2021\\\\cau|||||obm\\||||\||eng\d
         # date1 when the record was generated
@@ -122,6 +165,9 @@ class etdcomputeValues:
         self._compAttrs["recinfo"]  = f'{date}s{self._compAttrs["pub_year"]}    cau|||||obm  |||| ||{lang}|d'
         return
 
+    # ============================================================
+    # Title is split into main title and sub title.  
+    # ============================================================
     def splitTile(self, title):
         # need to split at : but only is it is not in middle of bracket
         maintitle = title
@@ -144,6 +190,9 @@ class etdcomputeValues:
 
         return maintitle, subtitle
 
+    # ============================================================
+    # Need to split title and also find out the code to use in Marc
+    # ============================================================
     def computeTitleComps(self):
         print("break the title by colon")
         title = self._xmlAttrs["title"]
@@ -168,6 +217,9 @@ class etdcomputeValues:
         self._compAttrs["titleIndicator"] = titleIndicator
         return
 
+    # ============================================================
+    # Build campus information based on inst code in xml
+    # ============================================================
     def computeCampusInfo(self):
         print("get campus location and name from db")
         schoolcode = self._xmlAttrs["inst_code"]
@@ -179,6 +231,9 @@ class etdcomputeValues:
         self._compAttrs["merrittbucket"] = self._compAttrs["campusshort"] + "_lib_etd"
         return
 
+    # ============================================================
+    # Package the advisor and  committee member info
+    # ============================================================
     def computeNotes(self):
         # need to create notes based on xml info about advisors 
         advisors = "Advisor(s): "
@@ -199,10 +254,17 @@ class etdcomputeValues:
         self._compAttrs["notes"] = notes
         return
 
+    # ============================================================
+    # Really simple task to join abstract lines.
+    # The abstract from xml joined for filling in marc
+    # ============================================================
     def computeAbstract(self):
         self._compAttrs["abstract"] = " ".join(self._xmlAttrs["abstractLines"])
 
 
+    # ============================================================
+    # Need to split title and also find out the code to use in Marc
+    # ============================================================
     def computeAuthorsAdvisor(self):
         # need to compile the list from xml information - lastname, first middle format
         # need a comma at the end for marc record sake
@@ -222,11 +284,17 @@ class etdcomputeValues:
         self._compAttrs["mainauthor"] = f'{self._xmlAttrs["authset"][0]["surname"]},{self._xmlAttrs["authset"][0]["fname"]}'
         return
 
+    # ============================================================
+    # Dept is filled with discipline from xml. 
+    # ============================================================
     def computeDept(self):
         # Start with this and see if something needs to change
         self._compAttrs["dept"] = self._xmlAttrs["discipline"]
         return
 
+    # ============================================================
+    # Authors needs to be formated in eschol specific format
+    # ============================================================
     def getescholAuthors(self):
         authors = []
         for author in self._xmlAttrs["authset"]:
@@ -237,6 +305,9 @@ class etdcomputeValues:
             authors.append(values)
         return authors
 
+    # ============================================================
+    # These are the local ids set for eschol submission
+    # ============================================================
     def getescholIds(self):
         localIds = []
         #API doesn't allow ark
@@ -245,6 +316,12 @@ class etdcomputeValues:
         localIds = {"id": self._xmlAttrs["external_id"], "scheme":"OTHER_ID", "subScheme":"proquest"}
         return localIds
 
+    # ============================================================
+    # Determine the eschol units the ETD needs to be part of. 
+    # Current logic is campus etd unit. There is possiblity of
+    # extending this to add additional units once mapping from
+    # xml info to department unit id is formulated.   
+    # ============================================================
     def getescholunits(self):
         units = []
         # get unit from campus settings
@@ -252,6 +329,9 @@ class etdcomputeValues:
         # inst_contact in xml can be used to determine other units the article should go to
         return units
 
+    # ============================================================
+    # Fill in ADVISOR contributors for eschol deposit package
+    # ============================================================
     def getcontributors(self):
         contribs = []
         # authinfo["middle"]
@@ -263,6 +343,11 @@ class etdcomputeValues:
 
         return contribs
 
+    # ============================================================
+    # The supplementary file info based on xml. The information is
+    # updated with file size when the files are copied to share folder
+    # for API to upload to eschol. 
+    # ============================================================
     def getsupplementaryFiiles(self):
         if not self._xmlAttrs["attachset"]:
             return None
@@ -281,6 +366,9 @@ class etdcomputeValues:
             suppFiles.append(entry)
         return suppFiles
 
+    # ============================================================
+    # Fill in cc license url based on code in xml if present
+    # ============================================================
     def getcclicense(self):
         # get the actual license if present
         if "cclicense" in self._xmlAttrs and self._xmlAttrs["cclicense"]:
@@ -292,6 +380,9 @@ class etdcomputeValues:
 
         return None
 
+    # ============================================================
+    # Compute the values needed for eschol deposit
+    # ============================================================
     def computeEscholValues(self):
         print("compute for eschol deposit json")   
         self._compAttrs["isPeerReviewed"] = True
@@ -305,8 +396,9 @@ class etdcomputeValues:
         self._compAttrs["cclicence"] = self.getcclicense()
         
 
-    # read a marc attr set along with the package id it is associated with
-    # start a json and add the following vales
+    # ============================================================
+    # Perform data info computation and save results in DB
+    # ============================================================
     def saveComputedValues(self):
         print("generate computed values for one record")
         # get the json version of the attrs

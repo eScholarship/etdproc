@@ -3,6 +3,10 @@ import inspect
 import os
 import consts
 
+
+# ============================================================
+# Utility script to convert settings from file to DB entry
+# ============================================================
 def load_module_from_file(file_path):
     module_name = os.path.splitext(os.path.basename(file_path))[0]
     spec = importlib.util.spec_from_file_location(module_name, file_path)

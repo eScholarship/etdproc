@@ -5,6 +5,20 @@ from sickle.models import Record
 from lxml import etree
 from sickle.oaiexceptions import NoRecordsMatch
 
+# ============================================================
+# Class Name: harvertMarc
+# Description:
+#     Harvest OAI feed from ALMA and save new entries
+#
+# Attributes:
+#     packageId (int): Id of the ETD in packages table.
+#
+# Usage:
+#     x = harvertMarc()
+#     x.getFeedAndSave()
+# Notes:
+#     - Uses from data for OAI based on last successfull harvest. 
+# ============================================================
 class harvertMarc:
     _sickle = None
     _listparams = None
