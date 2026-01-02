@@ -23,6 +23,11 @@ class harvertMarc:
     _sickle = None
     _listparams = None
 
+    ########################################
+    #
+    # Loads config info for next Harvest
+    #
+    ########################################
     def __init__(self):
         print("starting")
         self._listparams = {'metadataPrefix' : consts.configs['harvest.prefix'],
@@ -31,6 +36,11 @@ class harvertMarc:
         print(self._listparams)
         self._sickle = Sickle(consts.configs['harvest.url'])
 
+    ########################################
+    #
+    # Harvests and saves new items in DB
+    #
+    ########################################
     def getFeedAndSave(self):
         print("get feed and save")
         records = None

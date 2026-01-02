@@ -4,8 +4,23 @@ import traceback
 from datetime import date
 from pymarc import MARCReader, MARCWriter
 
+
 # ============================================================
-# Uploads consolidated MARC file to OCLC 
+# Class Name: uploadToOCLCftp
+# Description:
+#     Uploads consolidated MARC file to OCLC.
+#
+# Attributes:
+#     packageIds ([]): Ids of the ETD in packages table.
+#
+#
+# Usage:
+#     x = uploadToOCLCftp(packageId)
+#     x._countSent: tells the user count sent 
+#
+# Notes:
+#     - The logic ensures no duplicated record is sent so it 
+#     looks at queuelogs to find out if ETD has already been sent to OCLC
 # ============================================================
 class uploadToOCLCftp:
     _countSent = 0
@@ -20,6 +35,11 @@ class uploadToOCLCftp:
         self.connectAndUpload()
         self._countSent = len(self._combinedIds)
 
+    ########################################
+    #
+    # Combines records and sends consolidated file
+    #
+    ########################################
     def connectAndUpload(self):
         if len(self._packageIds) < 1:
             return
@@ -31,6 +51,11 @@ class uploadToOCLCftp:
         return
         
 
+    ########################################
+    #
+    # Creates consolidated MARC file
+    #
+    ########################################
     def combineMrcFiles(self):
         # Get today's date in YYYYMMDD format
         today_str = date.today().strftime('%Y%m%d')
@@ -56,6 +81,11 @@ class uploadToOCLCftp:
                     self._combinedIds.append(packageid)
             writer.close()
 
+    ########################################
+    #
+    # Copies file to OCLC
+    #
+    ########################################
     def uploadFiles(self, sftp):
         sftp.chdir(consts.configs['oclc_creds.uploaddir']) 
         try:
@@ -75,7 +105,11 @@ class uploadToOCLCftp:
 
 
 
-
+########################################
+#
+# Test for OCLC connection
+#
+########################################
 class uploadToFTP:
     _packageId = None
     _pubnum = None

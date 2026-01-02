@@ -22,6 +22,11 @@ class createMarc:
     _gwattrs = None
     _xmlattrs = None
     _compattrs = None
+    ########################################
+    #
+    # Loads data for the ETD to prepare for MARC
+    #
+    ########################################
     def __init__(self, packageId):
         self._packageId = packageId
         (_,gwAttrs, xmlAttrs, compAttrs) = consts.db.getAttrs(packageId)
@@ -29,6 +34,11 @@ class createMarc:
         self._xmlattrs = json.loads(xmlAttrs)
         self._compattrs = json.loads(compAttrs)
 
+    ########################################
+    #
+    # Update the data by performing configured task
+    #
+    ########################################
     def processvalue(self, value, action):
         if action == "dot":
             return value + '.'
@@ -42,6 +52,12 @@ class createMarc:
             return value.replace('\t', ' ')
         return value
 
+    ########################################
+    #
+    # Some of the data fields in MARC are filled with consts from config
+    # Creates a new field or adds subfields to the supplied field
+    #
+    ########################################
     def generateConst(self, setting, fieldtofill):
         #print("generate a const field")
 
@@ -58,7 +74,6 @@ class createMarc:
         ind2 = " " if setting.indicator2 == "bl" else setting.indicator2
 
         # create a field 
-        # TBD - I need to work on creating one field with multiple subfields
         if fieldtofill:
             #print("filliing")
             fieldtofill.subfields.append(Subfield(code=setting.field, value=value))
@@ -71,7 +86,12 @@ class createMarc:
                         Subfield(code=setting.field, value=value)
                     ])
 
-
+    ########################################
+    #
+    # Most of the data fields in MARC are filled with ETD specific info
+    # Creates a new field or adds subfields to the supplied field
+    #
+    ########################################
     def generateusingAttrs(self, setting, attrs, fieldtofill):
         # if ind1 and ind2 and field are empty - this is a special case
         if not setting.indicator1 and not setting.indicator2 and not setting.field:
@@ -84,8 +104,8 @@ class createMarc:
         if setting.sourcefield not in attrs or attrs[setting.sourcefield] is None:
             print("NOT PRESENT " +  setting.sourcefield)
             return None
+
         # create a field 
-        # TBD - I need to work on creating one field with multiple subfields
         if isinstance(attrs[setting.sourcefield], list):
             fields = []
             assert(not fieldtofill)
@@ -98,6 +118,7 @@ class createMarc:
                             Subfield(code=setting.field, value=value)
                         ])
                 fields.append(field)
+                # special case for 700. Need to add const to ETD attribute
                 if (field.tag == '700'):
                     field.subfields.append(Subfield(code='e', value='degree supervisor.'))
                 
@@ -116,7 +137,11 @@ class createMarc:
                         Subfield(code=setting.field, value=value)
                     ])
 
-
+    ########################################
+    #
+    # Processes the config info and creates const and attr specific fields
+    #
+    ########################################
     def generateFields(self, setting, lastSetting, lastField):
         #print("generate fields")
         # figure out if the last field should be used
@@ -150,6 +175,11 @@ class createMarc:
             return fields
         return None
 
+    ########################################
+    #
+    # Specific flags are set in Leader based on requirements from SILS RM
+    #
+    ########################################
     def fixRecordLeader(self, record):
         #print("fix record leader")
         record.leader[5] = 'n'
@@ -159,7 +189,11 @@ class createMarc:
         record.leader[18] = 'i'
 
 
-    # read silsmarc settings
+    ########################################
+    #
+    # Generates MARC record for one ETD
+    #
+    ########################################
     def generateRecord(self):
         print("generate one record")
         # from pymarc import Record, Field, Subfield
@@ -182,6 +216,12 @@ class createMarc:
         return record
 
 
+    ########################################
+    #
+    # Write one ETD's marc record
+    # Individual items are saved in Merritt and used to create combined record for OCLC
+    #
+    ########################################
     def writeMarcFile(self):
         record = self.generateRecord()
         mrcname =  f'{self._compattrs["campusshort"]}-{self._xmlattrs["pubNumber"]}.mrc'

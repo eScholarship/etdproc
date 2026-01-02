@@ -37,6 +37,11 @@ class etdParseGateway:
         self._pubNumber = consts.db.getPubNumber(packageId)
 
 
+    ########################################
+    #
+    # Calls Gateway and if item found saves in DB
+    #
+    ########################################     
     def process(self):
         assert(self._pubNumber)
         self.getmarc()
@@ -46,6 +51,11 @@ class etdParseGateway:
             return True # was able to retrieve data
         return False
 
+    ########################################
+    #
+    # Calls Gateway for a specific pubnum and check the result to make sure it is thesis record
+    #
+    ########################################  
     def getmarc(self):
         print("generate meta data")
         params = {
@@ -84,6 +94,11 @@ class etdParseGateway:
         # save isbn in identifiers table
         consts.db.saveIdentifier(self._packageId, "ISBN",self._data["isbn"])
 
+    ########################################
+    #
+    # Extracts data from Gateway response
+    #
+    ########################################  
     def extractMarcInfo(self):
         #print("start - extract")
         # have the parsing settings from DB

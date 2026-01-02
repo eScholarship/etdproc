@@ -31,6 +31,11 @@ class OaiUpdate:
     # This was used before to exclude 
     IgnoreKeys = []
     #IgnoreKeys = ["abstract"]
+    ########################################
+    #
+    # Loads the lastest and prior OAI record for diff and identification of the update
+    #
+    ########################################
     def __init__(self, packageid):
         # get all the entries with this package id
         self._entries = consts.db.getlastTwoHarvestEntries(packageid)
@@ -40,6 +45,11 @@ class OaiUpdate:
         self._escholValues = {}
         self._oaiattrs = []
 
+    ########################################
+    #
+    # Finds the metadata to diff and marks the item for oaioverride
+    #
+    ########################################
     def process(self):       
         if len(self._entries) == 0:
              raise Exception("No harvest entry found!")
@@ -60,6 +70,11 @@ class OaiUpdate:
         consts.db.markOaiProcessed(self._entries[0].identifier, self._entries[0].datestamp)
         return
 
+    ########################################
+    #
+    # Finds the metadata to diff and marks the item for oaioverride
+    #
+    ########################################
     def saveInMerritt(self):
         print("save xml in Merritt")
         (_, _, attrs) = consts.db.getCompAttrs(self._packageid)
@@ -69,7 +84,11 @@ class OaiUpdate:
         y.sendXmlToMerritt(marcxml)
         return
 
-
+    ########################################
+    #
+    # Saves oaioverride info that is used for ReplacementMetadata call to eschol
+    #
+    ########################################
     def addOaiOverride(self):
         print("add OAI override")
 
@@ -86,7 +105,11 @@ class OaiUpdate:
             return self.fillOverrides()
         return False
 
-
+    ########################################
+    #
+    # Normalize before comparing
+    #
+    ########################################
     def areValuesDifferent(self, key):
         if self._newValues[key] == None and self._oldValues[key] == None:
             return False
@@ -107,6 +130,11 @@ class OaiUpdate:
         text = re.sub(r'\s+', ' ', text)     # Collapse whitespace
         return text.strip()
 
+    ########################################
+    #
+    # Transforms data from OAI item to eschol format
+    #
+    ########################################
     def fillOverrides(self):
         print("fill the overrides")
         # need to look at the settings to see 
@@ -120,6 +148,11 @@ class OaiUpdate:
             return True
         return False
 
+    ########################################
+    #
+    # Processes incoming OAI data to create data for eschol
+    #
+    ########################################
     def addEscholValue(self, setting):
         value = self._newValues[setting.destfield]
         if value is None:
@@ -142,6 +175,11 @@ class OaiUpdate:
         self._escholValues[setting.escholfield] = value
         return
 
+    ########################################
+    #
+    # Formats authors data for eschol
+    #
+    ########################################
     def getNameparts(self, setting, value):
         result = []
         if setting.destfield == "authors":

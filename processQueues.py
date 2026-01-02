@@ -114,7 +114,7 @@ class processQueueImpl:
                 print(callstack)
                 print(e)
                 consts.db.saveQueueStatus(packageid, "parse-error")
-            # TBD - error case
+
 
     def processFetched(self):
         # extract these
@@ -131,7 +131,7 @@ class processQueueImpl:
                 print(callstack)
                 print(e)
                 consts.db.saveQueueStatus(packageid, "fetch-error")
-            # TBD - error case
+
 
     def processExtracted(self):
         # extract these
