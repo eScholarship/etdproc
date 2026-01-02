@@ -1,7 +1,11 @@
 
 # ETD processor
 
-ETD processor ingests incoming ETD packages from **ProQuest** and deposits them into **Merritt**, **eScholarship**, and the **Systemwide ILS**.
+ETD processor ingests incoming ETD packages from **ProQuest** and deposits them into **Merritt**, **eScholarship**, and the **Systemwide ILS**. 
+
+The ETD Processing (etdproc) system is a modular pipeline designed to ingest, normalize, enrich, and distribute Electronic Theses and Dissertations (ETDs) across multiple downstream systems, including Merritt, eScholarship, and the UC Libraries’ Systemwide ILS/Alma environment. The architecture emphasizes clear separation of concerns, with each subsystem handling a distinct phase of the workflow while sharing common utilities for configuration, database access, and metadata transformation.
+
+At a high level, the system operates as a data‑processing conveyor belt: ETD packages arrive from sources such as ProQuest or campus gateways, move through a series of validation and enrichment steps, and are ultimately deposited into preservation and discovery platforms.
 
 
 ## 🚀 Run Instructions
@@ -79,6 +83,69 @@ ALMA OAI → ETD Proc → Merritt, eScholarship
 | File | Description |
 |------|-------------|
 | `processQueues.py` | Processes internal job queues for ETD workflows. |
+
+## 📊 Architectural Diagram (Text‑Based)
+
+```
+                          +-----------------------------+
+                          |     ETD Processing System   |
+                          |           (etdproc)         |
+                          +--------------+--------------+
+                                         |
+                                         v
+                         +---------------+----------------+
+                         |     Core Pipeline Orchestration|
+                         |  (controller.py, processQueue.py)   |
+                         +---------------+----------------+
+                                         |
+      -----------------------------------------------------------------------------------
+      |                 |                         |                         |           |
+      v                 v                         v                         v           v
+
++-----------+   +------------------+    +--------------------+    +----------------+   +----------------+
+|  Ingest   |   |  Metadata Parsing|    |  Metadata Enrichment|    |  Queue Engine |   | Configuration  |
+|  Sources  |   |  & Normalization |    |  & Mapping          |    | processQueues |   |  & Database    |
++-----------+   +------------------+    +--------------------+    +----------------+   +----------------+
+| - ProQuest|   | - parseXml.py    |    | - computeValues.py |    |  Automated job |   | - configDb.py |
+|   getPQ   |   | - parseGateway   |    | - maps.py          |    |  routing       |   | - dbIntf.py   |
+| - Gateway |   | - processOai     |    | - consts.py        |    |                |   |               |
+| - OAI-PMH |   | - oaiupdate      |    |                    |    |                |   |               |
++-----------+   +------------------+    +--------------------+    +----------------+   +----------------+
+
+      |                 |                         |                         |           |
+      -----------------------------------------------------------------------------------
+                                         |
+                                         v
+                         +---------------+----------------+
+                         |     Output & Distribution      |
+                         +---------------+----------------+
+                                         |
+      -----------------------------------------------------------------------------------
+      |                 |                         |                         |           
+      v                 v                         v                         v           
+
++----------------+  +------------------+   +---------------------+   +----------------------+
+|  Merritt Repo  |  |  eScholarship    |   |  Library Systems    |   |  MARC / Cataloging   |
+| Preservation   |  |  Deposit         |   |  (SILS / Alma)      |   |       |
++----------------+  +------------------+   +---------------------+   +----------------------+
+| - sendToMerritt|  | - depositToEschol|   | - sendToSILS.py     |   | - generateMarc.py     |
+| - getFromMerritt| | - escholClient   |   | - oclctoAlma.py     |   |                      |
+| - fillMerrittArk| |                  |   |                     |   |                      |
+| - reprocessMCLog| |                  |   |                     |   |                      |
++----------------+  +------------------+   +---------------------+   +----------------------+
+
+```
+
+---
+
+### 📘 How to Read This Diagram
+
+- **Top layer**: The orchestrator that drives the entire ETD workflow.  
+- **Middle layer**: Ingest, parsing, enrichment, configuration, and queue automation.  
+- **Bottom layer**: Final distribution to preservation, discovery, and library systems.  
+- Arrows show the general direction of data flow from ingest → processing → distribution.
+
+
 
 
 
