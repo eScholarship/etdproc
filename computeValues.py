@@ -3,7 +3,7 @@ import json
 import dateparser
 import consts
 from datetime import datetime, date, timedelta
-from maps import cc_url_mapping
+from maps import cc_url_mapping, marc_language_overrides
 from urllib.parse import quote
 import pycountry
 
@@ -140,6 +140,9 @@ class etdcomputeValues:
             language = pycountry.languages.get(alpha_2=lang)
             if language:
                 self._compAttrs["languages"] = language.name
+                # MARC expects older three letter code in some case. Override if such case is detected
+                if lang in marc_language_overrides:
+                    return marc_language_overrides[lang]
                 return language.alpha_3
         return 'eng'
 
@@ -420,3 +423,6 @@ class etdcomputeValues:
 
 #x = "this is the link with space"
 #print(quote(x))
+
+# x = etdcomputeValues(17)
+# x.saveComputedValues()

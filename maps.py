@@ -94,3 +94,20 @@ cc_url_mapping = {
         'cc by-nd':'https://creativecommons.org/licenses/by-nd/4.0/',
         'cc by-sa':'https://creativecommons.org/licenses/by-sa/4.0/'
 		}
+
+marc_language_overrides = {
+    "zh": "chi",
+    "cs": "cze",
+    "de": "ger",
+    "el": "gre",
+    "is": "ice",
+    "mk": "mac",
+    "mi": "mao",
+    "ms": "may",
+    "fa": "per",
+    "ro": "rum",
+    "sk": "slo",
+    "bo": "tib",
+    "cy": "wel",
+}
+
