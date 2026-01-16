@@ -191,7 +191,7 @@ class OaiUpdate:
         namelist = value.split(firstsep)
         for name in namelist:
             x = {}
-            x["nameparts"] = self.splitNameparts(name)
+            x["nameParts"] = self.splitNameparts(name)
             if setting.destfield == "advisor":
                 x["role"] = "ADVISOR"
 
