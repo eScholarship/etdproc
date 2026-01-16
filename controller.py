@@ -32,7 +32,7 @@ class Controller:
         self.OaiHarvest()
         x = processQueueImpl() 
         x.processQueue()
-        consts.db.printqueryQueueCounts()
+        
 
 
     # ============================================================
@@ -136,8 +136,15 @@ class Controller:
                     print(f"Deleted: {dir_path}")
                 except Exception as e:
                     print(f"Failed to delete {dir_path}: {e}")
+
+    # ============================================================
+    # Print Queue state
+    # ============================================================
+    def printQueueState(self):
+        consts.db.printqueryQueueCounts()
         
 # Create the controller to build queue and process all
 c = Controller()
 c.purgeExtracted()
+c.printQueueState()
 
