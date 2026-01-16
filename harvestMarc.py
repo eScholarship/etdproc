@@ -53,8 +53,8 @@ class harvertMarc:
         # Iterate through records and print basic info
         for i, record in enumerate(records):
             print(f"\nRecord #{i+1}")
-            print("Identifier:", record.header.identifier)
-            print("Datestamp:", record.header.datestamp)
+            #print("Identifier:", record.header.identifier)
+            #print("Datestamp:", record.header.datestamp)
             oaiid = record.header.identifier
             stamp = record.header.datestamp.strip('Z')
             if record.header.deleted:

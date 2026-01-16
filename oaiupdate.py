@@ -177,30 +177,53 @@ class OaiUpdate:
 
     ########################################
     #
-    # Formats authors data for eschol
+    # Formats authors and advisor data for eschol
     #
     ########################################
     def getNameparts(self, setting, value):
         result = []
+        # author names are in normal format. Multiple names are separated by comma
         if setting.destfield == "authors":
             firstsep = ","
-            secondsep = " "
-        else:
+        else: 
             firstsep = ";"
-            secondsep = ","
 
         namelist = value.split(firstsep)
         for name in namelist:
-            splitname = name.split(secondsep)
-            x = {"nameparts": ""}
-            if setting.destfield == "authors":
-                x["nameparts"] = {"fname":splitname[0].strip(',.'),"lname":splitname[1].strip(',.')}
-            else:
-                x["nameparts"] = {"fname":splitname[1].strip(',.'),"lname":splitname[0].strip(',.')}
+            x = {}
+            x["nameparts"] = self.splitNameparts(name)
+            if setting.destfield == "advisor":
                 x["role"] = "ADVISOR"
 
             result.append(x)
         return result
 
-# x = OaiUpdate(2151)
+    
+    ########################################
+    #
+    # parse name parts
+    #
+    ########################################
+    def splitNameparts(self, raw):
+        parts = [p.strip(" ,.") for p in raw.split(",") if p.strip(" ,.")]
+        nameparts = {}
+
+        if len(parts) == 1:
+            # No comma found hence treat like normal name
+            sub = parts[0].split()
+            nameparts["lname"] = sub[-1]
+            nameparts["fname"] = sub[0]
+            nameparts["mname"] = " ".join(sub[1:-1])
+
+        else:
+            # Comma format: Last, First Middle
+            lname = parts[0]
+            rest = parts[1].split()
+
+            nameparts["lname"] = lname
+            nameparts["fname"] = rest[0] if rest else ""
+            nameparts["mname"] = " ".join(rest[1:]) if len(rest) > 1 else ""
+        return nameparts
+
+# x = OaiUpdate(55)
 # x.process()

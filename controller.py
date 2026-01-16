@@ -32,6 +32,8 @@ class Controller:
         self.OaiHarvest()
         x = processQueueImpl() 
         x.processQueue()
+        consts.db.printqueryQueueCounts()
+
 
     # ============================================================
     # Grab the incoming ProQuest packages and add to queue for further processing

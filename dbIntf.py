@@ -37,6 +37,7 @@ class etdDb:
     queryHarvestEntries = "select identifier, datestamp, attrs, isProcessed from harvestlog where packageId = {param} and isInvalid = False order by datestamp desc limit 2"
     queryOaiOverride = "select escholattrs from oaioverride where packageId = {param} order by actionTime desc limit 1"
     querydonefolders = "select zipname from packages where id in (select packageId from queues where queuename = 'done' and actionTime < NOW() - INTERVAL 30 DAY);"
+    queryQueueCounts = "select queuename, count(*) from queues group by queuename"
     insertPackage = "insert into packages (pubnum, zipname, campusId) VALUES ('{param1}','{param2}', {param3}) "
     insertMerrittRequest = "insert into merrittrequests (packageId, request, response, currentstatus) VALUES ({param1},'{param2}','{param3}','{param4}') "
     insertEscholRequest = "insert into escholrequests (packageId, escholId) VALUES ({param1},'{param2}')"
@@ -637,7 +638,18 @@ class etdDb:
             folder.append(row[0])
         return folder
 
-#x = etdDb()
+    # ============================================================
+    # Print the current state of queues
+    # ============================================================   
+    def printqueryQueueCounts(self):
+        print("Queue State")
+        self.cursor.execute(self.queryQueueCounts)
+        for row in self.cursor:
+            print(row)
+
+
+# x = etdDb()
+# x.printqueryQueueCounts()
 #x.saveQueueLog(1,"eschol")
 #x.saveEscholRequest(1, '{"X":"Y"}')
 #x.saveGwMetadata(1, '{"X":"Y"}')

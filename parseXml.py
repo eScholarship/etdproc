@@ -182,7 +182,7 @@ class etdParseXml:
         return
 
     def addRights(self):
-        print("add rights")
+        #print("add rights")
         repo = self._xpatheval("/DISS_submission/DISS_repository")[0]
         self._data["agreement_decision_date"] = self.getFirstValue(repo, "DISS_agreement_decision_date")
         self._data["repo_acceptance"] = self.getFirstValue(repo, "DISS_acceptance")

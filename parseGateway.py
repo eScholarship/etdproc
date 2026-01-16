@@ -30,7 +30,7 @@ class etdParseGateway:
     gwSettings = None
     # this needs to take packageId instead and obtain corresponding pubnum
     def __init__(self, packageId):
-        print("get gw info")
+        #print("get gw info")
         self._data = {}
         self._record = None
         self._packageId = packageId
@@ -57,7 +57,7 @@ class etdParseGateway:
     #
     ########################################  
     def getmarc(self):
-        print("generate meta data")
+        #print("generate meta data")
         params = {
             'operation': 'searchRetrieve',
             'version': '1.2',
