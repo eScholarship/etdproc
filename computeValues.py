@@ -67,7 +67,7 @@ class etdcomputeValues:
             decision = date.today()
          # if data is Jan 1st - change to Dec 31st
         if decision.month == 1 and decision.day == 1:
-            decision = datetime.date(decision.year, 12, 31)
+            decision = date(decision.year, 12, 31)
 
         return decision
 
