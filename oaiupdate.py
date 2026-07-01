@@ -63,7 +63,7 @@ class OaiUpdate:
             if self.addOaiOverride():
                 print("Found actionble change")
                 self.saveInMerritt()
-                consts.db.saveQueueStatus(self._packageid, "oaioverride")
+                consts.db.saveQueueStatus(self._packageid, "remeta")
             else:
                 consts.db.saveQueueStatus(self._packageid, "done")
 
